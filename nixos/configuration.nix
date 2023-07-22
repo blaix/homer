@@ -119,6 +119,35 @@ with lib;
 
     programs.helix = {
       enable = true;
+      settings = {
+        editor = {
+          auto-format = true;
+          cursor-shape = {
+            insert = "bar";
+            normal = "block";
+            select = "underline";
+          };
+        };
+        keys = {
+          normal = {
+            esc = [
+              "collapse_selection"
+              "keep_primary_selection"
+            ];
+            "C-[" = [
+              "collapse_selection"
+              "keep_primary_selection"
+            ];
+          };
+          insert = {
+            # ctrl-[ doesn't act as escape in helix :(
+            # https://github.com/helix-editor/helix/issues/6551
+            "C-[" = [
+              "normal_mode"
+            ];
+          };
+        };
+      };
     };
   };
   
