@@ -66,6 +66,7 @@ with lib;
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    bat
     diff-so-fancy
     git
     gnumake
@@ -90,6 +91,7 @@ with lib;
         EDITOR = "hx";
       };
       shellAliases = {
+        cat = "bat";
         s = "git st";
         b = "git b";
         d = "git d";
