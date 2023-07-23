@@ -120,8 +120,10 @@ with lib;
     programs.helix = {
       enable = true;
       settings = {
+        theme = "dracula";
         editor = {
           auto-format = true;
+          true-color = true;
           cursor-shape = {
             insert = "bar";
             normal = "block";
