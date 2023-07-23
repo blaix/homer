@@ -71,6 +71,7 @@ with lib;
     gnumake
     helix
     man
+    tmux
     vim
   ];
  
@@ -150,6 +151,11 @@ with lib;
           };
         };
       };
+    };
+
+    programs.tmux = {
+      enable = true;
+      prefix = "C-a";
     };
   };
   
