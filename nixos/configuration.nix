@@ -68,6 +68,7 @@ with lib;
   environment.systemPackages = with pkgs; [
     bat
     diff-so-fancy
+    direnv
     git
     gnumake
     helix
@@ -96,6 +97,11 @@ with lib;
         b = "git b";
         d = "git d";
       };
+    };
+
+    programs.direnv = {
+      enable = true;
+      enableBashIntegration = true;
     };
 
     programs.git = {
