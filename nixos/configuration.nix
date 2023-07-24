@@ -138,6 +138,11 @@ with lib;
             normal = "block";
             select = "underline";
           };
+          gutters = [
+            "diagnostics"
+            "line-numbers"
+            "spacer"
+          ];
         };
         keys = {
           normal = {
