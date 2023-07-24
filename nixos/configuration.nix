@@ -169,6 +169,33 @@ with lib;
     programs.tmux = {
       enable = true;
       prefix = "C-a";
+      extraConfig = ''
+        set -g default-terminal "xterm-256color"
+        # Prevent delay when hitting esc
+        set -g escape-time 10
+        # Switch to last window with ctrl-a, just like screen
+        bind-key C-a last-window
+        # Send a literal ctrl-a with c-a a
+        bind a send-keys C-a
+        # Set status bar
+        set -g status-bg black
+        set -g status-fg white
+        set -g status-right '"#H" %a %b-%d %I:%M%p'
+        # Lots of room for long session names
+        set -g status-left-length 30
+        # Big history
+        set-option -g history-limit 9000
+        # Use vim movements to move around panes
+        bind h select-pane -L
+        bind j select-pane -D
+        bind k select-pane -U
+        bind l select-pane -R
+        # Use capital vim movements to resize panes
+        bind J resize-pane -D 2
+        bind K resize-pane -U 2
+        bind H resize-pane -L 2
+        bind L resize-pane -R 2
+      '';
     };
   };
   
