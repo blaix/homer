@@ -111,7 +111,6 @@ in
       enable = true;
       userName = "Justin Blake";
       userEmail = "justin@blaix.com";
-      diff-so-fancy.enable = true;
       aliases = {
         b = "branch";
         d = "diff";
