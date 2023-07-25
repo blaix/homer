@@ -7,9 +7,14 @@ Assumes a vm set up via [OrbStack](https://orbstack.dev/).
 ### New setup
 
 ```bash
+# clone the repo and run setup
 nix --extra-experimental-features nix-command --extra-experimental-features flakes run nixpkgs#git clone git@github.com:blaix/homer.git
 cd homer/nixos
 ./run.sh
+
+# reload shell environment
+exit
+ssh orb
 ```
 
 If the git clone fails with a key error,
