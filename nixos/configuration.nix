@@ -76,6 +76,7 @@ in
     gnumake
     helix
     man
+    neovim
     tmux
     vim
   ];
