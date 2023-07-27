@@ -72,12 +72,15 @@ in
     bat
     diff-so-fancy
     direnv
+    gcc
     git
     gnumake
     helix
     man
     neovim
+    nodejs
     tmux
+    unzip
     vim
   ];
  
@@ -93,10 +96,15 @@ in
     programs.bash = {
       enable = true;
       sessionVariables = {
-        EDITOR = "hx";
+        EDITOR = "nvim";
       };
       shellAliases = {
         cat = "bat";
+        vim = "nvim";
+
+        # git stuff
+        gfo = "git fetch origin";
+	gmo = "git merge --ff-only origin/main";
         s = "git st";
         b = "git b";
         d = "git d";
@@ -200,8 +208,19 @@ in
         bind L resize-pane -R 2
       '';
     };
+
+    xdg.configFile = {
+      "nvim" = {
+        enable = true;
+        recursive = true;
+        source = builtins.fetchGit {
+          url = https://github.com/NvChad/NvChad;
+          
+        };
+      };
+    };
   };
-  
+
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
