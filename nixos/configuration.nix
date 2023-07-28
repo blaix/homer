@@ -90,6 +90,10 @@ in
     "flakes"
   ];
 
+  # https://nixos.wiki/wiki/Command_Shell
+  programs.zsh.enable = true;
+  users.defaultUserShell = pkgs.zsh;
+
   home-manager.users.justin = {
     home.stateVersion = "23.05";
 
@@ -104,7 +108,7 @@ in
 
         # git stuff
         gfo = "git fetch origin";
-	gmo = "git merge --ff-only origin/main";
+        gmo = "git merge --ff-only origin/main";
         s = "git st";
         b = "git b";
         d = "git d";
@@ -207,6 +211,38 @@ in
         bind H resize-pane -L 2
         bind L resize-pane -R 2
       '';
+    };
+
+    programs.zsh = {
+      enable = true;
+      sessionVariables = {
+        EDITOR = "nvim";
+      };
+      shellAliases = {
+        cat = "bat";
+        vim = "nvim";
+        # git aliases
+        gfo = "git fetch origin";
+        gmo = "git merge --ff-only origin/main";
+        s = "git st";
+        b = "git b";
+        d = "git d";
+      };
+      oh-my-zsh = {
+        enable = true;
+      };
+      plugins = [
+        { name = "powerlevel10k";
+          src = pkgs.zsh-powerlevel10k;
+          file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
+        }
+        { name = "powerlevel10k-config";
+          # To generate a new config, run `p10k configure`
+          # Then `mv ~/.p10k.zsh` to `homer/zsh/p10k/`
+          src = ../zsh/p10k;
+          file = "p10k.zsh";
+        }
+      ];
     };
 
     xdg.configFile = {
