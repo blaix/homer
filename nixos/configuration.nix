@@ -138,6 +138,9 @@ in
         init = {
           defaultBranch = "main";
         };
+        pager = {
+          branch = false;
+        };
       };
     };
 
