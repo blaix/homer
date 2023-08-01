@@ -21,12 +21,11 @@ ssh orb
 
 If the git clone fails with a key error,
 orbstack may not have linked them,
-and you'll need to do it manually:
+and you'll need to do it manually, e.g.:
 
 ```bash
-cd
-ln -s /mnt/mac/Users/justin/.ssh/id_rsa ./
-ln -s /mnt/mac/Users/justin/.ssh/id_rsa.pub ./
+ln -s /mnt/mac/Users/justin/.ssh/id_rsa /home/justin/.ssh/id_rsa
+ln -s /mnt/mac/Users/justin/.ssh/id_rsa.pub /home/justin/.ssh/id_rsa.pub
 ```
 
 ### Existing setup
