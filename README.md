@@ -42,7 +42,7 @@ orb create nixos # followed by optional vm name
 ssh orb # or ssh my-vm-name@orb
 
 # clone the repo and run setup
-nix --extra-experimental-features nix-command --extra-experimental-features flakes run nixpkgs#git clone git@github.com:blaix/homer.git
+nix --extra-experimental-features nix-command --extra-experimental-features flakes run nixpkgs#git clone git@codeberg.org:blaix/homer.git
 cd homer/nixos
 ./run.sh
 
