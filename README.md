@@ -1,13 +1,45 @@
 # System configuration files
 
-## NixOs
+Focused on managing a mac with nix for now.
 
-Assumes a vm set up via [OrbStack](https://orbstack.dev/).
+## Host system: nix-darwin
+
+Base system config and packages for a mac via [nix-darwin](https://github.com/LnL7/nix-darwin).
+
+### New setup
+
+- [Install nix](https://github.com/NixOS/nix#installation)
+- [Install nix-darwin](https://github.com/LnL7/nix-darwin#installing)
+
+Then:
+
+```
+cd
+
+# clone the repo and run setup
+nix --extra-experimental-features nix-command --extra-experimental-features flakes run nixpkgs#git clone git@codeberg.org:blaix/homer.git
+cd homer/nix-darwin
+./run.sh
+```
+
+Then open a new terminal to reload the shell environment.
+
+### Existing setup
+
+```bash
+cd ~/homer/nix-darwin
+make
+```
+
+## NixOS VMs
+
+Full NixOs running in [OrbStack](https://orbstack.dev/) VM for dev envirnments and testing.
 
 ### New setup
 
 ```bash
-ssh orb
+orb create nixos # followed by optional vm name
+ssh orb # or ssh my-vm-name@orb
 
 # clone the repo and run setup
 nix --extra-experimental-features nix-command --extra-experimental-features flakes run nixpkgs#git clone git@github.com:blaix/homer.git
