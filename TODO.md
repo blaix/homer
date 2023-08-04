@@ -9,3 +9,4 @@
 - [ ] Extract shared system pkgs while retaining ability to install per-machine pkgs
 - [ ] Tiling WM like https://github.com/koekeishiya/yabai on Mac?
 - [ ] Github mirror
+- [ ] Switch to a Flakes setup?
