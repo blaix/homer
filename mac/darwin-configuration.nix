@@ -56,6 +56,8 @@ in
     remapCapsLockToControl = true;
   };
 
+  # For available options / examples, see:
+  # https://github.com/LnL7/nix-darwin/blob/master/tests/system-defaults-write.nix
   system.defaults = {
     dock = {
       autohide = true;
@@ -66,6 +68,8 @@ in
     };
     NSGlobalDomain = {
       AppleKeyboardUIMode = 3; # full keyboard access
+      InitialKeyRepeat = 10;
+      KeyRepeat = 2;
     };
     CustomUserPreferences = {
       "com.apple.controlcenter" = {
