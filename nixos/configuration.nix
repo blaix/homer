@@ -67,24 +67,6 @@ in
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
   };
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    bat
-    diff-so-fancy
-    direnv
-    gcc
-    git
-    gnumake
-    helix
-    man
-    neovim
-    nodejs
-    tmux
-    unzip
-    vim
-  ];
- 
   # https://nixos.wiki/wiki/Command_Shell
   programs.zsh.enable = true;
   users.defaultUserShell = pkgs.zsh;

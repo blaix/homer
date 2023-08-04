@@ -23,7 +23,7 @@ cd homer/nix-darwin
 ```
 
 Then close the apple terminal and open `/Applications/Nix Apps/iTerm2.app`.
-Go to Settings -> Profiles -> Default -> Text and set Font to `MesloLGS NF`.
+Go to Settings -> Profiles -> Default -> Text and set Font to `Hack Nerd Font`.
 
 ### Existing setup
 
