@@ -18,7 +18,7 @@ in
       /etc/nixos/orbstack.nix
       # https://nixos.wiki/wiki/Home_Manager
       (import "${home-manager}/nixos")
-      ../default.nix
+      ../shared.nix
     ];
 
   # networking.hostName = mkForce "nixos"; # Overwrite the hostname.

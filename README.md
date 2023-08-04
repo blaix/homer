@@ -2,7 +2,7 @@
 
 Focused on managing a mac with nix for now.
 
-## Host system: nix-darwin
+## Mac
 
 Base system config and packages for a mac via [nix-darwin](https://github.com/LnL7/nix-darwin).
 
@@ -18,7 +18,7 @@ cd
 
 # clone the repo and run setup
 nix --extra-experimental-features nix-command --extra-experimental-features flakes run nixpkgs#git clone git@codeberg.org:blaix/homer.git
-cd homer/nix-darwin
+cd homer/mac
 ./run.sh
 ```
 
@@ -28,7 +28,7 @@ Go to Settings -> Profiles -> Default -> Text and set Font to `Hack Nerd Font`.
 ### Existing setup
 
 ```bash
-cd ~/homer/nix-darwin
+cd ~/homer/mac
 make
 ```
 

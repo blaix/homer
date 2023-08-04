@@ -6,7 +6,7 @@ in
 {
   imports = [
     (import "${home-manager}/nix-darwin")
-    ../default.nix
+    ../shared.nix
   ];
 
   users.users.justin = {

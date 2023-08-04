@@ -1,5 +1,5 @@
-- [ ] Rename nix-darwin to mac
-- [ ] Rename default.nix to shared.nix
+- [x] Rename nix-darwin to mac
+- [x] Rename default.nix to shared.nix
 - [ ] Fix annoying `#` jumping to beginning of line in vim
 - [ ] Dock hiding
 - [ ] Firefox on mac
