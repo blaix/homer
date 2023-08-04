@@ -13,6 +13,24 @@ in
     name = "justin";
     home = "/Users/justin";
   };
+
+  homebrew = {
+    enable = true;
+    onActivation = {
+      autoUpdate = true;
+      # remove all homebrew-installed things not listed here 
+      cleanup = "zap";
+    };
+    # Find casks at https://formulae.brew.sh/cask/
+    casks = [
+      # "1password"
+      # "amethyst"
+      # "firefox"
+      "iterm2"
+      # "slack"
+      # "thunderbird"
+    ];
+  };
   
   # Use a custom configuration.nix location.
   # $ darwin-rebuild switch -I darwin-config=$HOME/.config/nixpkgs/darwin/configuration.nix

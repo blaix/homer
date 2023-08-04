@@ -171,6 +171,9 @@
       };
       oh-my-zsh = {
         enable = true;
+        plugins = [
+          "brew"
+        ];
       };
       plugins = [
         { name = "powerlevel10k";
