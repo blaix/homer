@@ -1,5 +1,0 @@
-- [ ] Fix lib.modules.defaultPriority deprecation warning
-- [ ] Increase key repeat rate and decrease delay to repeat
-- [ ] Remove need for passwd on rebuild?
-- [ ] Extract shared system pkgs
-- [ ] Tiling WM like https://github.com/koekeishiya/yabai
