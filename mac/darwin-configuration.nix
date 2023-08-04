@@ -64,6 +64,11 @@ in
       "com.apple.controlcenter" = {
         Bluetooth = 18; # show in menu bar
       };
+      "com.microsoft.VSCode" = {
+        # Enable key-repeat on hold in vim mode
+        # https://vimforvscode.com/enable-key-repeat-vim
+        ApplePressAndHoldEnabled = false;
+      };
     };
   };
 
