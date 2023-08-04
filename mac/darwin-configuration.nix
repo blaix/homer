@@ -60,6 +60,9 @@ in
       autohide = true;
       mru-spaces = false; # don't auto-rearrange spaces
     };
+    spaces = {
+      spans-displays = true; # all displays in one space
+    };
     NSGlobalDomain = {
       AppleKeyboardUIMode = 3; # full keyboard access
     };
