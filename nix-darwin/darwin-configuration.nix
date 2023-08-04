@@ -1,13 +1,36 @@
 { config, pkgs, ... }:
 
+let 
+  home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-23.05.tar.gz"; 
+in
 {
+  imports = [
+    (import "${home-manager}/nix-darwin")
+    ../default.nix
+  ];
+
+  users.users.justin = {
+    name = "justin";
+    home = "/Users/justin";
+  };
+  
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
+    bat
+    diff-so-fancy
+    direnv
+    gcc
     git
     gnumake
+    iterm2
+    man
+    neovim
+    tmux
+    unzip
     vim
   ];
+
 
   # Use a custom configuration.nix location.
   # $ darwin-rebuild switch -I darwin-config=$HOME/.config/nixpkgs/darwin/configuration.nix
