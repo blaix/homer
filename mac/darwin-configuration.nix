@@ -30,6 +30,7 @@ in
       "obsidian"
       "slack"
       "thunderbird"
+      "visual-studio-code"
     ];
   };
 
