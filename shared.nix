@@ -6,10 +6,10 @@
     "flakes"
   ];
 
-  # List packages installed in system profile. To search by name, run:
+  # System-level packages to install. Try to keep these to cli packages only
+  # and use machine-specific modules for dessktop applications.
+  # To search available packages by name, run:
   # $ nix-env -qaP | grep wget
-  # Note: .app files that would normally be under "/Applications"
-  # will be under a "/Applications/Nix Apps" symlink to the nix store.
   environment.systemPackages = with pkgs; [
     bat
     diff-so-fancy
