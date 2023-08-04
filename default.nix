@@ -5,6 +5,13 @@
     "nix-command"
     "flakes"
   ];
+
+  fonts = {
+    fontDir.enable = true;
+    fonts = [
+      pkgs.meslo-lgs-nf
+    ];
+  };
   
   home-manager.users.justin = {
     home.stateVersion = "23.05";

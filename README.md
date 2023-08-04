@@ -22,7 +22,8 @@ cd homer/nix-darwin
 ./run.sh
 ```
 
-Then open a new terminal to reload the shell environment.
+Then close the apple terminal and open `/Applications/Nix Apps/iTerm2.app`.
+Go to Settings -> Profiles -> Default -> Text and set Font to `MesloLGS NF`.
 
 ### Existing setup
 

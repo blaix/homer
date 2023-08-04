@@ -16,6 +16,8 @@ in
   
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
+  # Note: .app files that would normally be under "/Applications"
+  # will be under a "/Applications/Nix Apps" symlink to the nix store.
   environment.systemPackages = with pkgs; [
     bat
     diff-so-fancy
@@ -30,7 +32,6 @@ in
     unzip
     vim
   ];
-
 
   # Use a custom configuration.nix location.
   # $ darwin-rebuild switch -I darwin-config=$HOME/.config/nixpkgs/darwin/configuration.nix
