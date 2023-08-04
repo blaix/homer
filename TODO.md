@@ -1,12 +1,12 @@
 - [ ] Rename nix-darwin to mac
 - [ ] Rename default.nix to shared.nix
+- [ ] Fix annoying `#` jumping to beginning of line in vim
 - [ ] Dock hiding
 - [ ] Firefox on mac
 - [ ] Dracula or catpuccino theme for iTerm2?
 - [ ] Fix lib.modules.defaultPriority deprecation warning on darwin
 - [ ] Increase key repeat rate and decrease delay to repeat on darwin
 - [ ] Remove need for passwd on darwin-rebuild. Can/should I run it with sudo?
-- [ ] Extract shared system pkgs while retaining ability to install per-machine pkgs
-- [ ] Tiling WM like https://github.com/koekeishiya/yabai on Mac?
+- [ ] Tiling WM like https://github.com/koekeishiya/yabai on Mac? amethyst?
 - [ ] Github mirror
 - [ ] Switch to a Flakes setup?
