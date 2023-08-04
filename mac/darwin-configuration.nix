@@ -24,7 +24,7 @@ in
     # Find casks at https://formulae.brew.sh/cask/
     casks = [
       "1password"
-      # "amethyst"
+      "amethyst"
       "firefox"
       "iterm2"
       "slack"
@@ -56,6 +56,10 @@ in
   };
 
   system.defaults = {
+    dock = {
+      autohide = true;
+      mru-spaces = false; # don't auto-rearrange spaces
+    };
     NSGlobalDomain = {
       AppleKeyboardUIMode = 3; # full keyboard access
     };
