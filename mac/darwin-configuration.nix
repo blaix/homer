@@ -53,10 +53,14 @@ in
     remapCapsLockToControl = true;
   };
 
-  system.defaults.CustomUserPreferences = {
-    "com.apple.controlcenter" = {
-      # show bluetooth in menu bar
-      "Bluetooth" = 18;
+  system.defaults = {
+    NSGlobalDomain = {
+      AppleKeyboardUIMode = 3; # full keyboard access
+    };
+    CustomUserPreferences = {
+      "com.apple.controlcenter" = {
+        Bluetooth = 18; # show in menu bar
+      };
     };
   };
 
