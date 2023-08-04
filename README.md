@@ -22,7 +22,7 @@ cd homer/mac
 ./run.sh
 ```
 
-Then close the apple terminal and open `/Applications/Nix Apps/iTerm2.app`.
+Then close the apple terminal and open iTerm2.
 Go to Settings -> Profiles -> Default -> Text and set Font to `Hack Nerd Font`.
 
 ### Existing setup
