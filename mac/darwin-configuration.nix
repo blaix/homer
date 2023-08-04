@@ -23,15 +23,15 @@ in
     };
     # Find casks at https://formulae.brew.sh/cask/
     casks = [
-      # "1password"
+      "1password"
       # "amethyst"
-      # "firefox"
+      "firefox"
       "iterm2"
-      # "slack"
-      # "thunderbird"
+      "slack"
+      "thunderbird"
     ];
   };
-  
+
   # Use a custom configuration.nix location.
   # $ darwin-rebuild switch -I darwin-config=$HOME/.config/nixpkgs/darwin/configuration.nix
   # environment.darwinConfig = "$HOME/.config/nixpkgs/darwin/configuration.nix";
