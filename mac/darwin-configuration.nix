@@ -52,4 +52,16 @@ in
     enableKeyMapping = true;
     remapCapsLockToControl = true;
   };
+
+  system.defaults.CustomUserPreferences = {
+    "com.apple.controlcenter" = {
+      # show bluetooth in menu bar
+      "Bluetooth" = 18;
+    };
+  };
+
+  # avoid need for a logout/login cycle for new settings to take effect
+  system.activationScripts.postUserActivation.text = ''
+    /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+  '';
 }
