@@ -2,6 +2,8 @@
 
 Focused on managing a mac with nix for now.
 
+Most recent version is at <https://codeberg.org/blaix/homer>.
+
 ## Mac
 
 Base system config and packages for a mac via [nix-darwin](https://github.com/LnL7/nix-darwin).
