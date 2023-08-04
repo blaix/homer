@@ -27,6 +27,7 @@ in
       "amethyst"
       "firefox"
       "iterm2"
+      "obsidian"
       "slack"
       "thunderbird"
     ];
