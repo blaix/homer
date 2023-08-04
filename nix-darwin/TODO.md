@@ -1,0 +1,1 @@
+- [ ] Tiling WM like https://github.com/koekeishiya/yabai
