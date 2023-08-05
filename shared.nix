@@ -25,6 +25,8 @@
     vim
   ];
 
+  environment.variables.EDITOR = "nvim";
+
   fonts = {
     fontDir.enable = true;
     fonts = [
@@ -38,9 +40,6 @@
   
     programs.bash = {
       enable = true;
-      sessionVariables = {
-        EDITOR = "nvim";
-      };
       shellAliases = {
         cat = "bat";
         vim = "nvim";
@@ -157,9 +156,6 @@
   
     programs.zsh = {
       enable = true;
-      sessionVariables = {
-        EDITOR = "nvim";
-      };
       shellAliases = {
         cat = "bat";
         vim = "nvim";
