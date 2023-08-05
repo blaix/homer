@@ -62,7 +62,7 @@ in
     };
     NSGlobalDomain = {
       AppleKeyboardUIMode = 3; # full keyboard access
-      InitialKeyRepeat = 10;
+      InitialKeyRepeat = 12;
       KeyRepeat = 2;
     };
     CustomUserPreferences = {
