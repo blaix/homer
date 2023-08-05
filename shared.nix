@@ -19,6 +19,7 @@
     gnumake
     man
     neovim
+    ripgrep # needed for Live grep in nvchad
     tmux
     unzip
     vim
