@@ -21,6 +21,11 @@ in
       # remove all homebrew-installed things not listed here 
       cleanup = "zap";
     };
+    # mac-specific cli-based packages.
+    # prefer nix pkgs in shared.nix whenever possible.
+    brews = [
+      "git-gui" # mac git no longer comes with gitk!
+    ];
     # Find casks at https://formulae.brew.sh/cask/
     casks = [
       "1password"
