@@ -89,6 +89,7 @@
         editor = {
           auto-format = true;
           true-color = true;
+          cursorline = true; # highlight current line
           cursor-shape = {
             insert = "bar";
             normal = "block";
