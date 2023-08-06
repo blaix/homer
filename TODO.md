@@ -1,4 +1,10 @@
-- [ ] Replace amethyst. I keep needing to restart it. Try yabai?
+- [ ] Switch to [alacritty](https://github.com/alacritty/alacritty)
+    - open source, cross-platform terminal emulator. 
+    - can be installed and configured via nix / home manager.
+- [ ] Replace amethyst with yabai.
+    - I keep needing to restart amethyst.
+    - I think yabai can be installed and configured via nix / home manager.
+    - [ ] Shortcuts for this + other things via [skhd](https://github.com/koekeishiya/skhd)?
 - [ ] Move networking name configs to machine-specific files
 - [x] Rename nix-darwin to mac
 - [x] Rename default.nix to shared.nix
