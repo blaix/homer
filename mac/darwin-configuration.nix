@@ -30,6 +30,7 @@ in
     casks = [
       "1password"
       "amethyst"
+      "dropbox"
       "firefox"
       "iterm2"
       "obsidian"
