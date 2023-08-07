@@ -25,7 +25,7 @@
     vim
   ];
 
-  environment.variables.EDITOR = "nvim";
+  environment.variables.EDITOR = "hx";
 
   fonts = {
     fontDir.enable = true;
