@@ -32,6 +32,7 @@
       co = "checkout";
       st = "status -sb";
       ci = "commit -v";
+      gr = "log --graph --all";
     };
     extraConfig = {
       github = {
