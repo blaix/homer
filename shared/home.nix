@@ -49,6 +49,16 @@
 
   programs.helix = {
     enable = true;
+    languages = {
+      language = [{
+        name = "gren";
+        scope = "source.gren";
+        grammar = "elm";
+        file-types = ["gren"];
+        roots = ["gren.json"];
+        auto-format = false;
+      }];
+    };
     settings = {
       theme = "dracula";
       editor = {
@@ -159,6 +169,11 @@
       source = builtins.fetchGit {
         url = https://github.com/NvChad/NvChad;
       };
+    };
+    "helix/runtime" = {
+      enable = true;
+      recursive = true;
+      source = ./helix/runtime;
     };
   };
 }

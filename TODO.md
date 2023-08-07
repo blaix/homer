@@ -1,3 +1,8 @@
+- [ ] Package and publish prelim helix language support for gren
+    - See my gren configs in shared/home.nix
+        - Add language to helix.languages
+        - Add runtime/queries (for syntax highlighting) (copied from elm) to xdg.configfile
+    - See queries (for syntax highlighting) in shared/helix
 - [ ] Switch to [alacritty](https://github.com/alacritty/alacritty)
     - open source, cross-platform terminal emulator. 
     - can be installed and configured via nix / home manager.
