@@ -18,8 +18,15 @@ in
       /etc/nixos/orbstack.nix
       # https://nixos.wiki/wiki/Home_Manager
       (import "${home-manager}/nixos")
-      ../shared.nix
+      ../shared/default.nix
     ];
+
+  
+  home-manager.users.justin = (
+    (import ../shared/home.nix { pkgs = pkgs; }) // {
+      # nixos-specific home config here  
+    }
+  );
 
   # networking.hostName = mkForce "nixos"; # Overwrite the hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.

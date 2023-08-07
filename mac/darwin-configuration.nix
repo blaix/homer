@@ -6,13 +6,26 @@ in
 {
   imports = [
     (import "${home-manager}/nix-darwin")
-    ../shared.nix
+    ../shared/default.nix
   ];
 
   users.users.justin = {
     name = "justin";
     home = "/Users/justin";
   };
+
+  home-manager.users.justin = (
+    # mac-specific home config here  
+    (import ../shared/home.nix { pkgs = pkgs; }) // {
+      # programs.ssh = {
+      #   enable = true;
+      #   extraConfig = ''
+      #     Host *
+      #     	IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+      #   '';
+      # };
+    }
+  );
 
   homebrew = {
     enable = true;
