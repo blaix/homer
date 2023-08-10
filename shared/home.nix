@@ -60,7 +60,7 @@
       }];
     };
     settings = {
-      theme = "dracula";
+      theme = "github_dark";
       editor = {
         auto-format = true;
         true-color = true;
