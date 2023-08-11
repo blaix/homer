@@ -21,6 +21,7 @@
     neovim
     ripgrep # needed for Live grep in nvchad
     tmux
+    tree
     unzip
     vim
   ];
