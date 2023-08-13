@@ -51,12 +51,54 @@
     enable = true;
     languages = {
       language = [{
+        name = "css";
+        auto-format = true;
+        formatter = {
+          command = "prettier";
+          args = ["--parser" "css"];
+        };
+      } {
         name = "gren";
         scope = "source.gren";
         grammar = "elm";
         file-types = ["gren"];
         roots = ["gren.json"];
         auto-format = false;
+      } {
+        name = "html";
+        auto-format = true;
+        formatter = {
+          command = "prettier";
+          args = ["--parser" "html"];
+        };
+      } {
+        name = "javascript";
+        auto-format = true;
+        formatter = {
+          command = "prettier";
+          args = ["--parser" "typescript"];
+        };
+      } {
+        name = "json";
+        auto-format = true;
+        formatter = {
+          command = "prettier";
+          args = ["--parser" "json"];
+        };
+      } {
+        name = "tsx";
+        auto-format = true;
+        formatter = {
+          command = "prettier";
+          args = ["--parser" "typescript"];
+        };
+      } {
+        name = "typescript";
+        auto-format = true;
+        formatter = {
+          command = "prettier";
+          args = ["--parser" "typescript"];
+        };
       }];
     };
     settings = {
