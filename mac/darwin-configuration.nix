@@ -48,6 +48,7 @@ in
       "firefox"
       "iterm2"
       "obsidian"
+      "postman"
       "slack"
       "thunderbird"
       "visual-studio-code"
