@@ -205,13 +205,14 @@
   };
 
   xdg.configFile = {
-    "nvim" = {
-      enable = true;
-      recursive = true;
-      source = builtins.fetchGit {
-        url = https://github.com/NvChad/NvChad;
-      };
-    };
+    # nvchad is too opinionated
+    # "nvim" = {
+    #   enable = true;
+    #   recursive = true;
+    #   source = builtins.fetchGit {
+    #     url = https://github.com/NvChad/NvChad;
+    #   };
+    # };
     "helix/runtime" = {
       enable = true;
       recursive = true;
