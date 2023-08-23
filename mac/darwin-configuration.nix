@@ -82,6 +82,7 @@ in
       AppleKeyboardUIMode = 3; # full keyboard access
       InitialKeyRepeat = 12;
       KeyRepeat = 2;
+      NSAutomaticSpellingCorrectionEnabled = false;
     };
     CustomUserPreferences = {
       "com.apple.controlcenter" = {
