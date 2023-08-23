@@ -27,6 +27,10 @@ in
     }
   );
 
+  # -----------------------------------------------------------------------------
+  # See https://daiderd.com/nix-darwin/manual/index.html for available options.
+  # -----------------------------------------------------------------------------
+
   homebrew = {
     enable = true;
     onActivation = {
