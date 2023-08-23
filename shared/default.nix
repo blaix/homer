@@ -14,12 +14,13 @@
     bat
     diff-so-fancy
     direnv
+    fd
     gcc
     git
     gnumake
     man
     neovim
-    ripgrep # needed for Live grep in nvchad
+    ripgrep # needed for some nvim plugins
     tmux
     tree
     unzip
