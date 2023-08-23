@@ -3,8 +3,8 @@ vim.g.mapleader = ' '
 vim.opt.undofile = true
 vim.opt.number = true
 
--- Installed via home manager
-vim.cmd [[colorscheme dracula]]
+-- Themes plugins installed via home manager
+vim.cmd [[colorscheme catppuccin]]
 
 -- Ignore case in search
 -- unless search contains an uppercase
@@ -18,6 +18,7 @@ vim.opt.shiftwidth = 2
 
 --
 -- PLUGIN CONFIGS
+-- Note: Plugins installed via home manager.
 --
 
 -- telescope-file-browser

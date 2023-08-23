@@ -144,8 +144,11 @@
     enable = true;
     extraLuaConfig = builtins.readFile ./nvim/init.lua;
     plugins = with pkgs.vimPlugins; [
-      dracula-nvim
       telescope-file-browser-nvim
+
+      # themes
+      catppuccin-nvim
+      dracula-nvim
 
       # dependencies for other plugins:
       nvim-web-devicons
