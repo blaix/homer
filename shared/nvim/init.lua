@@ -16,15 +16,11 @@ vim.opt.expandtab = true
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 
---
--- PLUGIN CONFIGS
--- Note: Plugins installed via home manager.
---
+---------------------------------------------------------------------
+-- Mappings
+-- https://neovim.io/doc/user/lua-guide.html#lua-guide-mappings-set
+---------------------------------------------------------------------
 
--- telescope-file-browser
-vim.api.nvim_set_keymap(
-   "n",
-   "<leader>ff",
-   "<cmd>lua require 'telescope'.extensions.file_browser.file_browser()<CR>",
-   {noremap = true}
-)
+-- File and string search
+vim.keymap.set('n', '<Leader>ff', '<cmd>Telescope find_files<cr>')
+vim.keymap.set('n', '<Leader>fs', '<cmd>Telescope live_grep<cr>')
