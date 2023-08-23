@@ -143,6 +143,9 @@
   programs.neovim = {
     enable = true;
     extraLuaConfig = builtins.readFile ./nvim/init.lua;
+    plugins = with pkgs.vimPlugins; [
+      dracula-nvim
+    ];
   };
 
   programs.tmux = {
