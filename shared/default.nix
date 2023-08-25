@@ -32,7 +32,7 @@
   fonts = {
     fontDir.enable = true;
     fonts = [
-      pkgs.meslo-lgs-nf
+      # pkgs.meslo-lgs-nf
       pkgs.nerdfonts
     ];
   };
