@@ -1,6 +1,8 @@
-# System configuration files
+# My personal system configuration files
 
-Focused on managing a mac with nix for now.
+Focused on managing my own mac and vms with nix for now.
+Feel free to use it as an example or reference,
+but it's pretty specific to me.
 
 Most recent version is at <https://codeberg.org/blaix/homer>.
 
