@@ -234,5 +234,10 @@
       recursive = true;
       source = ./helix/runtime;
     };
+    "nvim/filetype.lua" = {
+      enable = true;
+      recursive = false;
+      source = ./nvim/filetype.lua;
+    };
   };
 }
