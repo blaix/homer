@@ -35,27 +35,27 @@ local autocmd = vim.api.nvim_create_autocmd
 
 -- elm
 autocmd("BufRead", {
-    pattern = "*.elm",
-    callback = function()
-        local root_dir = vim.fs.dirname(
-            vim.fs.find({'elm.json'}, { upward = true })[1]
-        )
-        local client = vim.lsp.start({
-            name = 'elmls',
-            cmd = {'elm-language-server'},
-            root_dir = root_dir,
-        })
-        vim.lsp.buf_attach_client(0, client)
-        vim.opt.tabstop = 4
-        vim.opt.shiftwidth = 4
-    end
+  pattern = "*.elm",
+  callback = function()
+    local root_dir = vim.fs.dirname(
+    vim.fs.find({'elm.json'}, { upward = true })[1]
+    )
+    local client = vim.lsp.start({
+      name = 'elmls',
+      cmd = {'elm-language-server'},
+      root_dir = root_dir,
+    })
+    vim.lsp.buf_attach_client(0, client)
+    vim.opt.tabstop = 4
+    vim.opt.shiftwidth = 4
+  end
 })
 
 -- gren
 autocmd("BufRead", {
-    pattern = "*.gren",
-    callback = function()
-        vim.opt.tabstop = 4
-        vim.opt.shiftwidth = 4
-    end
+  pattern = "*.gren",
+  callback = function()
+    vim.opt.tabstop = 4
+    vim.opt.shiftwidth = 4
+  end
 })
