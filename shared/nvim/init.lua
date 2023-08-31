@@ -28,7 +28,7 @@ vim.keymap.set('n', '<Leader>fs', '<cmd>Telescope live_grep<cr>')
 
 
 ---------------------------------------------------------------------
--- Language Servers
+-- Language Configs
 ---------------------------------------------------------------------
 
 local autocmd = vim.api.nvim_create_autocmd
@@ -46,6 +46,16 @@ autocmd("BufRead", {
             root_dir = root_dir,
         })
         vim.lsp.buf_attach_client(0, client)
+        vim.opt.tabstop = 4
+        vim.opt.shiftwidth = 4
     end
 })
 
+-- gren
+autocmd("BufRead", {
+    pattern = "*.gren",
+    callback = function()
+        vim.opt.tabstop = 4
+        vim.opt.shiftwidth = 4
+    end
+})
