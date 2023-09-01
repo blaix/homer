@@ -1,3 +1,7 @@
+---------------------------------------------------------------------
+-- Basic settings
+---------------------------------------------------------------------
+
 vim.g.mapleader = ' '
 
 vim.opt.undofile = true
@@ -18,13 +22,11 @@ vim.opt.shiftwidth = 2
 
 
 ---------------------------------------------------------------------
--- Mappings
--- https://neovim.io/doc/user/lua-guide.html#lua-guide-mappings-set
+-- Plugin configs
+-- Plugins are installed via nix home manager. See shared/home.nix
 ---------------------------------------------------------------------
 
--- File and string search
-vim.keymap.set('n', '<Leader>ff', '<cmd>Telescope find_files<cr>')
-vim.keymap.set('n', '<Leader>fs', '<cmd>Telescope live_grep<cr>')
+require("nvim-tree").setup()
 
 
 ---------------------------------------------------------------------
@@ -59,3 +61,14 @@ autocmd("BufRead", {
     vim.opt.shiftwidth = 4
   end
 })
+
+
+---------------------------------------------------------------------
+-- Mappings
+-- https://neovim.io/doc/user/lua-guide.html#lua-guide-mappings-set
+---------------------------------------------------------------------
+
+-- File navigation and search
+vim.keymap.set('n', '<Leader>ff', '<cmd>Telescope find_files<cr>') -- [f]ind
+vim.keymap.set('n', '<Leader>fe', '<cmd>NvimTreeToggle<cr>')       -- [e]xplore
+vim.keymap.set('n', '<Leader>fs', '<cmd>Telescope live_grep<cr>')  -- [s]earch
