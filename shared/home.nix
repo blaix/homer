@@ -34,6 +34,9 @@
       ci = "commit -v";
       gr = "log --graph --all";
     };
+    ignores = [
+      ".DS_Store"
+    ];
     extraConfig = {
       github = {
         user = "blaix";
