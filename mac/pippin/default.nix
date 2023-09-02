@@ -5,8 +5,8 @@
   ];
 
   networking = {
-    computerName = "gimli";
-    hostName = "gimli";
+    computerName = "pippin";
+    hostName = "pippin";
   };
 
 }
