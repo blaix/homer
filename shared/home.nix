@@ -1,8 +1,12 @@
 { pkgs }:
 {
-   home.stateVersion = "23.05";
+  home.stateVersion = "23.05";
 
-   programs.bash = {
+  programs.alacritty = {
+    enable = true;
+  };
+
+  programs.bash = {
     enable = true;
     shellAliases = {
       cat = "bat";

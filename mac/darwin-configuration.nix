@@ -46,6 +46,7 @@ in
     # Find casks at https://formulae.brew.sh/cask/
     casks = [
       "1password"
+      "alacritty"
       "amethyst"
       "cyberduck"
       "dropbox"
