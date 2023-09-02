@@ -11,7 +11,7 @@ arwen:
 	HOST=arwen ./run.sh
 	git status -sb
 
-.PHONY: gimli
-gimli:
-	HOST=gimli ./run.sh
+.PHONY: pippin
+pippin:
+	HOST=pippin ./run.sh
 	git status -sb
