@@ -52,7 +52,6 @@ in
       "firefox"
       "iterm2"
       "michaelvillar-timer"
-      "microsoft-remote-desktop"
       "obsidian"
       "orbstack"
       "postman"
