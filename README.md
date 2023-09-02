@@ -12,10 +12,11 @@ Base system config and packages for a mac via [nix-darwin](https://github.com/Ln
 
 ### New setup
 
-- [Install nix](https://github.com/NixOS/nix#installation)
-- [Install nix-darwin](https://github.com/LnL7/nix-darwin#installing)
+1.  [Install nix](https://github.com/NixOS/nix#installation)
 
-Then:
+2. [Install nix-darwin](https://github.com/LnL7/nix-darwin#installing)
+
+3. Download and run these configs:
 
 ```
 cd
@@ -23,17 +24,20 @@ cd
 # clone the repo and run setup
 nix --extra-experimental-features nix-command --extra-experimental-features flakes run nixpkgs#git clone git@codeberg.org:blaix/homer.git
 cd homer/mac
-./run.sh
+HOST=[host name] ./run.sh
 ```
 
-Then close the apple terminal and open iTerm2.
-Go to Settings -> Profiles -> Default -> Text and set Font to `Hack Nerd Font`.
+4. Then close the apple terminal and open iTerm2.
+
+5. Go to Settings -> Profiles -> Default -> Text and set Font to `MesloLGS NF`.
+
+Done!
 
 ### Existing setup
 
 ```bash
 cd ~/homer/mac
-make
+make [host name]
 ```
 
 ## NixOS VMs
