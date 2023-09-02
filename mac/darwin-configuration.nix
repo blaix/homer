@@ -62,10 +62,9 @@ in
     ];
   };
 
-  # TODO: this should be on machine-specific configs
   networking = {
-    computerName = "arwen";
-    hostName = "arwen";
+    computerName = "${HOST}";
+    hostName = "${HOST}";
   };
 
   system.keyboard = {
