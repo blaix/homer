@@ -62,11 +62,6 @@ in
     ];
   };
 
-  networking = {
-    computerName = "${HOST}";
-    hostName = "${HOST}";
-  };
-
   system.keyboard = {
     enableKeyMapping = true;
     remapCapsLockToControl = true;
