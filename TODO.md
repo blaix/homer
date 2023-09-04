@@ -1,17 +1,13 @@
-- [ ] Switch to [alacritty](https://github.com/alacritty/alacritty)?
-    - open source, cross-platform terminal emulator. 
-    - can be installed and configured via nix / home manager.
 - [ ] Replace amethyst with yabai?
     - I keep needing to restart amethyst.
     - I think yabai can be installed and configured via nix / home manager.
     - [ ] Shortcuts for this + other things via [skhd](https://github.com/koekeishiya/skhd)?
-- [ ] Move networking name configs to machine-specific files
+- [x] Move networking name configs to machine-specific files
 - [x] Rename nix-darwin to mac
 - [x] Rename default.nix to shared.nix
 - [x] Fix annoying `#` jumping to beginning of line in vim
 - [x] Dock hiding
 - [x] Firefox on mac
-- [ ] Dracula or catpuccino theme for iTerm2?
 - [ ] Fix lib.modules.defaultPriority deprecation warning on darwin
 - [x] Increase key repeat rate and decrease delay to repeat on darwin
 - [x] Tiling WM like https://github.com/koekeishiya/yabai on Mac? amethyst?
