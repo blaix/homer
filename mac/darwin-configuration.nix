@@ -50,7 +50,6 @@ in
       "cyberduck"
       "dropbox"
       "firefox"
-      "iterm2"
       "kitty"
       "michaelvillar-timer"
       "obsidian"
