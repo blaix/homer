@@ -27,9 +27,7 @@ cd homer/mac
 HOST=[host name] ./run.sh
 ```
 
-4. Then close the apple terminal and open iTerm2.
-
-5. Go to Settings -> Profiles -> Default -> Text and set Font to `MesloLGS NF`.
+4. Then close the apple terminal and open kitty terminal
 
 Done!
 

@@ -2,8 +2,10 @@
 {
   home.stateVersion = "23.05";
 
-  programs.alacritty = {
+  programs.kitty = {
     enable = true;
+    font.name = "MesloLGS NF";
+    theme = "Dracula";
   };
 
   programs.bash = {

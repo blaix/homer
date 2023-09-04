@@ -46,12 +46,12 @@ in
     # Find casks at https://formulae.brew.sh/cask/
     casks = [
       "1password"
-      "alacritty"
       "amethyst"
       "cyberduck"
       "dropbox"
       "firefox"
       "iterm2"
+      "kitty"
       "michaelvillar-timer"
       "obsidian"
       "orbstack"
