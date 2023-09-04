@@ -4,15 +4,21 @@
 
 vim.g.mapleader = ' '
 
+-- Keep undo history when closing file
 vim.opt.undofile = true
+
+-- Show line numbers
 vim.opt.number = true
 
--- Themes plugins installed via home manager
+-- Highlight current line
+vim.opt.cursorline = true
+
+-- Set theme (plugins installed via nix)
 vim.cmd [[colorscheme catppuccin]]
 
 -- Ignore case in search
--- unless search contains an uppercase
 vim.opt.ignorecase = true
+-- unless search contains an uppercase
 vim.opt.smartcase = true
 
 -- Tabs
