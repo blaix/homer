@@ -4,7 +4,10 @@
 
   programs.kitty = {
     enable = true;
-    font.name = "MesloLGS NF";
+    font = {
+      name = "MesloLGS NF";
+      size = 14;
+    };
     theme = "Dracula";
   };
 
