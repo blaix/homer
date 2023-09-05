@@ -1,6 +1,13 @@
 { pkgs }:
 {
   home.stateVersion = "23.05";
+  
+  home.sessionVariables = {
+    EDITOR = "nvim";
+
+    # opt out of eternal terminal telemetry
+    ET_NO_TELEMETRY = 1;
+  };
 
   programs.kitty = {
     enable = true;
