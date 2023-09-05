@@ -210,6 +210,10 @@
       b = "git b";
       d = "git d";
     };
+    initExtra = ''
+      # https://github.com/jeffreytse/zsh-vi-mode#nix
+      source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+    '';
     oh-my-zsh = {
       enable = true;
       plugins = [
