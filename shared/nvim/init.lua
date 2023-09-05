@@ -46,7 +46,7 @@ autocmd("BufRead", {
   pattern = "*.elm",
   callback = function()
     local root_dir = vim.fs.dirname(
-    vim.fs.find({'elm.json'}, { upward = true })[1]
+      vim.fs.find({'elm.json'}, { upward = true })[1]
     )
     local client = vim.lsp.start({
       name = 'elmls',
