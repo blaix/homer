@@ -170,6 +170,10 @@
       catppuccin-nvim
       dracula-nvim
 
+      # status line
+      lualine-nvim
+      lualine-lsp-progress
+
       # dependencies for other plugins:
       nvim-web-devicons
       plenary-nvim
