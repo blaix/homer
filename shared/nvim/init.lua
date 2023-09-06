@@ -115,5 +115,5 @@ vim.keymap.set('n', '<Leader>gs', '<cmd>Telescope git_status<cr>')          -- [
 
 -- Vim
 vim.keymap.set('n', '<Leader>vs', '<cmd>Telescope spell_suggest<cr>') -- [s]pelling suggestions
-vim.keymap.set('n', '<Leader>vm', '<cmd>Telescope spell_suggest<cr>') -- [m]arks
-vim.keymap.set('n', '<Leader>vr', '<cmd>Telescope spell_suggest<cr>') -- [r]egisters
+vim.keymap.set('n', '<Leader>vm', '<cmd>Telescope marks<cr>')         -- [m]arks
+vim.keymap.set('n', '<Leader>vr', '<cmd>Telescope registers<cr>')     -- [r]egisters
