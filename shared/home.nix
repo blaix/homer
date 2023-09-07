@@ -16,6 +16,9 @@
       size = 14;
     };
     theme = "Dracula";
+    settings = {
+      enable_audio_bell = "no";
+    };
   };
 
   programs.bash = {
