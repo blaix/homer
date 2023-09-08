@@ -169,6 +169,10 @@
       nvim-tree-lua
       telescope-nvim
 
+      # completion
+      nvim-cmp
+      cmp-nvim-lsp
+
       # themes
       catppuccin-nvim
       dracula-nvim

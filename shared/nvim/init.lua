@@ -82,10 +82,43 @@ require("lualine").setup({
 
 
 ---------------------------------------------------------------------
--- Language Configs
+-- LSP & Language Configs
 ---------------------------------------------------------------------
 
 local autocmd = vim.api.nvim_create_autocmd
+
+-- Completion with https://github.com/hrsh7th/nvim-cmp
+local cmp = require("cmp")
+cmp.setup({
+  window = {
+    completion = cmp.config.window.bordered(),
+    documentation = cmp.config.window.bordered(),
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<TAB>'] = cmp.mapping.select_next_item(),
+  }),
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+  })
+})
+
+-- Borders for floating windows
+local _border = "single"
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+  vim.lsp.handlers.hover, {
+    border = _border
+  }
+)
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
+  vim.lsp.handlers.signature_help, {
+    border = _border
+  }
+)
+vim.diagnostic.config{
+  float={border=_border}
+}
 
 --
 -- elm
