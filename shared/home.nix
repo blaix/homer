@@ -39,6 +39,10 @@
   programs.direnv = {
     enable = true;
     enableBashIntegration = true;
+
+    # faster use_nix implementation
+    # https://github.com/nix-community/nix-direnv
+    nix-direnv.enable = true;
   };
 
   programs.git = {
