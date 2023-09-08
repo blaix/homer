@@ -174,12 +174,14 @@ vim.keymap.set('n', '<Leader>fs', '<cmd>Telescope live_grep<cr>')  -- [s]earch
 -- Diagnostics
 vim.keymap.set('n', '<Leader>do', '<cmd>Telescope diagnostics bufnr=0<cr>') -- [o]pen (file)
 vim.keymap.set('n', '<Leader>dO', '<cmd>Telescope diagnostics<cr>')         -- [O]pen (all)
+vim.keymap.set('n', '<Leader>dd', vim.diagnostic.open_float)                -- [d]iagnostic (show in floating window)
 vim.keymap.set('n', '<Leader>dn', vim.diagnostic.goto_next)                 -- [n]ext
 vim.keymap.set('n', '<Leader>dp', vim.diagnostic.goto_prev)                 -- [p]rev
 
 -- LSP
 vim.keymap.set('n', '<Leader>la', vim.lsp.buf.code_action)                    -- [a]ction
 vim.keymap.set('n', '<Leader>lf', vim.lsp.buf.format)                         -- [f]ormat
+vim.keymap.set('n', '<Leader>lh', vim.lsp.buf.hover)                          -- [h]over
 vim.keymap.set('n', '<Leader>ld', '<cmd>Telescope lsp_definitions<cr>')       -- [d]efinitions
 vim.keymap.set('n', '<Leader>lr', '<cmd>Telescope lsp_references<cr>')        -- [r]eferences
 vim.keymap.set('n', '<Leader>ls', '<cmd>Telescope lsp_document_symbols<cr>')  -- [s]ymbols (file)
