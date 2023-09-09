@@ -279,4 +279,8 @@
       source = ./nvim/filetype.lua;
     };
   };
+
+  services.syncthing = {
+    enable = true;
+  };
 }
