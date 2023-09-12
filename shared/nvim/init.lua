@@ -42,6 +42,7 @@ vim.opt.shiftwidth = 2
 require("nvim-tree").setup()
 
 -- https://github.com/vimwiki/vimwiki/
+vim.g.vimwiki_folding = 'expr' -- fold sections and code blocks
 vim.g.vimwiki_list = {{
   path = "~/Sync/Wiki",
   path_html = "~/Sync/Wiki/html/",
