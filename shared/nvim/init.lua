@@ -38,6 +38,15 @@ vim.opt.shiftwidth = 2
 
 require("nvim-tree").setup()
 
+-- https://github.com/vimwiki/vimwiki/
+vim.g.vimwiki_list = {{
+  path = "~/Sync/Wiki",
+  path_html = "~/Sync/Wiki/html/",
+  syntax = "markdown", 
+  ext = ".md",
+  custom_wiki2html = "vimwiki_markdown",
+}}
+
 -- https://github.com/nvim-lualine/lualine.nvim#configuring-lualine-in-initvim
 require("lualine").setup({
   options = {

@@ -173,6 +173,11 @@
       nvim-tree-lua
       telescope-nvim
 
+      # vimwiki: I use this for GTD, projects, and notes
+      # https://github.com/vimwiki/vimwiki
+      vimwiki
+      pkgs.vimwiki-markdown
+
       # completion
       nvim-cmp
       cmp-nvim-lsp
