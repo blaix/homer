@@ -41,8 +41,11 @@ vim.opt.shiftwidth = 2
 
 require("nvim-tree").setup()
 
+--
+-- vimwiki
 -- https://github.com/vimwiki/vimwiki/
-vim.g.vimwiki_folding = 'expr' -- fold sections and code blocks
+--
+
 vim.g.vimwiki_list = {{
   path = "~/Sync/Wiki",
   path_html = "~/Sync/Wiki/html/",
@@ -51,7 +54,35 @@ vim.g.vimwiki_list = {{
   custom_wiki2html = "vimwiki_markdown",
 }}
 
+-- Custom folding copied from :help vimwiki
+-- Doesn't fold last blank line before a header.
+vim.g.vimwiki_folding = 'custom'
+vim.cmd([[
+  function! VimwikiFoldLevelCustom(lnum)
+    let pounds = strlen(matchstr(getline(a:lnum), '^#\+'))
+    if (pounds)
+      return '>' . pounds  " start a fold level
+    endif
+    if getline(a:lnum) =~? '\v^\s*$'
+      if (strlen(matchstr(getline(a:lnum + 1), '^#\+')))
+        return '-1' " don't fold last blank line before header
+      endif
+    endif
+    return '=' " return previous fold level
+  endfunction
+  augroup VimrcAuGroup
+    autocmd!
+    autocmd FileType vimwiki setlocal foldmethod=expr |
+      \ setlocal foldenable | set foldexpr=VimwikiFoldLevelCustom(v:lnum)
+  augroup END
+
+]])
+
+--
+-- nvim-lualine (custom status line)
 -- https://github.com/nvim-lualine/lualine.nvim#configuring-lualine-in-initvim
+--
+
 require("lualine").setup({
   options = {
     icons_enabled = true,
