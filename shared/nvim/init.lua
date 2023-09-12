@@ -4,6 +4,9 @@
 
 vim.g.mapleader = ' '
 
+-- No wrapping by default
+vim.opt.wrap = false
+
 -- Keep undo history when closing file
 vim.opt.undofile = true
 
