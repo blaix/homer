@@ -75,7 +75,6 @@ vim.cmd([[
     autocmd FileType vimwiki setlocal foldmethod=expr |
       \ setlocal foldenable | set foldexpr=VimwikiFoldLevelCustom(v:lnum)
   augroup END
-
 ]])
 
 --
