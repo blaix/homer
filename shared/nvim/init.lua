@@ -60,6 +60,9 @@ vim.g.vimwiki_list = {{
 -- Looks like there's some open issues about this:
 -- https://github.com/nvim-telescope/telescope.nvim/issues/699
 -- https://github.com/nvim-telescope/telescope.nvim/issues/559
+-- TODO: also, when it does work, it defaults to completely folded.
+-- From searching it sounds like this is default with some foldmethods.
+-- Could try an autocmd that runs zR
 vim.g.vimwiki_folding = 'custom'
 vim.cmd([[
   function! VimwikiFoldLevelCustom(lnum)
