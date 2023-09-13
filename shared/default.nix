@@ -19,6 +19,7 @@
     git
     gnumake
     man
+    neofetch # print sys info + ascii logo in cli
     neovim
     ripgrep # needed for some nvim plugins
     tmux
