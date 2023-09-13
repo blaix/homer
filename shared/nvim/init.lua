@@ -56,6 +56,10 @@ vim.g.vimwiki_list = {{
 
 -- Custom folding copied from :help vimwiki
 -- Doesn't fold last blank line before a header.
+-- TODO: This doesn't work when file is opened via Telescope find_file
+-- Looks like there's some open issues about this:
+-- https://github.com/nvim-telescope/telescope.nvim/issues/699
+-- https://github.com/nvim-telescope/telescope.nvim/issues/559
 vim.g.vimwiki_folding = 'custom'
 vim.cmd([[
   function! VimwikiFoldLevelCustom(lnum)
