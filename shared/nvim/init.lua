@@ -56,6 +56,12 @@ vim.g.vimwiki_list = {{
 
 -- Custom folding copied from :help vimwiki
 -- Doesn't fold last blank line before a header.
+--
+-- COMMENTING OUT DUE TO ODD / INCONSISTENT BEHAVIOR
+-- (see TODOs below)
+--
+-- TODO: Sometimes folding when I don't expect it to.
+-- e.g. C-space to check off a todo item folds a random section...?
 -- TODO: This doesn't work when file is opened via Telescope find_file
 -- Looks like there's some open issues about this:
 -- https://github.com/nvim-telescope/telescope.nvim/issues/699
@@ -63,26 +69,26 @@ vim.g.vimwiki_list = {{
 -- TODO: also, when it does work, it defaults to completely folded.
 -- From searching it sounds like this is default with some foldmethods.
 -- Could try an autocmd that runs zR
-vim.g.vimwiki_folding = 'custom'
-vim.cmd([[
-  function! VimwikiFoldLevelCustom(lnum)
-    let pounds = strlen(matchstr(getline(a:lnum), '^#\+'))
-    if (pounds)
-      return '>' . pounds  " start a fold level
-    endif
-    if getline(a:lnum) =~? '\v^\s*$'
-      if (strlen(matchstr(getline(a:lnum + 1), '^#\+')))
-        return '-1' " don't fold last blank line before header
-      endif
-    endif
-    return '=' " return previous fold level
-  endfunction
-  augroup VimrcAuGroup
-    autocmd!
-    autocmd FileType vimwiki setlocal foldmethod=expr |
-      \ setlocal foldenable | set foldexpr=VimwikiFoldLevelCustom(v:lnum)
-  augroup END
-]])
+-- vim.g.vimwiki_folding = 'custom'
+-- vim.cmd([[
+--   function! VimwikiFoldLevelCustom(lnum)
+--     let pounds = strlen(matchstr(getline(a:lnum), '^#\+'))
+--     if (pounds)
+--       return '>' . pounds  " start a fold level
+--     endif
+--     if getline(a:lnum) =~? '\v^\s*$'
+--       if (strlen(matchstr(getline(a:lnum + 1), '^#\+')))
+--         return '-1' " don't fold last blank line before header
+--       endif
+--     endif
+--     return '=' " return previous fold level
+--   endfunction
+--   augroup VimrcAuGroup
+--     autocmd!
+--     autocmd FileType vimwiki setlocal foldmethod=expr |
+--       \ setlocal foldenable | set foldexpr=VimwikiFoldLevelCustom(v:lnum)
+--   augroup END
+-- ]])
 
 --
 -- nvim-lualine (custom status line)
