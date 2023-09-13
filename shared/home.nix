@@ -9,6 +9,10 @@
     ET_NO_TELEMETRY = 1;
   };
 
+  home.sessionPath = [
+    "$HOME/homer/shared/bin"
+  ];
+
   programs.kitty = {
     enable = true;
     font = {
