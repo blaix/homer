@@ -1,4 +1,15 @@
-{ pkgs }:
+{ pkgs, lib }:
+# adapted from https://gist.github.com/nat-418/d76586da7a5d113ab90578ed56069509
+let
+  vimPluginFromGitHub = ref: repo: pkgs.vimUtils.buildVimPluginFrom2Nix {
+    pname = "${lib.strings.sanitizeDerivationName repo}";
+    version = ref;
+    src = builtins.fetchGit {
+      url = "https://github.com/${repo}.git";
+      ref = ref;
+    };
+  };
+in
 {
   home.stateVersion = "23.05";
   
@@ -174,6 +185,7 @@
     enable = true;
     extraLuaConfig = builtins.readFile ./nvim/init.lua;
     plugins = with pkgs.vimPlugins; [
+      (vimPluginFromGitHub "HEAD" "ChrisWellsWood/roc.vim")
       nvim-tree-lua
       telescope-nvim
 

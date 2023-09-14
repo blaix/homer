@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let 
   home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-23.05.tar.gz"; 
@@ -16,7 +16,7 @@ in
 
   home-manager.users.justin = (
     # mac-specific home config here  
-    (import ../shared/home.nix { pkgs = pkgs; }) // {
+    (import ../shared/home.nix { pkgs = pkgs; lib = lib; }) // {
       # programs.ssh = {
       #   enable = true;
       #   extraConfig = ''
