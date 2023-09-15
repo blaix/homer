@@ -15,6 +15,7 @@
     diff-so-fancy
     direnv
     fd
+    fzf
     gcc
     git
     gnumake
