@@ -222,6 +222,8 @@ autocmd("BufRead", {
 -- https://neovim.io/doc/user/lua-guide.html#lua-guide-mappings-set
 ---------------------------------------------------------------------
 
+vim.keymap.set('n', '<Leader><Leader>', '<cmd>w<cr>')
+
 -- File navigation and search
 vim.keymap.set('n', '<Leader>ff', '<cmd>Telescope find_files<cr>') -- [f]ind
 vim.keymap.set('n', '<Leader>fe', '<cmd>NvimTreeToggle<cr>')       -- [e]xplore
