@@ -74,6 +74,8 @@ in
     };
     ignores = [
       ".DS_Store"
+      ".direnv"
+      ".envrc"
     ];
     extraConfig = {
       github = {
