@@ -180,7 +180,7 @@ vim.diagnostic.config{
 -- elm
 --
 
-autocmd("BufRead", {
+autocmd("BufEnter", {
   pattern = "*.elm",
   callback = function()
     local root_dir = vim.fs.dirname(
@@ -208,7 +208,7 @@ autocmd("BufWritePre", {
 -- gren
 --
 
-autocmd("BufRead", {
+autocmd("BufEnter", {
   pattern = "*.gren",
   callback = function()
     vim.opt.tabstop = 4
