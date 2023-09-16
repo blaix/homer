@@ -15,6 +15,7 @@ in
   
   home.sessionVariables = {
     EDITOR = "nvim";
+    TASKER_HOME = "~/Sync/wiki";
 
     # opt out of eternal terminal telemetry
     ET_NO_TELEMETRY = 1;
@@ -251,6 +252,7 @@ in
     shellAliases = {
       cat = "bat";
       vim = "nvim";
+      t = "~/projects/tasker/tasker.sh";
       # git aliases
       gfo = "git fetch origin";
       gmo = "git merge --ff-only origin/main";
