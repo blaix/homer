@@ -252,7 +252,9 @@ in
     shellAliases = {
       cat = "bat";
       vim = "nvim";
-      t = "~/projects/tasker/tasker.sh";
+      t = "tasker";
+      wiki = "cd ~/Sync/wiki";
+      homer = "cd ~/homer";
       # git aliases
       gfo = "git fetch origin";
       gmo = "git merge --ff-only origin/main";
