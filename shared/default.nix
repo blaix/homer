@@ -1,4 +1,10 @@
-{ pkgs, ... }:
+{ pkgs ? import <nixpkgs> {}, ... }:
+let
+  tasker = import (builtins.fetchGit {
+    url = "https://codeberg.org/blaix/tasker.git";
+    ref = "main";
+  });
+in
 {
   # https://nixos.wiki/wiki/Nix_command 
   nix.settings.experimental-features = [
@@ -27,6 +33,7 @@
     tree
     unzip
     vim
+    (callPackage tasker {})
   ];
 
   fonts = {

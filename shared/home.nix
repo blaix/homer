@@ -15,7 +15,7 @@ in
   
   home.sessionVariables = {
     EDITOR = "nvim";
-    TASKER_HOME = "~/Sync/wiki";
+    TASKER_HOME = "$HOME/Sync/wiki";
 
     # opt out of eternal terminal telemetry
     ET_NO_TELEMETRY = 1;
