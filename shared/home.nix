@@ -261,14 +261,12 @@ in
       s = "git st";
       b = "git b";
       d = "git d";
+      # always inherit environment when using tmux
+      tmux = "tmux -L default";
     };
     initExtra = ''
       # https://github.com/jeffreytse/zsh-vi-mode#nix
       source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
-
-      # shortcuts to inherit environment when using tmux
-      tmn() { tmux -L $1 new -t $1 }
-      tma() { tmux -L $1 att -t $1 }
     '';
     oh-my-zsh = {
       enable = true;
