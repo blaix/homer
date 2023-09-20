@@ -191,6 +191,7 @@ in
       (vimPluginFromGitHub "HEAD" "ChrisWellsWood/roc.vim")
       nvim-tree-lua
       telescope-nvim
+      bufferline-nvim
 
       # vimwiki: I use this for GTD, projects, and notes
       # https://github.com/vimwiki/vimwiki

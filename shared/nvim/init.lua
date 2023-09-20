@@ -42,6 +42,18 @@ vim.opt.shiftwidth = 2
 require("nvim-tree").setup()
 
 --
+-- bufferline
+-- https://github.com/akinsho/bufferline.nvim
+--
+
+vim.opt.termguicolors = true
+require("bufferline").setup({
+  options = {
+    diagnostics = "nvim_lsp",
+  },
+})
+
+--
 -- vimwiki
 -- https://github.com/vimwiki/vimwiki/
 --
@@ -222,21 +234,22 @@ autocmd("BufEnter", {
 -- https://neovim.io/doc/user/lua-guide.html#lua-guide-mappings-set
 ---------------------------------------------------------------------
 
+-- double space to save
 vim.keymap.set('n', '<Leader><Leader>', '<cmd>w<cr>')
 
--- File navigation and search
+-- f: File navigation and search
 vim.keymap.set('n', '<Leader>ff', '<cmd>Telescope find_files<cr>') -- [f]ind
 vim.keymap.set('n', '<Leader>fe', '<cmd>NvimTreeToggle<cr>')       -- [e]xplore
 vim.keymap.set('n', '<Leader>fs', '<cmd>Telescope live_grep<cr>')  -- [s]earch
 
--- Diagnostics
+-- d: Diagnostics
 vim.keymap.set('n', '<Leader>do', '<cmd>Telescope diagnostics bufnr=0<cr>') -- [o]pen (file)
 vim.keymap.set('n', '<Leader>dO', '<cmd>Telescope diagnostics<cr>')         -- [O]pen (all)
 vim.keymap.set('n', '<Leader>dd', vim.diagnostic.open_float)                -- [d]iagnostic (show in floating window)
 vim.keymap.set('n', '<Leader>dn', vim.diagnostic.goto_next)                 -- [n]ext
 vim.keymap.set('n', '<Leader>dp', vim.diagnostic.goto_prev)                 -- [p]rev
 
--- LSP
+-- l: LSP
 vim.keymap.set('n', '<Leader>la', vim.lsp.buf.code_action)                    -- [a]ction
 vim.keymap.set('n', '<Leader>lf', vim.lsp.buf.format)                         -- [f]ormat
 vim.keymap.set('n', '<Leader>lh', vim.lsp.buf.hover)                          -- [h]over
@@ -245,14 +258,19 @@ vim.keymap.set('n', '<Leader>lr', '<cmd>Telescope lsp_references<cr>')        --
 vim.keymap.set('n', '<Leader>ls', '<cmd>Telescope lsp_document_symbols<cr>')  -- [s]ymbols (file)
 vim.keymap.set('n', '<Leader>lS', '<cmd>Telescope lsp_workspace_symbols<cr>') -- [s]ymbols (all)
 
--- Git
+-- g: Git
 vim.keymap.set('n', '<Leader>gc', '<cmd>Telescope git_bcommits<cr>')        -- [c]ommits (file)
 vim.keymap.set('v', '<Leader>gc', '<cmd>Telescope git_bcommits_range<cr>')  -- [c]ommits (selection)
 vim.keymap.set('n', '<Leader>gC', '<cmd>Telescope git_commits<cr>')         -- [C]ommits (all)
 vim.keymap.set('n', '<Leader>gb', '<cmd>Telescope git_branches<cr>')        -- [b]ranches
 vim.keymap.set('n', '<Leader>gs', '<cmd>Telescope git_status<cr>')          -- [s]status
 
--- Vim
+-- v: Vim
 vim.keymap.set('n', '<Leader>vs', '<cmd>Telescope spell_suggest<cr>') -- [s]pelling suggestions
 vim.keymap.set('n', '<Leader>vm', '<cmd>Telescope marks<cr>')         -- [m]arks
 vim.keymap.set('n', '<Leader>vr', '<cmd>Telescope registers<cr>')     -- [r]egisters
+
+-- t: Bufferline ([t]abs): https://github.com/akinsho/bufferline.nvim
+vim.keymap.set('n', '<Leader>tn', '<cmd>BufferLineCycleNext<cr>') -- [n]ext tab
+vim.keymap.set('n', '<Leader>tp', '<cmd>BufferLineCyclePrev<cr>') -- [p]rev tab
+vim.keymap.set('n', '<Leader>tc', '<cmd>BufferLinePick<cr>')     -- [c]hoose tab
