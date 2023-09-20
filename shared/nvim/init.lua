@@ -271,6 +271,9 @@ vim.keymap.set('n', '<Leader>vm', '<cmd>Telescope marks<cr>')         -- [m]arks
 vim.keymap.set('n', '<Leader>vr', '<cmd>Telescope registers<cr>')     -- [r]egisters
 
 -- t: Bufferline ([t]abs): https://github.com/akinsho/bufferline.nvim
+vim.keymap.set('n', '<Leader>tc', '<cmd>BufferLinePick<cr>')      -- [c]hoose tab
 vim.keymap.set('n', '<Leader>tn', '<cmd>BufferLineCycleNext<cr>') -- [n]ext tab
 vim.keymap.set('n', '<Leader>tp', '<cmd>BufferLineCyclePrev<cr>') -- [p]rev tab
-vim.keymap.set('n', '<Leader>tc', '<cmd>BufferLinePick<cr>')     -- [c]hoose tab
+vim.keymap.set('n', '<Leader>tN', '<cmd>BufferLineMoveNext<cr>')  -- move tab right
+vim.keymap.set('n', '<Leader>tP', '<cmd>BufferLineMovePrev<cr>')  -- move tab left
+vim.keymap.set('n', '<Leader>tc', '<cmd>w|bd<cr>')                -- save and [c]lose tab
