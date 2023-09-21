@@ -273,6 +273,7 @@ in
       enable = true;
       plugins = [
         "brew"
+        "fzf"
       ];
     };
     plugins = [
