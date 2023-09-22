@@ -253,6 +253,7 @@ in
     shellAliases = {
       cat = "bat";
       vim = "nvim";
+      fv = "nvim $(fzf)";
       t = "tasker";
       wiki = "cd ~/Sync/wiki";
       homer = "cd ~/homer";
