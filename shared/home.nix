@@ -221,6 +221,8 @@ in
     prefix = "C-a";
     extraConfig = ''
       set -g default-terminal "xterm-256color"
+      # Use vi-style keybindings in scrollback buffer mode
+      set-window-option -g mode-keys vi
       # Prevent delay when hitting esc
       set -g escape-time 10
       # Switch to last window with ctrl-a, just like screen
