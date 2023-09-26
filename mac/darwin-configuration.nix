@@ -56,6 +56,7 @@ in
       "orbstack"
       "postman"
       "slack"
+      "spotify"
       "thunderbird"
       "visual-studio-code"
     ];
