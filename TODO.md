@@ -1,4 +1,4 @@
-- [ ] Replace amethyst with yabai?
+- [O] Replace amethyst with yabai?
     - I keep needing to restart amethyst.
     - I think yabai can be installed and configured via nix / home manager.
     - [ ] Shortcuts for this + other things via [skhd](https://github.com/koekeishiya/skhd)?

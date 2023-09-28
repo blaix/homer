@@ -97,6 +97,27 @@ in
     };
   };
   
+  # WIP
+  #
+  ## Tiling window manager
+  ## https://github.com/koekeishiya/yabai
+  #services.yabai = { 
+  #  enable = true;
+  #  layout = "bsp";
+  #};
+
+  ## Keyboard shortcuts that work with yabai
+  ## https://github.com/koekeishiya/skhd
+  #services.skhd = {
+  #  enable = true;
+  #};
+
+  ## Status bar that works well with yabai
+  ## https://github.com/FelixKratz/SketchyBar
+  #services.sketchybar = {
+  #  enable = true;
+  #};
+  
   # Auto upgrade nix package and the daemon service.
   services.nix-daemon.enable = true;
   # nix.package = pkgs.nix;
