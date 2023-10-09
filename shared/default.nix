@@ -29,6 +29,7 @@ in
     neofetch # print sys info + ascii logo in cli
     neovim
     ripgrep # needed for some nvim plugins
+    shellcheck
     tmux
     tree
     unzip
