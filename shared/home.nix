@@ -257,8 +257,11 @@ in
       vim = "nvim";
       fv = "nvim \"$(fzf)\"";
       t = "tasker";
+      # navigation aliases
       wiki = "cd ~/Sync/wiki";
       homer = "cd ~/homer";
+      tasker = "cd ~/projects/tasker";
+      pencils = "cd ~/projects/pencils";
       # git aliases
       gfo = "git fetch origin";
       gmo = "git merge --ff-only origin/main";
