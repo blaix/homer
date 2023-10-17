@@ -260,7 +260,7 @@ in
       # navigation aliases
       wiki = "cd ~/Sync/wiki";
       homer = "cd ~/homer";
-      tasker = "cd ~/projects/tasker";
+      taskfiles = "cd ~/projects/taskfiles";
       pencils = "cd ~/projects/pencils";
       # git aliases
       gfo = "git fetch origin";
