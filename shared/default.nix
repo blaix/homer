@@ -2,7 +2,7 @@
 let
   tasker = import (builtins.fetchGit {
     url = "https://codeberg.org/blaix/tasker.git";
-    rev = "26b7473aa0b066fff5fdb1ac8b231eeea84a7173";
+    rev = "9d7ec8847d1361f3497caafcbc943b81672c1614";
   });
 in
 {
