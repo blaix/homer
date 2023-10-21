@@ -190,6 +190,7 @@ in
     plugins = with pkgs.vimPlugins; [
       (vimPluginFromGitHub "HEAD" "ChrisWellsWood/roc.vim")
       nvim-tree-lua
+      nvim-lspconfig
       telescope-nvim
       bufferline-nvim
 

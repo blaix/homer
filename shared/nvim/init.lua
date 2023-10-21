@@ -154,6 +154,9 @@ require("lualine").setup({
 ---------------------------------------------------------------------
 
 local autocmd = vim.api.nvim_create_autocmd
+local lspconfig = require("lspconfig")
+
+vim.lsp.set_log_level("debug")
 
 -- Completion with https://github.com/hrsh7th/nvim-cmp
 local cmp = require("cmp")
@@ -192,22 +195,7 @@ vim.diagnostic.config{
 -- elm
 --
 
-autocmd("BufEnter", {
-  pattern = "*.elm",
-  callback = function()
-    local root_dir = vim.fs.dirname(
-      vim.fs.find({'elm.json'}, { upward = true })[1]
-    )
-    local client = vim.lsp.start({
-      name = 'elmls',
-      cmd = {'elm-language-server'},
-      root_dir = root_dir,
-    })
-    vim.lsp.buf_attach_client(0, client)
-    vim.opt.tabstop = 4
-    vim.opt.shiftwidth = 4
-  end
-})
+lspconfig.elmls.setup {}
 
 autocmd("BufWritePre", {
   pattern = "*.elm",
