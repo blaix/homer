@@ -25,6 +25,7 @@ in
     gcc
     git
     gnumake
+    htop
     man
     neofetch # print sys info + ascii logo in cli
     neovim
