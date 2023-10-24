@@ -48,6 +48,7 @@ in
       "1password"
       "amethyst"
       "cyberduck"
+      "drawio"
       "dropbox"
       "firefox"
       "kitty"
