@@ -216,6 +216,18 @@ autocmd("BufEnter", {
   end
 })
 
+--
+-- rust
+--
+
+lspconfig.rust_analyzer.setup {}
+
+autocmd("BufWritePre", {
+  pattern = "*.rs",
+  callback = function()
+    vim.lsp.buf.format()
+  end
+})
 
 ---------------------------------------------------------------------
 -- Mappings
