@@ -42,6 +42,7 @@ in
     # prefer nix pkgs in shared.nix whenever possible.
     brews = [
       "git-gui" # mac git no longer comes with gitk!
+      "xcodegen"
     ];
     # Find casks at https://formulae.brew.sh/cask/
     casks = [
