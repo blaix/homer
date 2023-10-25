@@ -52,6 +52,7 @@ in
       "drawio"
       "dropbox"
       "firefox"
+      "google-chrome"
       "kitty"
       "michaelvillar-timer"
       "obsidian"
