@@ -59,6 +59,7 @@ in
       "orbstack"
       "postman"
       "slack"
+      "steam"
       "spotify"
       "thunderbird"
       "visual-studio-code"
