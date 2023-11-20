@@ -48,6 +48,7 @@ in
     casks = [
       "1password"
       "amethyst"
+      "crystalfetch" # for downloading windows isos
       "cyberduck"
       "drawio"
       "dropbox"
@@ -62,6 +63,7 @@ in
       "steam"
       "spotify"
       "thunderbird"
+      "utm" # for running windows
       "visual-studio-code"
     ];
   };
