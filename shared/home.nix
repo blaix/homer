@@ -193,6 +193,7 @@ in
       nvim-lspconfig
       telescope-nvim
       bufferline-nvim
+      neogit
 
       # vimwiki: I use this for GTD, projects, and notes
       # https://github.com/vimwiki/vimwiki

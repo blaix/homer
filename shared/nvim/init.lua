@@ -39,7 +39,8 @@ vim.opt.shiftwidth = 2
 -- Plugins are installed via nix home manager. See shared/home.nix
 ---------------------------------------------------------------------
 
-require("nvim-tree").setup()
+require("nvim-tree").setup({})
+require("neogit").setup({})
 
 --
 -- bufferline
