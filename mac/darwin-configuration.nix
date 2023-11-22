@@ -50,6 +50,7 @@ in
       "amethyst"
       "crystalfetch" # for downloading windows isos
       "cyberduck"
+      "discord"
       "drawio"
       "dropbox"
       "firefox"
