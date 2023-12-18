@@ -15,7 +15,6 @@ in
   
   home.sessionVariables = {
     EDITOR = "nvim";
-    TASKER_HOME = "$HOME/Sync/taskfiles"; # deprecated
     TASKFILES_HOME = "$HOME/Sync/taskfiles";
 
     # opt out of eternal terminal telemetry
@@ -259,9 +258,10 @@ in
       cat = "bat";
       vim = "nvim";
       fv = "nvim \"$(fzf)\"";
-      t = "tasker";
+      t = "taskfiles";
       # navigation aliases
-      wiki = "cd ~/Sync/wiki";
+      tf = "cd \"$TASKFILES_HOME\"";
+      tfp = "cd ~/projects/taskfiles";
       homer = "cd ~/homer";
       pencils = "cd ~/projects/pencils";
       # git aliases
