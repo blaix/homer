@@ -184,42 +184,39 @@ in
     };
   };
 
-  # Switched to LazyVim
-  # Starter cloned to shared/nvim,
-  # see xdg.configFile settings below.
-  #programs.neovim = {
-  #  enable = true;
-  #  extraLuaConfig = builtins.readFile ./nvim/init.lua;
-  #  plugins = with pkgs.vimPlugins; [
-  #    (vimPluginFromGitHub "HEAD" "ChrisWellsWood/roc.vim")
-  #    nvim-tree-lua
-  #    nvim-lspconfig
-  #    telescope-nvim
-  #    bufferline-nvim
-  #    neogit
+  programs.neovim = {
+    enable = true;
+    extraLuaConfig = builtins.readFile ./nvim/init.lua;
+    plugins = with pkgs.vimPlugins; [
+      (vimPluginFromGitHub "HEAD" "ChrisWellsWood/roc.vim")
+      nvim-tree-lua
+      nvim-lspconfig
+      telescope-nvim
+      bufferline-nvim
+      neogit
 
-  #    # vimwiki: I use this for GTD, projects, and notes
-  #    # https://github.com/vimwiki/vimwiki
-  #    vimwiki
-  #    pkgs.vimwiki-markdown
+      # vimwiki: I use this for GTD, projects, and notes
+      # https://github.com/vimwiki/vimwiki
+      vimwiki
+      pkgs.vimwiki-markdown
 
-  #    # completion
-  #    nvim-cmp
-  #    cmp-nvim-lsp
+      # completion
+      nvim-cmp
+      cmp-nvim-lsp
 
-  #    # themes
-  #    catppuccin-nvim
-  #    dracula-nvim
+      # themes
+      catppuccin-nvim
+      dracula-nvim
 
-  #    # status line
-  #    lualine-nvim
-  #    lualine-lsp-progress
+      # status line
+      lualine-nvim
+      lualine-lsp-progress
 
-  #    # dependencies for other plugins:
-  #    nvim-web-devicons
-  #    plenary-nvim
-  #  ];
-  #};
+      # dependencies for other plugins:
+      nvim-web-devicons
+      plenary-nvim
+    ];
+  };
 
   programs.tmux = {
     enable = true;
@@ -302,18 +299,23 @@ in
   };
 
   xdg.configFile = {
-    # Bootstrapped with LazyVim starter:
-    # https://github.com/LazyVim/Starter
-    # Remove ~/.local/share/nvim to reset.
-    "nvim" = {
-      enable = true;
-      recursive = true;
-      source = ./nvim;
-    };
+    # nvchad is too opinionated
+    # "nvim" = {
+    #   enable = true;
+    #   recursive = true;
+    #   source = builtins.fetchGit {
+    #     url = https://github.com/NvChad/NvChad;
+    #   };
+    # };
     "helix/runtime" = {
       enable = true;
       recursive = true;
       source = ./helix/runtime;
+    };
+    "nvim/filetype.lua" = {
+      enable = true;
+      recursive = false;
+      source = ./nvim/filetype.lua;
     };
   };
 
