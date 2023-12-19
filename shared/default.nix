@@ -35,7 +35,14 @@ in
     tree
     unzip
     vim
+    wget
     (callPackage taskfiles {})
+
+    # needed for LazyVim
+    lazygit
+    tree-sitter
+    python311Packages.pynvim
+    vimPlugins.nvim-treesitter.withAllGrammars # needed for LazyVim
   ];
 
   fonts = {
