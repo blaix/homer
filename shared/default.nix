@@ -18,6 +18,7 @@ in
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
     bat
+    devbox
     diff-so-fancy
     direnv
     fd
