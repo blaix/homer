@@ -72,6 +72,7 @@ in
       st = "status -sb";
       ci = "commit -v";
       gr = "log --graph --all";
+      gmo = "git merge --ff-only origin/master";
     };
     ignores = [
       ".DS_Store"
