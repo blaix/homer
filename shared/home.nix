@@ -261,6 +261,7 @@ in
       fv = "nvim \"$(fzf)\"";
       t = "taskfiles";
       # navigation aliases
+      pn = "cd ~/projects/prettynice";
       tf = "cd \"$TASKFILES_HOME\"";
       tfp = "cd ~/projects/taskfiles";
       homer = "cd ~/homer";
