@@ -73,6 +73,7 @@ in
       ci = "commit -v";
       gr = "log --graph --all";
       gmo = "git merge --ff-only origin/master";
+      fetch = "fetch -p";
     };
     ignores = [
       ".DS_Store"
