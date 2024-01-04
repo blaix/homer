@@ -202,10 +202,6 @@ in
       vimwiki
       pkgs.vimwiki-markdown
 
-      # completion
-      nvim-cmp
-      cmp-nvim-lsp
-
       # themes
       catppuccin-nvim
       dracula-nvim
