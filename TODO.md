@@ -11,5 +11,9 @@
 - [ ] Fix lib.modules.defaultPriority deprecation warning on darwin
 - [x] Increase key repeat rate and decrease delay to repeat on darwin
 - [x] Tiling WM like https://github.com/koekeishiya/yabai on Mac? amethyst?
-- [ ] Github mirror
+* [ ] Secrets encryption?
+  * https://discourse.nixos.org/t/how-to-effectively-manage-secrets/25793
+  * https://github.com/ryantm/agenix
+  * https://github.com/Mic92/sops-nix
+- [ ] Github mirror?
 - [ ] Switch to a Flakes setup?
