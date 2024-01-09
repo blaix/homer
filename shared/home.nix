@@ -44,7 +44,7 @@ in
       vim = "nvim";
 
       # git stuff
-      gfo = "git fetch origin";
+      gfo = "git fetch -p origin";
       gmo = "git merge --ff-only origin/main";
       s = "git st";
       b = "git b";
@@ -264,7 +264,7 @@ in
       homer = "cd ~/homer";
       pencils = "cd ~/projects/pencils";
       # git aliases
-      gfo = "git fetch origin";
+      gfo = "git fetch -p origin";
       gmo = "git merge --ff-only origin/main";
       s = "git st";
       b = "git b";
