@@ -193,6 +193,7 @@ in
       (vimPluginFromGitHub "HEAD" "ChrisWellsWood/roc.vim")
       nvim-tree-lua
       nvim-lspconfig
+      vim-commentary
       telescope-nvim
       bufferline-nvim
       neogit
