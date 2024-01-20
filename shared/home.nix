@@ -17,8 +17,9 @@ in
     EDITOR = "nvim";
     TASKFILES_HOME = "$HOME/Sync/taskfiles";
 
-    # opt out of eternal terminal telemetry
-    ET_NO_TELEMETRY = 1;
+    # opt out of project telemetries
+    ET_NO_TELEMETRY = 1;          # eternal terminal
+    NEXT_TELEMETRY_DISABLED = 1;  # next.js
   };
 
   home.sessionPath = [
