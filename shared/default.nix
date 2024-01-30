@@ -22,6 +22,7 @@ in
     diff-so-fancy
     direnv
     fd
+    flyctl
     fzf
     gcc
     git
