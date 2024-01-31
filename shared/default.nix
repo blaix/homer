@@ -17,25 +17,35 @@ in
   # To search available packages by name, run:
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
-    bat
-    devbox
+    bat # better cat
+    catimg # cat for images
     diff-so-fancy
     direnv
     fd
+    flyctl
     fzf
     gcc
     git
+    glow # render pretty markdown on the cli
     gnumake
     htop
     man
+    nb
     neofetch # print sys info + ascii logo in cli
     neovim
-    ripgrep # needed for some nvim plugins
+    nmap
+    pandoc
+    ripgrep
     shellcheck
+    termpdfpy # cli vim-like ebook reader 
+    tig # ncurses git repository browser
     tmux
     tree
     unzip
     vim
+    visidata # view tabular data on the command line
+    viu # terminal image viewer (beautiful!)
+    w3m # text-based web browser
     (callPackage taskfiles {})
   ];
 
