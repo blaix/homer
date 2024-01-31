@@ -194,6 +194,7 @@ in
       nvim-tree-lua
       nvim-lspconfig
       vim-commentary
+      vim-just
       telescope-nvim
       bufferline-nvim
       neogit
