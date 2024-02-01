@@ -34,6 +34,7 @@ in
     neofetch # print sys info + ascii logo in cli
     neovim
     nmap
+    nodePackages.degit
     pandoc
     ripgrep
     shellcheck

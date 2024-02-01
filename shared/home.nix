@@ -300,6 +300,12 @@ in
     ];
   };
 
+  # degit will fail if it can't create or find this directory
+  home.file.".degit/.keep" = {
+    recursive = true;
+    source = builtins.toFile "keep" ""; 
+  };
+
   xdg.configFile = {
     # nvchad is too opinionated
     # "nvim" = {
