@@ -55,6 +55,14 @@ require("bufferline").setup({
 })
 
 --
+-- vim-markdown-toc (table of contents generator)
+-- https://github.com/mzlogin/vim-markdown-toc
+--
+
+-- Only show 1 level of headings
+vim.g.vmt_max_level = 2
+
+--
 -- vimwiki
 -- https://github.com/vimwiki/vimwiki/
 --
