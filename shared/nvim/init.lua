@@ -266,6 +266,7 @@ vim.keymap.set('n', '<Leader>vr', '<cmd>Telescope registers<cr>')     -- [r]egis
 vim.keymap.set('n', '<Leader>bc', '<cmd>BufferLinePick<cr>')      -- [c]hoose tab
 vim.keymap.set('n', '<Leader>bn', '<cmd>BufferLineCycleNext<cr>') -- [n]ext tab
 vim.keymap.set('n', '<Leader>bp', '<cmd>BufferLineCyclePrev<cr>') -- [p]rev tab
-vim.keymap.set('n', '<Leader>bN', '<cmd>BufferLineMoveNext<cr>')  -- move tab right
-vim.keymap.set('n', '<Leader>bP', '<cmd>BufferLineMovePrev<cr>')  -- move tab left
-vim.keymap.set('n', '<Leader>bc', '<cmd>w|bd<cr>')                -- save and [c]lose tab
+vim.keymap.set('n', '<Leader>bo', '<cmd>%bd|e#|bd#<cr>') -- [o]nly this tab (close all others)
+                                                         -- %db delete all buffers
+                                                         -- e# edit last open buffer
+                                                         -- bd# delete the No Name buffer that gets opened automatically
