@@ -195,6 +195,7 @@ in
       nvim-tree-lua
       nvim-lspconfig
       vim-commentary
+      vim-prisma
       vim-just
       telescope-nvim
       bufferline-nvim
