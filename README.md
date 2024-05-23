@@ -6,6 +6,12 @@ but it's pretty specific to me.
 
 **Most recent version is at <https://github.com/blaix/homer>.**
 
+# UPDATE: Restarting with Flakes
+
+Trying out https://github.com/dustinlyons/nixos-config
+
+# OLD README BELOW:
+
 ## Mac
 
 Base system config and packages for a mac via [nix-darwin](https://github.com/LnL7/nix-darwin).
