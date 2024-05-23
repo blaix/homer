@@ -1,1 +1,2 @@
-- [O] Switch to a Flakes setup. Write up instructions as I go.
+- [X] Switch to a Flakes setup.
+- [ ] Better documentation
