@@ -45,6 +45,7 @@
     git
     gnumake
     htop
+    just
     man
     neofetch # print sys info + ascii logo in cli
     neovim
