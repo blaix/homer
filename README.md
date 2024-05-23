@@ -10,6 +10,19 @@ but it's pretty specific to me.
 
 Going to start from scratch with flakes and write up instructions as I go.
 
+```
+flake.nix
+hosts/
+  common.nix
+  mac/
+    common.nix
+    arwen.nix
+    bilbo.nix
+  nixos/
+    server1.nix
+    server2.nix
+```
+
 # OLD README BELOW:
 
 ## Mac
