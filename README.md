@@ -8,7 +8,7 @@ but it's pretty specific to me.
 
 # UPDATE: Restarting with Flakes
 
-Trying out https://github.com/dustinlyons/nixos-config
+Going to start from scratch with flakes and write up instructions as I go.
 
 # OLD README BELOW:
 

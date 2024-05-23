@@ -1,2 +1,1 @@
-- [O] Switch to a Flakes setup?
-  - [O] Try this: restart with flakes and https://github.com/dustinlyons/nixos-config
+- [O] Switch to a Flakes setup. Write up instructions as I go.
