@@ -8,9 +8,15 @@ Important files:
 * [`home.nix`](/home.nix): User environment configs.
 * [`hosts/`](/hosts): System, OS, and machine-specific configs.
 
-## Usage: Mac
+## Usage
 
-**Initial setup on new Mac:**
+* If you haven't already, go through the [initial setup](#initial-setup)
+* Test changes by building them: `just build [hostname]`
+* Update your system to the latest changes: `just switch [hostname]`
+
+## Initial setup
+
+### Mac
 
 1. Install nix: https://nix.dev/install-nix.html
 
@@ -29,14 +35,7 @@ Important files:
   nix --extra-experimental-features nix-command --extra-experimental-features flakes run nix-darwin -- switch --flake .#[hostname]
   ```
 
-**After initial setup:**
-
-* Test changes by building them: `just build [hostname]`
-* Update your system to the latest changes: `just switch [hostname]`
-
-## Usage: NixOs
-
-**Initial setup:**
+### NixOs
 
 0. Log in to your nix server.
    You can create a nixos vm on mac with [orbstack](https://orbstack.dev/) (installed via configs in this repo) with:
@@ -65,3 +64,4 @@ Important files:
   ```
   sudo nixos-rebuild switch --impure --flake .#orb
   ```
+
