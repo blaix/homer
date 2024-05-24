@@ -1,15 +1,25 @@
 { pkgs, lib, ... }:
+let
+  isLinux = pkgs.stdenv.hostPlatform.isLinux;
+  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
+  unsupported = builtins.abort "Unsupported platform";
+in
 {
   # ---------------------------------------------------------------------------
   #   Base-level system settings common to all machines
   # ---------------------------------------------------------------------------
 
-  users.users.justin.name = "justin";
-  # home set in hosts/[mac|nixos]/common.nix
+  users.users.justin = {
+    name = "justin";
+    home =
+      if isLinux then "/home/justin" else
+      if isDarwin then "/Users/justin" else unsupported;
+  };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nixpkgs.config.allowUnfree = true;
   nix.package = pkgs.nix;
+  programs.zsh.enable = true;
 
   # Auto upgrade nix package and the daemon service.
   services.nix-daemon.enable = true;

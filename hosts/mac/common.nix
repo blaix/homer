@@ -6,8 +6,6 @@
   #   Settings shared among all my Macs
   # ---------------------------------------------------------------------------
 
-  users.users.justin.home = "/Users/justin";
-  
   homebrew = {
     enable = true;
     onActivation = {

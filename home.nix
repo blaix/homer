@@ -4,12 +4,11 @@
   #   User home and dotfile settings common to all machines
   # ---------------------------------------------------------------------------
 
-  home.username = "justin";
-
   # Leave this alone.
   # It's set and should only ever change on a full re-install.
   home.stateVersion = "23.05";
-  
+  programs.home-manager.enable = true; 
+
   # Environment variables
   home.sessionVariables = {
     EDITOR = "nvim";
