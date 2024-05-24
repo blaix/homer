@@ -47,7 +47,7 @@ Important files:
 2. Clone this repo:
 
   ```
-  nix --extra-experimental-features nix-command --extra-experimental-features flakes run nixpkgs#git clone git@github.com:blaix/homer.git && cd homer
+  git clone git@github.com:blaix/homer.git && cd homer
   ```
 
 3. Choose a host name.
