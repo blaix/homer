@@ -33,7 +33,17 @@
       };
     };
 
-    # nixos servers
-    # TBD
+    # nixos
+    nixosConfigurations = {
+      orb = nixpkgs.lib.nixosSystem {
+        system = "aarch64-linux";
+        modules = [ 
+          ./hosts/nixos/orb.nix
+          home-manager.nixosModules.home-manager {
+            home-manager.users.justin = import ./home.nix;
+          }
+        ];
+      };
+    };
   };
 }

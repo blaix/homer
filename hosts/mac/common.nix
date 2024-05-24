@@ -6,6 +6,9 @@
   #   Settings shared among all my Macs
   # ---------------------------------------------------------------------------
 
+  # Auto upgrade nix package and the daemon service.
+  services.nix-daemon.enable = true;
+
   homebrew = {
     enable = true;
     onActivation = {

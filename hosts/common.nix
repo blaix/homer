@@ -11,6 +11,8 @@ in
 
   users.users.justin = {
     name = "justin";
+    group = "staff";
+    isSystemUser = true;
     home =
       if isLinux then "/home/justin" else
       if isDarwin then "/Users/justin" else unsupported;
@@ -20,9 +22,6 @@ in
   nixpkgs.config.allowUnfree = true;
   nix.package = pkgs.nix;
   programs.zsh.enable = true;
-
-  # Auto upgrade nix package and the daemon service.
-  services.nix-daemon.enable = true;
 
   # do garbage collection weekly to keep disk usage low
   nix.gc = {
