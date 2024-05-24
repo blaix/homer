@@ -6,4 +6,5 @@
   
   imports = [ ../common.nix ];
   
+  users.defaultUserShell = pkgs.zsh;
 }

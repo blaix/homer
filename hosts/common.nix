@@ -14,7 +14,6 @@ in
   nix.package = pkgs.nix;
 
   programs.zsh.enable = true;
-  users.defaultUserShell = pkgs.zsh;
 
   # do garbage collection weekly to keep disk usage low
   nix.gc = {
