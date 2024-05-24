@@ -9,15 +9,6 @@ in
   #   Base-level system settings common to all machines
   # ---------------------------------------------------------------------------
 
-  users.users.justin = {
-    name = "justin";
-    group = "staff";
-    isSystemUser = true;
-    home =
-      if isLinux then "/home/justin" else
-      if isDarwin then "/Users/justin" else unsupported;
-  };
-
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nixpkgs.config.allowUnfree = true;
   nix.package = pkgs.nix;
