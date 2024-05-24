@@ -38,6 +38,13 @@ Important files:
 
 **Initial setup:**
 
+0. Log in to your nix server.
+   You can create a nixos vm on mac with [orbstack](https://orbstack.dev/) (installed via configs in this repo) with:
+
+  ```
+  orb create nixos && ssh orb
+  ```
+
 1. Start a shell with `git` available:
 
   ```
