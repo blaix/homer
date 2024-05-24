@@ -10,7 +10,6 @@ with lib;
       ./common.nix
     ];
 
-  networking.hostName = mkForce "orb";
   system.stateVersion = "21.05"; # leave it
 
   # The global useDHCP flag is deprecated, therefore explicitly set to false here.
