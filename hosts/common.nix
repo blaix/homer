@@ -12,7 +12,9 @@ in
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nixpkgs.config.allowUnfree = true;
   nix.package = pkgs.nix;
+
   programs.zsh.enable = true;
+  users.defaultUserShell = pkgs.zsh;
 
   # do garbage collection weekly to keep disk usage low
   nix.gc = {
