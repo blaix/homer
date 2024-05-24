@@ -36,4 +36,25 @@ Important files:
 
 ## Usage: NixOs
 
-TODO
+**Initial setup:**
+
+1. Start a shell with `git` available:
+
+  ```
+  nix-shell -p git
+  ```
+  
+2. Clone this repo:
+
+  ```
+  nix --extra-experimental-features nix-command --extra-experimental-features flakes run nixpkgs#git clone git@github.com:blaix/homer.git && cd homer
+  ```
+
+3. Choose a host name.
+   Make sure it has a definitionn under `nixosConfigurations` in [`flake.nix`](/flake.nix) pointing to a `[hostname].nix` file under [`hosts/nixos`](/hosts/nixos).
+
+4. Run the following, replacing `[hostname]` with the name from the previous step (e.g. `.#orb`):
+  
+  ```
+  sudo nixos-rebuild switch --impure --flake .#orb
+  ```

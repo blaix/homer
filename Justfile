@@ -8,8 +8,8 @@ switch HOST:
 
 [linux]
 build HOST:
-  nix build .#{{HOST}}
+  sudo nixos-rebuild build --impure --flake .#{{HOST}}
 
 [linux]
 switch HOST:
-  nix switch .#{{HOST}}
+  sudo nixos-rebuild switch --impure --flake .#{{HOST}}
