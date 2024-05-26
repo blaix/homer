@@ -1,2 +1,3 @@
 - [X] Switch to a Flakes setup.
+- [ ] Consider/try snowfall lib
 - [ ] Better documentation
