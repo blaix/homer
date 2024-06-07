@@ -217,6 +217,11 @@ autocmd("BufWritePre", {
 -- double space to save
 vim.keymap.set('n', '<Leader><Leader>', '<cmd>w<cr>')
 
+-- a: append stuff
+-- i: insert stuff
+vim.keymap.set('n', '<Leader>id', 'i<c-r>=strftime("%F")<cr><esc>') -- [i]nsert [d]date (YYYY-MM-DD)
+vim.keymap.set('n', '<Leader>ad', 'a<c-r>=strftime("%F")<cr><esc>') -- [a]ppend [d]date (YYYY-MM-DD)
+
 -- b: Bufferline: https://github.com/akinsho/bufferline.nvim
 vim.keymap.set('n', '<Leader>bc', '<cmd>BufferLinePick<cr>')      -- [c]hoose tab
 vim.keymap.set('n', '<Leader>bn', '<cmd>BufferLineCycleNext<cr>') -- [n]ext tab
