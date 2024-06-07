@@ -63,8 +63,8 @@
     };
     NSGlobalDomain = {
       AppleKeyboardUIMode = 3; # full keyboard access
-      InitialKeyRepeat = 12;
-      KeyRepeat = 2;
+      InitialKeyRepeat = 12; # lower = faster
+      KeyRepeat = 2; # lower = fast
       NSAutomaticSpellingCorrectionEnabled = false;
     };
     CustomUserPreferences = {
