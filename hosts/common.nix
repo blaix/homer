@@ -3,6 +3,10 @@ let
   isLinux = pkgs.stdenv.hostPlatform.isLinux;
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
   unsupported = builtins.abort "Unsupported platform";
+  taskfiles = import (builtins.fetchGit {
+    url = "https://codeberg.org/blaix/taskfiles.git";
+    rev = "a57983a85a2adc1bbd3f342ec47380454e008140";
+  });
 in
 {
   # ---------------------------------------------------------------------------
@@ -63,6 +67,7 @@ in
     visidata # view tabular data on the command line
     viu # terminal image viewer (beautiful!)
     w3m # text-based web browser
+    (callPackage taskfiles {})
   ];
 
   fonts = {
