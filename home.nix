@@ -12,6 +12,7 @@
   # Environment variables
   home.sessionVariables = {
     EDITOR = "nvim";
+    TASKFILES_HOME = "$HOME/Sync/taskfiles";
 
     # opt out of project telemetries
     ET_NO_TELEMETRY = 1;          # eternal terminal
