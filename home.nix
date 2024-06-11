@@ -158,6 +158,7 @@
       tfp = "cd ~/projects/taskfiles";
       homer = "cd ~/homer";
       pencils = "cd ~/projects/pencils";
+      work = "cd ~/Sync/work/7Factor";
       # git aliases
       gfo = "git fetch -p origin";
       gmo = "git merge --ff-only origin/main";
