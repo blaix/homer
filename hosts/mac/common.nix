@@ -66,6 +66,9 @@
       InitialKeyRepeat = 12; # lower = faster
       KeyRepeat = 2; # lower = fast
       NSAutomaticSpellingCorrectionEnabled = false;
+      # Just repeat the key when I hold it down,
+      # don't show a suggestions tooltip.
+      ApplePressAndHoldEnabled = false;
     };
     CustomUserPreferences = {
       "com.apple.controlcenter" = {
