@@ -65,6 +65,9 @@
       ".direnv"
       ".envrc"
     ];
+    hooks = {
+      pre-commit = ./git/hooks/pre-commit.sh;
+    };
     extraConfig = {
       github = {
         user = "blaix";
