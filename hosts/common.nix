@@ -43,6 +43,7 @@ in
     bat # better cat
     catimg # cat for images
     comma # run binaries that aren't installed
+    devbox
     diff-so-fancy
     direnv
     fd
