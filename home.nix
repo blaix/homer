@@ -1,5 +1,17 @@
-{ config, pkgs, ... }:
-{
+{ config, lib, pkgs, ... }:
+let
+  # installs a vim plugin from github repo
+  # rev can be commit or a tag
+  vimPluginGithub = repo: rev: pkgs.vimUtils.buildVimPlugin {
+    pname = "${lib.strings.sanitizeDerivationName repo}";
+    version = "${repo}-${rev}";
+    src = builtins.fetchGit {
+      url = "https://github.com/${repo}.git";
+      rev = rev;
+    };
+  };
+in {
+
   # ---------------------------------------------------------------------------
   #   User home and dotfile settings common to all machines
   # ---------------------------------------------------------------------------
@@ -94,6 +106,10 @@
       bufferline-nvim
       neogit
       vim-markdown-toc # https://github.com/mzlogin/vim-markdown-toc
+
+      # latest commits after Mae's gren treesitter added and plugin created
+      (vimPluginGithub "nvim-treesitter/nvim-treesitter" "d0f567251b25974f508527253d590019c4062887")
+      (vimPluginGithub "MaeBrooks/nvim-gren" "56918120c490b62f2704f5f58bcbdb35e9e38e74")
 
       # vimwiki: I use this for GTD, projects, and notes
       # https://github.com/vimwiki/vimwiki

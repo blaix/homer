@@ -44,6 +44,8 @@ vim.opt.foldlevelstart = 99
 
 require("nvim-tree").setup({})
 require("neogit").setup({})
+require("nvim-treesitter").setup({ensure_installed = {"gren"}})
+require("nvim-gren").setup({})
 
 --
 -- bufferline

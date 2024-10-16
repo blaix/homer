@@ -1,5 +1,5 @@
 vim.filetype.add({
   extension = {
-    gren = 'elm',
+    gren = 'gren',
   },
 })
