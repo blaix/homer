@@ -51,6 +51,7 @@ in
     gcc
     git
     gnumake
+    gnupg
     htop
     just
     man

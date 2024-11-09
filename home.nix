@@ -55,7 +55,7 @@
       d = "diff";
       co = "checkout";
       st = "status -sb";
-      ci = "commit -v";
+      ci = "commit -v -S";
       gr = "log --graph --all";
       gmo = "git merge --ff-only origin/master";
       fetch = "fetch -p";
