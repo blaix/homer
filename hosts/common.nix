@@ -63,7 +63,6 @@ in
     pandoc
     ripgrep
     shellcheck
-    termpdfpy # cli vim-like ebook reader 
     tig # ncurses git repository browser
     tmux
     tree
