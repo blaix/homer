@@ -31,7 +31,7 @@
       name = "MesloLGS NF";
       size = 14;
     };
-    theme = "Dracula";
+    themeFile = "Dracula";
     settings = {
       enable_audio_bell = "no";
     };
