@@ -19,7 +19,8 @@ in
 
   programs.zsh.enable = true;
 
-  # do garbage collection weekly to keep disk usage low
+  # optimize and garbage collect automatically to keep disk usage low
+  nix.optimise.automatic = true;
   nix.gc = {
     automatic = lib.mkDefault true;
     options = lib.mkDefault "--delete-older-than 7d";
