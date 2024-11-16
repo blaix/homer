@@ -74,8 +74,7 @@ in
   ];
 
   fonts = {
-    fontDir.enable = true;
-    fonts = [
+    packages = [
       pkgs.meslo-lgs-nf
     ];
   };
