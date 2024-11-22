@@ -35,6 +35,8 @@ Important files:
   nix --extra-experimental-features nix-command --extra-experimental-features flakes run nix-darwin -- switch --flake .#[hostname]
   ```
 
+5. Import my gpg key. See 1Password.
+
 ### NixOs
 
 0. Log in to your nix server.
@@ -65,3 +67,4 @@ Important files:
   sudo nixos-rebuild switch --impure --flake .#orb
   ```
 
+5. Import my gpg key. See 1Password.
