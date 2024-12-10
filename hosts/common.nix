@@ -61,6 +61,8 @@ in
     nmap
     nodePackages.degit
     pandoc
+    python3
+    rename
     ripgrep
     shellcheck
     tig # ncurses git repository browser
