@@ -170,6 +170,8 @@
       d = "git d";
       # always inherit environment when using tmux
       tmux = "tmux -L default";
+      # gren aliases
+      mygren = "GREN_BIN=~/projects/gren/compiler/gren node ~/projects/gren/compiler/cli.js";
     };
     initExtra = ''
       # https://github.com/jeffreytse/zsh-vi-mode#nix
