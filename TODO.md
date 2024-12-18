@@ -4,3 +4,4 @@
     - [ ] Can't get git-installed nvim-treesitter to have .withPlugins attribute, but published package doesn't have her gren grammar yet
 - [ ] Consider/try snowfall lib
 - [ ] Better documentation
+- [ ] anything I can do about how slow it is?
