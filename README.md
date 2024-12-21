@@ -18,7 +18,7 @@ Important files:
 
 ### Mac
 
-1. Install nix: https://nix.dev/install-nix.html
+1. [Install nix](https://github.com/DeterminateSystems/nix-installer?tab=readme-ov-file#determinate-nix-installer) (or [lix](https://lix.systems/install/) - but I haven't tested this yet).
 
 2. Clone this repo: 
 
