@@ -50,6 +50,7 @@ in
     fd
     fzf
     gcc
+    gh
     git
     gnumake
     gnupg
