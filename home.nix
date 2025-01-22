@@ -151,6 +151,7 @@
   programs.zsh = {
     enable = true;
     shellAliases = {
+      gr = "nix shell nixpkgs#nodejs_20 github:gren-lang/nix/0.5.2 --command gren";
       cat = "bat";
       vim = "nvim";
       fv = "nvim \"$(fzf)\"";
@@ -173,8 +174,6 @@
       initgren = "devbox init && devbox add github:gren-lang/nix/0.5.x && devbox gen direnv";
       localgren = "GREN_BIN=~/projects/gren/compiler/gren node ~/projects/gren/compiler/cli.js";
       maingren = "nix shell nixpkgs#nodejs_20 github:gren-lang/nix/main --command gren";
-      gren4 = "nix shell nixpkgs#nodejs_20 github:gren-lang/nix/0.4.x --command gren";
-      gren5 = "nix shell nixpkgs#nodejs_20 github:gren-lang/nix/0.5.x --command gren";
     };
     initExtra = ''
       # https://github.com/jeffreytse/zsh-vi-mode#nix
