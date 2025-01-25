@@ -78,6 +78,9 @@
       pager = {
         branch = false;
       };
+      fetch = {
+        prune = true;
+      };
     };
   };
 
