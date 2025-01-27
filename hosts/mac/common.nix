@@ -30,6 +30,7 @@
       "drawio"
       "dropbox"
       "firefox"
+      "ghostty"
       "google-chrome"
       "kitty"
       "michaelvillar-timer"
