@@ -23,6 +23,7 @@
     # Find casks at https://formulae.brew.sh/cask/
     casks = [
       "1password"
+      "alfred"
       "amethyst"
       "crystalfetch" # for downloading windows isos
       "cyberduck"
