@@ -17,6 +17,13 @@
     # opt out of project telemetries
     ET_NO_TELEMETRY = 1;          # eternal terminal
     NEXT_TELEMETRY_DISABLED = 1;  # next.js
+
+    # Unfortunately ssh doesn't recognize ghostty's terminfo. Until it does,
+    # I'm opting out of ghostty's advanced features in exchange for better a
+    # terminal that actually works the way I'm used to when I ssh to another
+    # machine (especially another one of my own machines on my network).
+    # See https://github.com/ghostty-org/ghostty/discussions/3161
+    TERM = "xterm-256color";
   };
 
   # Extra directories to add to PATH
