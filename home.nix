@@ -161,6 +161,7 @@
   programs.zsh = {
     enable = true;
     shellAliases = {
+      flushdns = "sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder";
       gr = "nix shell nixpkgs#nodejs_20 github:gren-lang/nix/0.5.2 --command gren";
       cat = "bat";
       vim = "nvim";
