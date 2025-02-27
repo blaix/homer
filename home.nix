@@ -31,6 +31,16 @@
     "$HOME/homer/shared/bin"
   ];
 
+  # librewolf settings in nix home manager are not supported on mac.
+  # so writing config file directly instead.
+  # https://librewolf.net/docs/settings/#where-do-i-find-my-librewolfoverridescfg
+  home.file.".librewolf/librewolf.overrides.cfg" = {
+    # https://librewolf.net/docs/settings/
+    text = ''
+      defaultPref("identity.fxaccounts.enabled", true); 
+    '';
+  };
+
   # Kitty terminal config
   programs.kitty = {
     enable = true;
