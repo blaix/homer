@@ -22,6 +22,7 @@
       "1password"
       "alfred"
       "amethyst"
+      "charles" # watch network requests on mac
       "crystalfetch" # for downloading windows isos
       "cyberduck"
       "discord"
