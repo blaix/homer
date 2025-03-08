@@ -6,9 +6,6 @@
   #   Settings shared among all my Macs
   # ---------------------------------------------------------------------------
 
-  # Auto upgrade nix package and the daemon service.
-  services.nix-daemon.enable = true;
-
   users.users.justin = {
     name = "justin";
     home = "/Users/justin";

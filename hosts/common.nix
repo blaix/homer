@@ -60,7 +60,8 @@ in
     neofetch # print sys info + ascii logo in cli
     neovim
     nmap
-    nodePackages.degit
+    # failing to build on unstable
+    #nodePackages.degit
     pandoc
     python3
     rename
