@@ -41,19 +41,6 @@
     '';
   };
 
-  # Kitty terminal config
-  programs.kitty = {
-    enable = true;
-    font = {
-      name = "MesloLGS NF";
-      size = 14;
-    };
-    themeFile = "Dracula";
-    settings = {
-      enable_audio_bell = "no";
-    };
-  };
-
   programs.direnv = {
     enable = true;
     enableBashIntegration = true;

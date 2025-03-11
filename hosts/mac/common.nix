@@ -31,7 +31,6 @@
       "firefox"
       "ghostty"
       "google-chrome"
-      "kitty"
       "librewolf" # https://librewolf.net/docs/faq/#why-is-librewolf-marked-as-broken
       "michaelvillar-timer"
       "obsidian"
