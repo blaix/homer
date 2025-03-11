@@ -43,6 +43,7 @@ vim.opt.foldlevelstart = 99
 ---------------------------------------------------------------------
 
 require("nvim-tree").setup({})
+require("nvim-treesitter.configs").setup({highlight = {enable = true}})
 require("neogit").setup({})
 
 --

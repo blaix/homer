@@ -107,6 +107,7 @@
     plugins = with pkgs.vimPlugins; [
       nvim-tree-lua
       nvim-lspconfig
+      nvim-treesitter.withAllGrammars
       vim-commentary
       vim-prisma
       vim-just
