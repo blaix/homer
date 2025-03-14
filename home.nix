@@ -41,6 +41,20 @@
     '';
   };
 
+  # using the cask until the nix build is fixed
+  #programs.ghostty = {
+  #  enable = true;
+  #  settings = {
+  #    theme = "catppuccin-mocha";
+  #    font-feature = "-calt"; # no glyphs
+  #    keybind = [
+  #      # make zsh understand ctrl-[ as ESC
+  #      # https://github.com/ghostty-org/ghostty/issues/2976
+  #      "ctrl+left_bracket=text:\x1b"
+  #    ];
+  #  };
+  #};
+
   programs.direnv = {
     enable = true;
     enableBashIntegration = true;
