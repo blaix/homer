@@ -21,6 +21,7 @@
     casks = [
       "1password"
       "alfred"
+      "aws-vpn-client"
       "amethyst"
       "charles" # watch network requests on mac
       "crystalfetch" # for downloading windows isos
