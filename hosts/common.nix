@@ -47,6 +47,7 @@ in
     devbox
     diff-so-fancy
     direnv
+    entr
     fd
     fzf
     gcc
