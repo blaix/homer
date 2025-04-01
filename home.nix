@@ -152,7 +152,9 @@
       # Set status bar
       set -g status-bg black
       set -g status-fg white
-      set -g status-right '"#H" %a %b-%d %I:%M%p'
+      # Old status with date and time:
+      #set -g status-right '"#H" %a %b-%d %I:%M%p'
+      set -g status-right '"#H"'
       # Lots of room for long session names
       set -g status-left-length 30
       # Big history
