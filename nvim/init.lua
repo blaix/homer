@@ -210,6 +210,18 @@ autocmd("BufEnter", {
 })
 
 --
+-- ts
+--
+
+autocmd("BufEnter", {
+  pattern = "*.ts",
+  callback = function()
+    vim.opt.tabstop = 2
+    vim.opt.shiftwidth = 2
+  end
+})
+
+--
 -- rust
 --
 
