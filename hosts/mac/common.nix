@@ -67,6 +67,11 @@
       InitialKeyRepeat = 12; # lower = faster
       KeyRepeat = 2; # lower = fast
       NSAutomaticSpellingCorrectionEnabled = false;
+
+      # When I switch apps, *don't* switch to a space
+      # with a window open for that app.
+      AppleSpacesSwitchOnActivate = false;
+
       # Just repeat the key when I hold it down,
       # don't show a suggestions tooltip.
       ApplePressAndHoldEnabled = false;
