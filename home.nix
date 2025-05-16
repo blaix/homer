@@ -42,6 +42,7 @@
   };
 
   # using the cask until the nix build is fixed
+  # https://github.com/NixOS/nixpkgs/issues/368742
   #programs.ghostty = {
   #  enable = true;
   #  settings = {
