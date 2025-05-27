@@ -39,6 +39,9 @@ vim.opt.foldlevelstart = 99
 -- Always keep at least 5 lines under cursor when scrolling
 vim.opt.scrolloff = 5
 
+-- Subtle border at the 80th column
+vim.opt.colorcolumn = "80"
+
 
 ---------------------------------------------------------------------
 -- Plugin configs
@@ -175,6 +178,10 @@ vim.diagnostic.config{
   float={border=_border}
 }
 
+-------------------------------------
+-- TODO: move below to ftplugins?
+-------------------------------------
+
 --
 -- elm
 --
@@ -188,7 +195,7 @@ autocmd("BufWritePre", {
   end
 })
 
---
+---
 -- gren
 --
 

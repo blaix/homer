@@ -234,10 +234,10 @@
   };
 
   xdg.configFile = {
-    "nvim/filetype.lua" = {
+    "nvim" = {
       enable = true;
-      recursive = false;
-      source = ./nvim/filetype.lua;
+      recursive = true;
+      source = ./nvim;
     };
   };
 }
