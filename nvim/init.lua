@@ -36,6 +36,9 @@ vim.opt.shiftwidth = 4
 -- Default to no folds when opening file
 vim.opt.foldlevelstart = 99
 
+-- Always keep at least 5 lines under cursor when scrolling
+vim.opt.scrolloff = 5
+
 
 ---------------------------------------------------------------------
 -- Plugin configs
