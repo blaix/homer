@@ -18,7 +18,7 @@ Important files:
 
 ### Mac
 
-1. [Install nix](https://github.com/DeterminateSystems/nix-installer) (or [lix](https://lix.systems/install/) - but I haven't tested this yet).
+1. [Install nix](https://github.com/DeterminateSystems/nix-installer) (or [lix](https://lix.systems/install/)).
 
 2. Clone this repo: 
 
