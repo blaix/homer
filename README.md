@@ -69,4 +69,4 @@ It's set up for myself but should be adaptable if you want to use this setup for
   sudo nixos-rebuild switch --impure --flake .#orb
   ```
 
-5. Import my gpg key. See 1Password.
+5. If you are me: Import my gpg key from 1Password.
