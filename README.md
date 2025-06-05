@@ -8,6 +8,8 @@ Important files:
 * [`home.nix`](/home.nix): User environment configs.
 * [`hosts/`](/hosts): System, OS, and machine-specific configs.
 
+It's set up for myself but should be adaptable if you want to use this setup for your own systems.
+
 ## Usage
 
 * If you haven't already, go through the [initial setup](#initial-setup)
@@ -35,7 +37,7 @@ Important files:
   nix --extra-experimental-features nix-command --extra-experimental-features flakes run nix-darwin -- switch --flake .#[hostname]
   ```
 
-5. Import my gpg key. See 1Password.
+5. If you are me: Import my gpg key from 1Password.
 
 ### NixOs
 
