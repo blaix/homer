@@ -45,6 +45,7 @@ in
     catimg # cat for images
     comma # run binaries that aren't installed
     devbox
+    devenv
     diff-so-fancy
     direnv
     entr
