@@ -198,7 +198,7 @@
       tmux = "tmux -L default";
       # gren aliases
       initgren-054 = "devbox init && devbox add github:gren-lang/nix/0.5.4 && devbox add nodejs@22 && devbox gen direnv";
-      localgren = "GREN_BIN=~/projects/gren/compiler/gren node ~/projects/gren/compiler/cli.js";
+      localgren = "GREN_BIN=~/projects/gren/compiler/gren node ~/projects/gren/compiler/app";
       blaixgren = "GREN_BIN=~/projects/gren/compiler-blaix/gren node ~/projects/gren/compiler-blaix/cli.js";
       maingren = "nix shell nixpkgs#nodejs_20 github:gren-lang/nix/main --command gren";
     };
