@@ -208,6 +208,18 @@ autocmd("BufEnter", {
 })
 
 --
+-- html
+--
+
+autocmd("BufEnter", {
+  pattern = "*.html",
+  callback = function()
+    vim.opt.tabstop = 2
+    vim.opt.shiftwidth = 2
+  end
+})
+
+--
 -- js
 --
 
