@@ -202,7 +202,7 @@
       blaixgren = "GREN_BIN=~/projects/gren/compiler-blaix/gren node ~/projects/gren/compiler-blaix/cli.js";
       maingren = "nix shell nixpkgs#nodejs_20 github:gren-lang/nix/main --command gren";
     };
-    initExtra = ''
+    initContent = ''
       # https://github.com/jeffreytse/zsh-vi-mode#nix
       source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
     '';

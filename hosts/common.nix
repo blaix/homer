@@ -14,6 +14,7 @@ in
   # ---------------------------------------------------------------------------
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.trusted-users = [ "root" "justin" ];
   nixpkgs.config.allowUnfree = true;
   nix.package = pkgs.nix;
 

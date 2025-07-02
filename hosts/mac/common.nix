@@ -11,6 +11,8 @@
     home = "/Users/justin";
   };
 
+  system.primaryUser = "justin";
+
   homebrew = {
     enable = true;
     onActivation = {
@@ -88,12 +90,6 @@
     };
   };
   
-  # avoid need for a logout/login cycle for new settings to take effect
-  # not sure if this is actually working?
-  system.activationScripts.postUserActivation.text = ''
-    /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
-  '';
-
   # Leave this alone. 
   # It's set when you first install nix-darwin.
   # Only change via a full system reinstall.
