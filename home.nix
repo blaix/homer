@@ -194,8 +194,6 @@
       s = "git st";
       b = "git b";
       d = "git d";
-      # always inherit environment when using tmux
-      tmux = "tmux -L default";
       # gren aliases
       initgren-054 = "devbox init && devbox add github:gren-lang/nix/0.5.4 && devbox add nodejs@22 && devbox gen direnv";
       localgren = "GREN_BIN=~/projects/gren/compiler/gren node ~/projects/gren/compiler/app";
