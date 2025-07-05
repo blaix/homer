@@ -232,11 +232,11 @@ autocmd("BufEnter", {
 })
 
 --
--- ts
+-- nix
 --
 
 autocmd("BufEnter", {
-  pattern = "*.ts",
+  pattern = "*.nix",
   callback = function()
     vim.opt.tabstop = 2
     vim.opt.shiftwidth = 2
@@ -253,6 +253,18 @@ autocmd("BufWritePre", {
   pattern = "*.rs",
   callback = function()
     vim.lsp.buf.format()
+  end
+})
+
+--
+-- ts
+--
+
+autocmd("BufEnter", {
+  pattern = "*.ts",
+  callback = function()
+    vim.opt.tabstop = 2
+    vim.opt.shiftwidth = 2
   end
 })
 
