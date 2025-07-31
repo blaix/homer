@@ -63,6 +63,7 @@ in
     neofetch # print sys info + ascii logo in cli
     neovim
     nmap
+    nodejs_22
     # failing to build on unstable
     #nodePackages.degit
     pandoc
