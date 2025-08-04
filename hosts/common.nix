@@ -57,6 +57,7 @@ in
     git
     gnumake
     gnupg
+    gren
     htop
     just
     man
