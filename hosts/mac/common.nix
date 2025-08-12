@@ -36,6 +36,7 @@
       "google-chrome"
       "librewolf" # https://librewolf.net/docs/faq/#why-is-librewolf-marked-as-broken
       "michaelvillar-timer"
+      "netnewswire"
       "obsidian"
       "orbstack"
       "postman"
