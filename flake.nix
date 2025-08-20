@@ -15,20 +15,23 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-    lix-module = {
-      url = "https://git.lix.systems/lix-project/nixos-module/archive/2.93.3-1.tar.gz";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # lix is failing to build
+
+    #lix-module = {
+    #  url = "https://git.lix.systems/lix-project/nixos-module/archive/2.93.3-1.tar.gz";
+    #  inputs.nixpkgs.follows = "nixpkgs";
+    #};
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, lix-module, ... }: {
+  #outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, lix-module, ... }: {
+  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, ... }: {
 
     # macs
     darwinConfigurations = {
       arwen = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         modules = [ 
-          lix-module.nixosModules.default
+          #lix-module.nixosModules.default
           ./hosts/mac/arwen.nix
           home-manager.darwinModules.home-manager {
             home-manager.users.justin = import ./home.nix;
@@ -38,7 +41,7 @@
       bilbo = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         modules = [ 
-          lix-module.nixosModules.default
+          #lix-module.nixosModules.default
           ./hosts/mac/bilbo.nix
           home-manager.darwinModules.home-manager {
             home-manager.users.justin = import ./home.nix;
@@ -52,7 +55,7 @@
       orb = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
         modules = [ 
-          lix-module.nixosModules.default
+          #lix-module.nixosModules.default
           ./hosts/nixos/orb.nix
           home-manager.nixosModules.home-manager {
             home-manager.users.justin = import ./home.nix;
