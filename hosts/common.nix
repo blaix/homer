@@ -44,6 +44,7 @@ in
   environment.systemPackages = with pkgs; [
     bat # better cat
     catimg # cat for images
+    claude-code
     comma # run binaries that aren't installed
     devbox
     devenv
