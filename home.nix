@@ -231,6 +231,11 @@
     source = builtins.toFile "keep" ""; 
   };
 
+  # Shared CLAUDE.md memory file across all hosts
+  home.file.".claude/CLAUDE.md" = {
+    source = ./shared/CLAUDE.md;
+  };
+
   xdg.configFile = {
     "nvim" = {
       enable = true;
