@@ -19,11 +19,18 @@ The key differences to Elm are:
 * The unit type is `{}`, not `()`.
 * There are no automatic constructors for type aliased records. You have to create your own functions.
 * Custom type variants can only hold one value. If you need more than one, use a record.
+* There are more modules for native web apis. See https://packages.gren-lang.org/package/gren-lang/browser and https://packages.gren-lang.org/package/gren-lang/core
+* There are more functions available in https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/Bytes
 
 Common gren commands:
 
 * Compile a module: `gren make ModuleName` (usually `Main`)
 * Run a module: `gren run ModuleName` (usually `Main`)
+* Create a gren browser application: `gren init`
+* create a gren node application: `gren init --platform=node`
+* Create a gren browser package: `gren init --package`
+* Create a gren node package: `gren init --package --platform=node`
+* Create a gren common package: `gren init --package --platform=common`
 
 Common packages and APIs:
 
