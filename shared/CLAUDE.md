@@ -26,6 +26,7 @@ Common gren commands:
 
 * Compile a module: `gren make ModuleName` (usually `Main`)
 * Run a module: `gren run ModuleName` (usually `Main`)
+* Install packages with: `gren package install package/name`
 * Create a gren browser application: `gren init`
 * create a gren node application: `gren init --platform=node`
 * Create a gren browser package: `gren init --package`
@@ -40,3 +41,23 @@ Common packages and APIs:
 * Node API: https://packages.gren-lang.org/package/gren-lang/node/version/latest/overview
 * PrettyNice web framework: https://github.com/blaix/prettynice
     * examples: https://github.com/blaix/prettynice/tree/main/examples/v3
+
+Other things to remember about Gren:
+
+* The program type for browser programs is just `Program` and does not need to be imported.
+* Multi-line record updates should be formatted like this:
+    ```
+    { myRecord
+        | field1 = "whatever"
+        , field2 = "whatever"
+    }
+    ```
+
+My Gren coding preferences:
+
+* Favor fully qualified paths for functions in imported modules.
+* Exception to the above point for Html.Events
+* Favor aliasing nested modules to the leaf module name.
+* Import Html as H
+* Import Html.Attributes as A
+* Forms should be actual forms using onSubmit, instead of an onClick on the submit button.
