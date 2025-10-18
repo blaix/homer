@@ -1,6 +1,9 @@
 # list available themes with cli command: ghostty +list-themes
 theme = Catppuccin Mocha
 
+# start maximized
+maximize = true
+
 # no glyphs
 font-feature = -calt
 
