@@ -41,21 +41,6 @@
     '';
   };
 
-  # using the cask until the nix build is fixed
-  # https://github.com/NixOS/nixpkgs/issues/368742
-  #programs.ghostty = {
-  #  enable = true;
-  #  settings = {
-  #    theme = "catppuccin-mocha";
-  #    font-feature = "-calt"; # no glyphs
-  #    keybind = [
-  #      # make zsh understand ctrl-[ as ESC
-  #      # https://github.com/ghostty-org/ghostty/issues/2976
-  #      "ctrl+left_bracket=text:\x1b"
-  #    ];
-  #  };
-  #};
-
   programs.direnv = {
     enable = true;
     enableBashIntegration = true;
@@ -241,6 +226,15 @@
       enable = true;
       recursive = true;
       source = ./nvim;
+    };
+
+    # Switch to the home manager configs after the ghostty nix build is fixed:
+    # https://github.com/NixOS/nixpkgs/issues/368742
+    # Until then, using the homebrew cask and hardcoding the config file:
+    "ghostty" = {
+      enable = true;
+      recursive = true;
+      source = ./ghostty;
     };
   };
 }

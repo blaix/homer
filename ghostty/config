@@ -1,0 +1,16 @@
+# list available themes with cli command: ghostty +list-themes
+theme = Catppuccin Mocha
+
+# no glyphs
+font-feature = -calt
+
+# make zsh understand ctrl-[ as ESC
+# https://github.com/ghostty-org/ghostty/issues/2976
+keybind = ctrl+left_bracket=text:\x1b
+
+# text under cursor not visible without this
+cursor-invert-fg-bg = true
+
+# By default ghostty starts in last directory. I don't like that.
+working-directory = home
+window-inherit-working-directory = false
