@@ -158,7 +158,6 @@ require("lualine").setup({
 ---------------------------------------------------------------------
 
 local autocmd = vim.api.nvim_create_autocmd
-local lspconfig = require("lspconfig")
 
 vim.lsp.set_log_level("debug")
 
@@ -186,7 +185,7 @@ vim.diagnostic.config{
 -- elm
 --
 
-lspconfig.elmls.setup {}
+vim.lsp.enable("elmls")
 
 autocmd("BufWritePre", {
   pattern = "*.elm",
@@ -247,7 +246,7 @@ autocmd("BufEnter", {
 -- rust
 --
 
-lspconfig.rust_analyzer.setup {}
+vim.lsp.enable("rust_analyzer")
 
 autocmd("BufWritePre", {
   pattern = "*.rs",
