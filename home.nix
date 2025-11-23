@@ -66,6 +66,7 @@
     };
     ignores = [
       ".DS_Store"
+      ".claude"
       ".direnv"
       ".envrc"
     ];
