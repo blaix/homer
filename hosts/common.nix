@@ -70,6 +70,7 @@ in
     #nodePackages.degit
     pandoc
     python3
+    python313Packages.pip
     rename
     ripgrep
     shellcheck

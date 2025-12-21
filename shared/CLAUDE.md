@@ -61,3 +61,10 @@ My Gren coding preferences:
 * Import Html as H
 * Import Html.Attributes as A
 * Forms should be actual forms using onSubmit, instead of an onClick on the submit button.
+
+## Python
+
+* I use nix. The python interpreter should be on my path at `/run/current-system/sw/bin/python`
+* When you need to install python packages, prefer local virtualenvs, using the built-in python functionality for this (`python -m venv ./.venv && source ./.venv/bin/activate`)
+* To install missing python modules/packages, use pip after activating the local virtualenv.
+* Python scripts should be run with python explicitly, not with a shebang line in the script, so the local venv is picked up.
