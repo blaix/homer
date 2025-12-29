@@ -7,14 +7,8 @@ This file contains shared memory and context for Claude Code across all hosts.
 Gren is a programming language similar to Elm.
 Read the documentation at https://gren-lang.org/book/
 
- **CRITICAL: Always verify function existence in the official docs before using ANY functions in the modules listed below.**
- **Do NOT assume functions exist based on Elm or general knowledge.**
-    * Array: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/Array
-    * String: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/String
-    * Dict: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/Dict
-    * Bytes: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/Bytes
- 
-**CRITICAL: There is no List type. See the following points for details.**
+There is no List type in Gren:
+
 * The default sequential data type is an Array.
 * Literal brackets will create arrays, not lists.
 * All APIs are updated to use Arrays instead of lists.
@@ -29,6 +23,11 @@ Other key differences to Elm are:
 * There are no automatic constructors for type aliased records. You have to create your own functions.
 * Custom type variants can only hold one value. If you need more than one, use a record.
 * There are more modules for native web apis. See https://packages.gren-lang.org/package/gren-lang/browser and https://packages.gren-lang.org/package/gren-lang/core
+
+Common function name differences from Elm:
+
+* `Array.filter` does not exist - use `Array.keepIf` instead
+* `Array.toList` does not exist - Arrays ARE the list type in Gren
 
 Common gren commands:
 
@@ -46,7 +45,13 @@ Common packages and APIs:
 * Tests use https://packages.gren-lang.org/package/gren-lang/test/version/latest/overview
 * Test effects with https://packages.gren-lang.org/package/blaix/gren-effectful-tests/version/latest/overview
 * Browser API: https://packages.gren-lang.org/package/gren-lang/browser/version/latest/overview
+* Html.Events API: https://packages.gren-lang.org/package/gren-lang/browser/version/latest/module/Html.Events
+* Html.Keyed API: https://packages.gren-lang.org/package/gren-lang/browser/version/latest/module/Html.Keyed
 * Node API: https://packages.gren-lang.org/package/gren-lang/node/version/latest/overview
+* Array: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/Array
+* String: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/String
+* Dict: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/Dict
+* Bytes: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/Bytes
 * PrettyNice web framework: https://github.com/blaix/prettynice
     * examples: https://github.com/blaix/prettynice/tree/main/examples/v3
 
@@ -60,6 +65,9 @@ Other things to remember about Gren:
         , field2 = "whatever"
     }
     ```
+* Keyed nodes are available via `Html.Keyed.node` and take children as `Array { key : String, node : Html msg }`
+* For custom event handlers with decoders, use `Html.Events.on "eventName" decoder`
+* Use `Process.sleep` (takes milliseconds) with `Task.perform` to schedule delayed messages
 
 My Gren coding preferences:
 
