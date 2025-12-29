@@ -14,9 +14,14 @@ Read the documentation at https://gren-lang.org/book/
     * Dict: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/Dict
     * Bytes: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/Bytes
  
+**CRITICAL: There is no List type. See the following points for details.**
+* The default sequential data type is an Array.
+* Literal brackets will create arrays, not lists.
+* All APIs are updated to use Arrays instead of lists.
+* You should NEVER try to convert an array to a list.
+ 
 Other key differences to Elm are:
 
-* There is no List type. The default sequential data type is an Array. Literal brackets will create arrays, not lists.
 * The pattern matching syntax has changed from `case..of` to `when..is`
 * There are no tuples. Where you would normally use a tuple in Elm, you should use a record in Gren.
 * Pattern matching has extended to support records. Read the documentation at https://gren-lang.org/book/syntax/pattern_matching/ and https://gren-lang.org/book/syntax/destructuring/
