@@ -40,6 +40,8 @@ Common gren commands:
 * Create a gren node package: `gren init --package --platform=node`
 * Create a gren common package: `gren init --package --platform=common`
 
+**Important:** If there is a `devbox.json` in the project directory, you should prefix `gren` commands with `devbox run`. E.g. `devbox run gren make Main`
+
 Common packages and APIs:
 
 * Tests use https://packages.gren-lang.org/package/gren-lang/test/version/latest/overview
