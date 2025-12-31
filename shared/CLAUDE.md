@@ -70,6 +70,13 @@ Other things to remember about Gren:
 * Keyed nodes are available via `Html.Keyed.node` and take children as `Array { key : String, node : Html msg }`
 * For custom event handlers with decoders, use `Html.Events.on "eventName" decoder`
 * Use `Process.sleep` (takes milliseconds) with `Task.perform` to schedule delayed messages
+* Math functions like `round`, `floor`, and `ceiling` are in the `Math` module, not global like in Elm
+* String functions differ from Elm:
+    * Use `String.count` instead of `String.length`
+    * Use `String.takeLast` and `String.dropLast` instead of `String.right` and `String.dropRight`
+* The `gren make` command uses module paths, not file paths:
+    * Correct: `gren make Main`
+    * Incorrect: `gren make src/Main.gren`
 
 My Gren coding preferences:
 
