@@ -16,7 +16,6 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     # lix is failing to build
-
     #lix-module = {
     #  url = "https://git.lix.systems/lix-project/nixos-module/archive/2.93.3-1.tar.gz";
     #  inputs.nixpkgs.follows = "nixpkgs";
@@ -24,44 +23,39 @@
   };
 
   #outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, lix-module, ... }: {
-  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, ... }: {
+  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, ... }:
+    let
+      homeManagerConfig = {
+        home-manager.users.justin = import ./home.nix;
+      };
 
-    # macs
-    darwinConfigurations = {
-      arwen = nix-darwin.lib.darwinSystem {
+      mkDarwinSystem = hostname: nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
-        modules = [ 
+        modules = [
           #lix-module.nixosModules.default
-          ./hosts/mac/arwen.nix
-          home-manager.darwinModules.home-manager {
-            home-manager.users.justin = import ./home.nix;
-          }
+          ./hosts/mac/${hostname}.nix
+          home-manager.darwinModules.home-manager homeManagerConfig
         ];
       };
-      bilbo = nix-darwin.lib.darwinSystem {
-        system = "aarch64-darwin";
-        modules = [ 
+
+      mkNixosSystem = { hostname, system ? "aarch64-linux" }: nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
           #lix-module.nixosModules.default
-          ./hosts/mac/bilbo.nix
-          home-manager.darwinModules.home-manager {
-            home-manager.users.justin = import ./home.nix;
-          }
+          ./hosts/nixos/${hostname}.nix
+          home-manager.nixosModules.home-manager homeManagerConfig
         ];
+      };
+    in {
+      # macs
+      darwinConfigurations = {
+        arwen = mkDarwinSystem "arwen";
+        bilbo = mkDarwinSystem "bilbo";
+      };
+
+      # nixos
+      nixosConfigurations = {
+        orb = mkNixosSystem { hostname = "orb"; };
       };
     };
-
-    # nixos
-    nixosConfigurations = {
-      orb = nixpkgs.lib.nixosSystem {
-        system = "aarch64-linux";
-        modules = [ 
-          #lix-module.nixosModules.default
-          ./hosts/nixos/orb.nix
-          home-manager.nixosModules.home-manager {
-            home-manager.users.justin = import ./home.nix;
-          }
-        ];
-      };
-    };
-  };
 }
