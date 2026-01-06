@@ -1,8 +1,10 @@
 - [X] Switch to a Flakes setup
+- [X] Use Mae's gren-treesitter (officially added to the nvim-treesitter plugin)
+
+Maybe:
+
 - [ ] Switch to Lix? https://lix.systems/add-to-config/#flake-based-configurations
 - [ ] Try https://flake.parts/
-- [ ] Use Mae's gren-treesitter (officially added to the nvim-treesitter plugin) and/or nvim-gren plugin
-    - [ ] Can't get git-installed nvim-treesitter to have .withPlugins attribute, but published package doesn't have her gren grammar yet
 - [ ] Consider/try snowfall lib
 - [ ] Better documentation
 - [ ] anything I can do about how slow it is?
