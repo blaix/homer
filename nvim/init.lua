@@ -231,6 +231,18 @@ autocmd("BufEnter", {
 })
 
 --
+-- json
+--
+
+autocmd("BufEnter", {
+  pattern = "*.json",
+  callback = function()
+    vim.opt.tabstop = 2
+    vim.opt.shiftwidth = 2
+  end
+})
+
+--
 -- nix
 --
 
