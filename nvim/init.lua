@@ -49,8 +49,10 @@ vim.opt.colorcolumn = "80"
 ---------------------------------------------------------------------
 
 require("nvim-tree").setup({})
-require("nvim-treesitter.configs").setup({highlight = {enable = true}})
 require("neogit").setup({})
+require("nvim-treesitter").setup({
+    highlight = {enable = true},
+})
 
 --
 -- bufferline
@@ -198,9 +200,10 @@ autocmd("BufWritePre", {
 -- gren
 --
 
-autocmd("BufEnter", {
-  pattern = "*.gren",
-  callback = function()
+autocmd("FileType", {
+  pattern = "gren",
+  callback = function(args)
+    vim.treesitter.start(args.buf, "gren")
     vim.opt.tabstop = 4
     vim.opt.shiftwidth = 4
   end

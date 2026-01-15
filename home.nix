@@ -52,28 +52,19 @@
 
   programs.git = {
     enable = true;
-    userName = "Justin Blake";
-    userEmail = "justin@blaix.com";
-    aliases = {
-      b = "branch";
-      d = "diff";
-      co = "checkout";
-      st = "status -sb";
-      ci = "commit -v -S";
-      gr = "log --graph --all";
-      gmo = "git merge --ff-only origin/master";
-      fetch = "fetch -p";
-    };
-    ignores = [
-      ".DS_Store"
-      ".claude"
-      ".direnv"
-      ".envrc"
-    ];
-    hooks = {
-      pre-commit = ./git/hooks/pre-commit.sh;
-    };
-    extraConfig = {
+    settings = {
+      user.name = "Justin Blake";
+      user.email = "justin@blaix.com";
+      alias = {
+        b = "branch";
+        d = "diff";
+        co = "checkout";
+        st = "status -sb";
+        ci = "commit -v -S";
+        gr = "log --graph --all";
+        gmo = "git merge --ff-only origin/master";
+        fetch = "fetch -p";
+      };
       github = {
         user = "blaix";
       };
@@ -87,11 +78,20 @@
         prune = true;
       };
     };
+    ignores = [
+      ".DS_Store"
+      ".claude"
+      ".direnv"
+      ".envrc"
+    ];
+    hooks = {
+      pre-commit = ./git/hooks/pre-commit.sh;
+    };
   };
 
+  # Note: config is in nvim/* copied via xdgconfig below
   programs.neovim = {
     enable = true;
-    extraLuaConfig = builtins.readFile ./nvim/init.lua;
     plugins = with pkgs.vimPlugins; [
       nvim-tree-lua
       nvim-lspconfig
