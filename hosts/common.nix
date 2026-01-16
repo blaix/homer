@@ -59,6 +59,7 @@ in
     gnumake
     gnupg
     gren
+    (callPackage ../pkgs/gren-language-server.nix {})
     htop
     just
     man

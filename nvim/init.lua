@@ -200,12 +200,29 @@ autocmd("BufWritePre", {
 -- gren
 --
 
+-- Setup gren language server
+require('lspconfig.configs').grenls = {
+  default_config = {
+    cmd = { 'gren-language-server-unofficial' },
+    filetypes = { 'gren' },
+    root_dir = require('lspconfig.util').root_pattern('gren.json', '.git'),
+    settings = {
+      grenPath = 'gren',
+      grenFormatPath = 'builtin',
+    },
+  },
+}
+
+require('lspconfig').grenls.setup({})
+
 autocmd("FileType", {
   pattern = "gren",
   callback = function(args)
-    vim.treesitter.start(args.buf, "gren")
     vim.opt.tabstop = 4
     vim.opt.shiftwidth = 4
+    
+    -- enable mae's treesitter for syntax highlighting
+    vim.treesitter.start(args.buf, "gren") 
   end
 })
 
