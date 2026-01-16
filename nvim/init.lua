@@ -163,21 +163,15 @@ local autocmd = vim.api.nvim_create_autocmd
 
 vim.lsp.set_log_level("debug")
 
--- Borders for floating windows
-local _border = "single"
-vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
-  vim.lsp.handlers.hover, {
-    border = _border
-  }
-)
-vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
-  vim.lsp.handlers.signature_help, {
-    border = _border
-  }
-)
-vim.diagnostic.config{
-  float={border=_border}
-}
+-- Override the underlying floating preview function to ensure borders.
+-- There has to be a better way to do this... but so far nothing I tried works.
+local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
+function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+  opts = opts or {}
+  -- See options at https://neovim.io/doc/user/options.html#'winborder'
+  opts.border = opts.border or "bold" 
+  return orig_util_open_floating_preview(contents, syntax, opts, ...)
+end
 
 -------------------------------------
 -- TODO: move below to ftplugins?
