@@ -7,12 +7,14 @@ This file contains shared memory and context for Claude Code across all hosts.
 Gren is a programming language similar to Elm.
 Read the documentation at https://gren-lang.org/book/
 
-There is no List type in Gren:
+IMPORTANT: There is no List type in Gren!
 
 * The default sequential data type is an Array.
 * Literal brackets will create arrays, not lists.
 * All APIs are updated to use Arrays instead of lists.
 * You should NEVER try to convert an array to a list.
+* You NEVER need to use Array.fromList or similar.
+  If you think you do, the API you're using probably wants an array anyway.
  
 Other key differences to Elm are:
 
