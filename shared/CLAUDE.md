@@ -42,7 +42,10 @@ Common gren commands:
 * Create a gren node package: `gren init --package --platform=node`
 * Create a gren common package: `gren init --package --platform=common`
 
-**Important:** If there is a `devbox.json` in the project directory, you should prefix `gren` commands with `devbox run`. E.g. `devbox run gren make Main`
+Devox:
+
+* If there is a `devbox.json` in the project directory, you should prefix `gren` commands with `devbox run`. E.g. `devbox run gren make Main`
+* Look at devbox.json for scripts like "build" and "test". If they exist, use those instead of the make commands above.
 
 Common packages and APIs:
 
