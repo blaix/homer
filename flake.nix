@@ -6,7 +6,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     home-manager.url = "github:nix-community/home-manager/master";
-    
+
     # versioned
     #nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     #nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
@@ -14,6 +14,14 @@
 
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    # doitanyway web application
+    doitanyway.url = "git+ssh://git@github.com/blaix/doitanyway.new.git";
+    doitanyway.inputs.nixpkgs.follows = "nixpkgs";
+
+    # disko for declarative disk management
+    disko.url = "github:nix-community/disko";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
 
     # lix is failing to build
     #lix-module = {
@@ -23,7 +31,7 @@
   };
 
   #outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, lix-module, ... }: {
-  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, ... }:
+  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, disko, ... }:
     let
       homeManagerConfig = {
         home-manager.users.justin = import ./home.nix;
@@ -40,6 +48,7 @@
 
       mkNixosSystem = { hostname, system ? "aarch64-linux" }: nixpkgs.lib.nixosSystem {
         inherit system;
+        specialArgs = { inherit inputs; };
         modules = [
           #lix-module.nixosModules.default
           ./hosts/nixos/${hostname}.nix
@@ -55,7 +64,9 @@
 
       # nixos
       nixosConfigurations = {
-        orb = mkNixosSystem { hostname = "orb"; };
+        orb = mkNixosSystem { hostname = "orb"; }; # my orbstack vm
+        blaixapps = mkNixosSystem { hostname = "blaixapps"; system = "x86_64-linux"; }; # multi-app server
+        blaixapps-base = mkNixosSystem { hostname = "blaixapps-base"; system = "x86_64-linux"; }; # base-level nixos server install
       };
     };
 }

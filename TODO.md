@@ -1,5 +1,7 @@
 - [X] Switch to a Flakes setup
 - [X] Use Mae's gren-treesitter (officially added to the nvim-treesitter plugin)
+- [ ] Remove duplication under the various hosts/ files. Especially with my user setup.
+- [ ] See TODO comments in code.
 
 Maybe:
 

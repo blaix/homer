@@ -48,6 +48,8 @@
     # faster use_nix implementation
     # https://github.com/nix-community/nix-direnv
     nix-direnv.enable = true;
+
+    config.global.log_filter = "^(loading|using|nix-direnv)";
   };
 
   programs.git = {
@@ -162,6 +164,7 @@
   programs.zsh = {
     enable = true;
     shellAliases = {
+      dev = "nix develop -c zsh"; # nix dev shell with my normal shells setup (from this home manager config)
       flushdns = "sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder";
       gr = "nix shell nixpkgs#nodejs_20 github:gren-lang/nix/0.5.2 --command gren";
       cat = "bat";
