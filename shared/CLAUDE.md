@@ -30,6 +30,8 @@ Common function name differences from Elm:
 
 * `Array.filter` does not exist - use `Array.keepIf` instead
 * `Array.toList` does not exist - Arrays ARE the list type in Gren
+* `Set.insert` does not exist - use `Set.set` instead
+* `Set.size` does not exist - use `Set.count` instead
 
 Common gren commands:
 
@@ -58,6 +60,7 @@ Common packages and APIs:
 * Array: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/Array
 * String: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/String
 * Dict: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/Dict
+* Set: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/Set
 * Bytes: https://packages.gren-lang.org/package/gren-lang/core/version/latest/module/Bytes
 * PrettyNice web framework: https://github.com/blaix/prettynice
     * examples: https://github.com/blaix/prettynice/tree/main/examples/v3
@@ -82,6 +85,7 @@ Other things to remember about Gren:
 * The `gren make` command uses module paths, not file paths:
     * Correct: `gren make Main`
     * Incorrect: `gren make src/Main.gren`
+* IMPORTANT (this is a common mistake): The Html.Events.onChecked event sends the checkbox's value as it exists BEFORE the click. For example, if you click an unchecked checkbox, you will get a message holding a False value, not a true one.
 
 My Gren coding preferences:
 
