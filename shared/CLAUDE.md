@@ -99,6 +99,37 @@ My Gren coding preferences:
 * Forms should be actual forms using onSubmit, instead of an onClick on the submit button.
 * Prefer past-tense verbs for message names. E.g. `InputUpdated` instead of `UpdateInput`
 
+## Nix
+
+### Flake Input Overrides with Remote Builds
+
+When using `nixos-rebuild` with `--build-host` to build on a remote server:
+
+* Flake evaluation happens locally (on your machine)
+* Nix fetches all inputs locally, then copies sources to the build host
+* The server never needs direct access to private repos - it receives sources from your machine
+
+When using `--override-input` with a local path for remote builds:
+
+* IMPORTANT: Use the `path:` prefix for local directory overrides: `--override-input myinput path:/local/path`
+* Without `path:`, Nix may fail to properly copy the local directory to the remote build host
+* The error will look like the remote server trying to access your local path (e.g., "getting status of '/Users/...'")
+
+### Homer Setup
+
+Homer is my NixOS/nix-darwin configuration repo.
+
+Key hosts:
+* `blaixapps` - Multi-app server at dia.blaix.com (x86_64-linux)
+* Mac hosts use nix-darwin (aarch64-darwin)
+
+Deployment commands (see Justfile):
+* `just deploy-blaixapps` - Normal deploy (evaluates locally, builds on server)
+
+The blaixapps server hosts multiple web apps as flake inputs:
+* `doitanyway` - Private repo (git+ssh), server can't fetch directly
+* `growth` - Public repo
+
 ## Python
 
 * I use nix. The python interpreter should be on my path at `/run/current-system/sw/bin/python`
