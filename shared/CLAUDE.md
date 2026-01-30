@@ -86,6 +86,8 @@ Other things to remember about Gren:
     * Correct: `gren make Main`
     * Incorrect: `gren make src/Main.gren`
 * IMPORTANT (this is a common mistake): The Html.Events.onChecked event sends the checkbox's value as it exists BEFORE the click. For example, if you click an unchecked checkbox, you will get a message holding a False value, not a true one.
+* Command-line arguments in Node programs are available via `env.args : Array String` in the `init` function. The first element is the application path, actual arguments start at index 1.
+* `port` is a reserved word - use `port_` for field names related to ports.
 
 My Gren coding preferences:
 
