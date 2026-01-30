@@ -29,11 +29,11 @@
         "ws4sql": "ws4sql"
       },
       "locked": {
-        "lastModified": 1769715274,
-        "narHash": "sha256-qQ+/9oaP9EOlf1GV0fYFd7+KzawmqefO0ToPVK/85HE=",
+        "lastModified": 1769774973,
+        "narHash": "sha256-X9mblkyH3WhzvJyflRyvJaADYqlBiR3/PwqdmmcZcuM=",
         "ref": "refs/heads/main",
-        "rev": "debd4aa2eda4d06cedb878c6e991dfe33aa1dc62",
-        "revCount": 125,
+        "rev": "09cdc1d32977a810937ab467373beddda6815b73",
+        "revCount": 133,
         "type": "git",
         "url": "ssh://git@github.com/blaix/doitanyway.new.git"
       },
@@ -67,11 +67,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1769699427,
-        "narHash": "sha256-dAQt3qXugGhg92A+jqaUcmH0elbgEN/mV4vy1+ohLZk=",
+        "lastModified": 1769723138,
+        "narHash": "sha256-kgkwjs33YfJasADIrHjHcTIDs3wNX0xzJhnUP+oldEw=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "2a08ab21abc8b482f41c521b5f9b0df5b18a67eb",
+        "rev": "175532b6275b34598a0ceb1aef4b9b4006dd4073",
         "type": "github"
       },
       "original": {
