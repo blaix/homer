@@ -87,11 +87,11 @@
         "ws4sql": "ws4sql_2"
       },
       "locked": {
-        "lastModified": 1769788312,
-        "narHash": "sha256-+O0CkJZgaHuze0bCMHMahMNETuBN19LM0sekFWNadTY=",
+        "lastModified": 1769795315,
+        "narHash": "sha256-0D8WEZewxKL1O9x6ZiduKqykDLXDVN8aXh16Q0u7dxE=",
         "owner": "blaix",
         "repo": "growth",
-        "rev": "2a7b6fb2d1363ac981fac4c688d430a8fba54a94",
+        "rev": "bdc8fd20935c83173bc7ae97afa2bf90c4424fe6",
         "type": "github"
       },
       "original": {
@@ -107,11 +107,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1769723138,
-        "narHash": "sha256-kgkwjs33YfJasADIrHjHcTIDs3wNX0xzJhnUP+oldEw=",
+        "lastModified": 1769776025,
+        "narHash": "sha256-70a1kVC08AMTvPc7iqQsJbbD4Y1fukakMVudz4oY9SM=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "175532b6275b34598a0ceb1aef4b9b4006dd4073",
+        "rev": "0fba737f8d5571d41467f3d99a878e11b8c0f0f0",
         "type": "github"
       },
       "original": {
