@@ -19,6 +19,10 @@
     doitanyway.url = "git+ssh://git@github.com/blaix/doitanyway.new.git";
     doitanyway.inputs.nixpkgs.follows = "nixpkgs";
 
+    # growth web application
+    growth.url = "github:blaix/growth";
+    growth.inputs.nixpkgs.follows = "nixpkgs";
+
     # disko for declarative disk management
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";

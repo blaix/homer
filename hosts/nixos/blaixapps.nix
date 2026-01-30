@@ -4,6 +4,7 @@
     ./blaixapps-base.nix
     ./common.nix
     inputs.doitanyway.nixosModules.doitanyway
+    inputs.growth.nixosModules.growth
   ];
 
   # Hostname
@@ -15,5 +16,15 @@
     domain = "dia.blaix.com";
     acmeEmail = "justin@blaix.com";
     enableBackups = true;
+  };
+
+  # Enable growth service
+  services.growth = {
+    enable = true;
+    domain = "growth.blaix.com";
+    acmeEmail = "justin@blaix.com";
+    appPort = 3030;
+    ws4sqlPort = 12322;
+    basicAuth.enable = true;
   };
 }
