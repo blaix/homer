@@ -23,6 +23,10 @@
     growth.url = "github:blaix/growth";
     growth.inputs.nixpkgs.follows = "nixpkgs";
 
+    # mycomics web application
+    mycomics.url = "github:blaix/mycomics";
+    mycomics.inputs.nixpkgs.follows = "nixpkgs";
+
     # disko for declarative disk management
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
