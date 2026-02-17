@@ -43,9 +43,7 @@ in
 
   environment.systemPackages = with pkgs; [
     bat # better cat
-    catimg # cat for images
     claude-code
-    comma # run binaries that aren't installed
     devbox
     devenv
     diff-so-fancy
@@ -69,19 +67,15 @@ in
     nodejs_22
     # failing to build on unstable
     #nodePackages.degit
-    pandoc
     python3
     python313Packages.pip
     rename
     ripgrep
-    shellcheck
     tig # ncurses git repository browser
     tmux
     tree
     unzip
-    visidata # view tabular data on the command line
     viu # terminal image viewer (beautiful!)
-    w3m # text-based web browser
     #(callPackage taskfiles {})
   ];
 

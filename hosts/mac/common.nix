@@ -34,7 +34,6 @@
       "firefox"
       "ghostty"
       "google-chrome"
-      "librewolf" # https://librewolf.net/docs/faq/#why-is-librewolf-marked-as-broken
       "michaelvillar-timer"
       "netnewswire"
       "obsidian"
@@ -42,9 +41,7 @@
       "postman"
       "slack"
       "steam"
-      "spotify"
       "utm" # for running windows
-      "visual-studio-code"
     ];
   };
 
