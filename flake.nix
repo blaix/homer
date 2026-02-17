@@ -27,6 +27,10 @@
     mycomics.url = "github:blaix/mycomics";
     mycomics.inputs.nixpkgs.follows = "nixpkgs";
 
+    # myrecords web application
+    myrecords.url = "github:blaix/myrecords";
+    myrecords.inputs.nixpkgs.follows = "nixpkgs";
+
     # disko for declarative disk management
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";

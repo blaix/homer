@@ -6,6 +6,7 @@
     inputs.doitanyway.nixosModules.doitanyway
     inputs.growth.nixosModules.growth
     inputs.mycomics.nixosModules.mycomics
+    inputs.myrecords.nixosModules.myrecords
   ];
 
   # Hostname
@@ -36,6 +37,16 @@
     acmeEmail = "justin@blaix.com";
     appPort = 3031;
     ws4sqlPort = 12323;
+    basicAuth.enable = true;
+  };
+
+  # Enable myrecords service
+  services.myrecords = {
+    enable = true;
+    domain = "records.blaix.com";
+    acmeEmail = "justin@blaix.com";
+    appPort = 3032;
+    ws4sqlPort = 12324;
     basicAuth.enable = true;
   };
 }
