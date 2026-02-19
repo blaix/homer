@@ -19,6 +19,9 @@
       autoUpdate = true;
       cleanup = "zap"; # remove brew packages not listed here
     };
+    brews = [
+      "git-gui" # Bring back gitk: https://www.bstefanski.com/blog/gitk-on-macos
+    ];
     # Find casks at https://formulae.brew.sh/cask/
     casks = [
       "1password"
