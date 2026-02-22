@@ -44,10 +44,16 @@ Common gren commands:
 * Create a gren node package: `gren init --package --platform=node`
 * Create a gren common package: `gren init --package --platform=common`
 
-Devox:
+Devbox:
 
 * If there is a `devbox.json` in the project directory, you should prefix `gren` commands with `devbox run`. E.g. `devbox run gren make Main`
 * Look at devbox.json for scripts like "build" and "test". If they exist, use those instead of the make commands above.
+
+Nix:
+
+Many of my projects use nix directly INSTEAD of devbox.
+If you see .nix files in the project, read them to understand the build.
+You will likely want to use something like `nix build .#[project name]`
 
 Common packages and APIs:
 
@@ -98,6 +104,7 @@ My Gren coding preferences:
 * Import Html.Attributes as A
 * Forms should be actual forms using onSubmit, instead of an onClick on the submit button.
 * Prefer past-tense verbs for message names. E.g. `InputUpdated` instead of `UpdateInput`
+* Format tests so `<|` and `\_ ->` are on the same line. E.g. `test "my test" <| \_ ->`
 
 ## Nix
 
