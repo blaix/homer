@@ -17,7 +17,9 @@
 
     # doitanyway web application
     doitanyway.url = "git+ssh://git@github.com/blaix/doitanyway.new.git";
-    doitanyway.inputs.nixpkgs.follows = "nixpkgs";
+    # doitanyway's node2nix needs nodejs.src, which is missing in nixpkgs
+    # unstable. Let it use its own pinned nixpkgs instead.
+    #doitanyway.inputs.nixpkgs.follows = "nixpkgs";
 
     # growth web application
     growth.url = "github:blaix/growth";
