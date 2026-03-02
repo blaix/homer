@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1772420042,
-        "narHash": "sha256-naZz40TUFMa0E0CutvwWsSPhgD5JldyTUDEgP9ADpfU=",
+        "lastModified": 1772699110,
+        "narHash": "sha256-jkyo/9fZVB3F/PHk3fVK1ImxJBZ71DCOYZvAz4R4v4E=",
         "owner": "nix-community",
         "repo": "disko",
-        "rev": "5af7af10f14706e4095bd6bc0d9373eb097283c6",
+        "rev": "42affa9d33750ac0a0a89761644af20d8d03e6ee",
         "type": "github"
       },
       "original": {
@@ -27,11 +27,11 @@
         "ws4sql": "ws4sql"
       },
       "locked": {
-        "lastModified": 1772480913,
-        "narHash": "sha256-ZTkDr6REfzBff9CpVwu06OZTF9GVhEdNDszrAZSNV+0=",
+        "lastModified": 1772720803,
+        "narHash": "sha256-jDw8aZGd0Ajk58v3jkXJu74FEMAXAsl4DomHSbyi6uE=",
         "ref": "refs/heads/main",
-        "rev": "f332cae0cb600d8449da2a9eb40365893928a03a",
-        "revCount": 232,
+        "rev": "e49358c605e5a05b17eea79f5295b62f862021f4",
+        "revCount": 240,
         "type": "git",
         "url": "ssh://git@github.com/blaix/doitanyway.new.git"
       },
@@ -141,11 +141,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1772380461,
-        "narHash": "sha256-O3ukj3Bb3V0Tiy/4LUfLlBpWypJ9P0JeUgsKl2nmZZY=",
+        "lastModified": 1772633327,
+        "narHash": "sha256-jl+DJB2DUx7EbWLRng+6HNWW/1/VQOnf0NsQB4PlA7I=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "f140aa04d7d14f8a50ab27f3691b5766b17ae961",
+        "rev": "5a75730e6f21ee624cbf86f4915c6e7489c74acc",
         "type": "github"
       },
       "original": {
@@ -186,11 +186,11 @@
         "ws4sql": "ws4sql_4"
       },
       "locked": {
-        "lastModified": 1771883888,
-        "narHash": "sha256-dweQEdL0vHig/gOpoADu6FM9NZkFAOP+dxqA/w/9/kw=",
+        "lastModified": 1772547280,
+        "narHash": "sha256-05MJTsGUcLWmAmUsbQtJafxnc9yjU5p0hTexPv4qJ70=",
         "owner": "blaix",
         "repo": "myrecords",
-        "rev": "a9cb4b4548c8a1ed5d027ffff0bc467f0f633fb1",
+        "rev": "3a7fe19c09a7883bd8c55aec52c5f3078a230d0f",
         "type": "github"
       },
       "original": {
@@ -302,11 +302,11 @@
     },
     "nixpkgs_6": {
       "locked": {
-        "lastModified": 1772433332,
-        "narHash": "sha256-izhTDFKsg6KeVBxJS9EblGeQ8y+O8eCa6RcW874vxEc=",
+        "lastModified": 1772624091,
+        "narHash": "sha256-QKyJ0QGWBn6r0invrMAK8dmJoBYWoOWy7lN+UHzW1jc=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "cf59864ef8aa2e178cccedbe2c178185b0365705",
+        "rev": "80bdc1e5ce51f56b19791b52b2901187931f5353",
         "type": "github"
       },
       "original": {
