@@ -49,6 +49,13 @@
     };
   };
 
+  # When device needs to swap, start by storing the compressed pages in ram.
+  # Faster than physical storage swap and gives us a buffer before OOM crashes.
+  zramSwap = {
+    enable = true;
+    memoryPercent = 50;
+  };
+
   # Boot loader - disko will configure the device
   boot.loader.grub = {
     enable = true;
