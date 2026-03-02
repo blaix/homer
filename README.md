@@ -108,5 +108,31 @@ Apps hosted on this server maintain their own flake for building the project, bu
    systemctl status  # Check system health
    ```
 
-7. Deploy the full config and applications: `just deploy-blaixapps`
+7. Set up server secrets (see below).
+
+8. Deploy the full config and applications: `just deploy-blaixapps`
+
+#### Server Secrets
+
+These files must exist on the server and are not managed by nix:
+
+- **`/etc/grafana-admin-password`** — Password for the Grafana `admin` user.
+  ```bash
+  echo 'your-secure-password' | sudo tee /etc/grafana-admin-password
+  sudo chown grafana:grafana /etc/grafana-admin-password
+  sudo chmod 0600 /etc/grafana-admin-password
+  ```
+
+- **`/etc/grafana-secret-key`** — Secret key used by Grafana to sign cookies and encrypt data.
+  ```bash
+  nix run nixpkgs#openssl -- rand -hex 32 | sudo tee /etc/grafana-secret-key
+  sudo chown grafana:grafana /etc/grafana-secret-key
+  sudo chmod 0600 /etc/grafana-secret-key
+  ```
+
+- **`/etc/htpasswd`** — nginx basic auth file used by several of my personal apps.
+  ```bash
+  nix-shell -p apacheHttpd
+  sudo htpasswd -c /etc/htpasswd <username>
+  ```
 
