@@ -61,7 +61,7 @@ in
     htop
     just
     man
-    neofetch # print sys info + ascii logo in cli
+    fastfetch # print sys info + ascii logo in cli
     neovim
     nmap
     nodejs_22
