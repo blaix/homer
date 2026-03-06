@@ -45,6 +45,7 @@
       "slack"
       "steam"
       "utm" # for running windows
+      "vivaldi"
     ];
   };
 
