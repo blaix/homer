@@ -13,6 +13,12 @@
 
   system.primaryUser = "justin";
 
+  nix.settings = {
+    # Increase default buffer size to prevent bottlenecks during nix builds
+    # when downloads outpace decompression (I was seeing this a lot on Dia).
+    download-buffer-size = 268435456; # 256 MiB
+  };
+
   homebrew = {
     enable = true;
     onActivation = {
