@@ -27,11 +27,11 @@
         "ws4sql": "ws4sql"
       },
       "locked": {
-        "lastModified": 1773141298,
-        "narHash": "sha256-WRytXgrwMPKt1JkBdwV0bzHsjUMESJfHXKdlbPYnWl8=",
+        "lastModified": 1773263315,
+        "narHash": "sha256-eWqqf39t+BfkzXprOUdgfgJRGdDkdyRoF4QJr+u9YzI=",
         "ref": "refs/heads/main",
-        "rev": "65d93749907c5e156a49238cc00c57cd79952728",
-        "revCount": 246,
+        "rev": "c7b50c87369d6faddacf7d14cbe50028b284c58f",
+        "revCount": 248,
         "type": "git",
         "url": "ssh://git@github.com/blaix/doitanyway.new.git"
       },
@@ -121,11 +121,11 @@
         "ws4sql": "ws4sql_2"
       },
       "locked": {
-        "lastModified": 1771429147,
-        "narHash": "sha256-Y1iyaVOQFXip23KDTZgAh0gcJxn6iDR/x1RZR+wdrZY=",
+        "lastModified": 1773263018,
+        "narHash": "sha256-lww6pA3RvLH7Nku11omZQlrVcrHkqRYbhW4GoOMkO0M=",
         "owner": "blaix",
         "repo": "growth",
-        "rev": "8df89bd29e23b436114ab8130889578f91cc0dd2",
+        "rev": "eed8bde7516a319485439f8eacdbf054853fee2d",
         "type": "github"
       },
       "original": {
@@ -164,11 +164,11 @@
         "ws4sql": "ws4sql_3"
       },
       "locked": {
-        "lastModified": 1770754659,
-        "narHash": "sha256-Z0GSY8VjOo5h2+Rw4d/vAbrYZsHyL1H/9f3s97tTDcY=",
+        "lastModified": 1773262883,
+        "narHash": "sha256-cuTTysHkeO3ahr+RHMuMnfKJvfCOlPB+UjHJ9rPWF54=",
         "owner": "blaix",
         "repo": "mycomics",
-        "rev": "2a6a33e4c71985d7abd0cdc327e85eaacd0b5be3",
+        "rev": "ba0d4d8134b81964329e86933ac8c0bef449ede2",
         "type": "github"
       },
       "original": {
@@ -186,11 +186,11 @@
         "ws4sql": "ws4sql_4"
       },
       "locked": {
-        "lastModified": 1772547280,
-        "narHash": "sha256-05MJTsGUcLWmAmUsbQtJafxnc9yjU5p0hTexPv4qJ70=",
+        "lastModified": 1773262955,
+        "narHash": "sha256-iCsNEVemVu/sxV7TmxhWkXv+vCj07UJ14s+ooF7PcWc=",
         "owner": "blaix",
         "repo": "myrecords",
-        "rev": "3a7fe19c09a7883bd8c55aec52c5f3078a230d0f",
+        "rev": "c0ca47ae2b62741ac34fdd1b08836714df76524c",
         "type": "github"
       },
       "original": {
@@ -222,11 +222,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1769018530,
-        "narHash": "sha256-MJ27Cy2NtBEV5tsK+YraYr2g851f3Fl1LpNHDzDX15c=",
+        "lastModified": 1772963539,
+        "narHash": "sha256-9jVDGZnvCckTGdYT53d/EfznygLskyLQXYwJLKMPsZs=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
+        "rev": "9dcb002ca1690658be4a04645215baea8b95f31d",
         "type": "github"
       },
       "original": {
@@ -238,11 +238,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1768886240,
-        "narHash": "sha256-C2TjvwYZ2VDxYWeqvvJ5XPPp6U7H66zeJlRaErJKoEM=",
+        "lastModified": 1772963539,
+        "narHash": "sha256-9jVDGZnvCckTGdYT53d/EfznygLskyLQXYwJLKMPsZs=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "80e4adbcf8992d3fd27ad4964fbb84907f9478b0",
+        "rev": "9dcb002ca1690658be4a04645215baea8b95f31d",
         "type": "github"
       },
       "original": {
@@ -254,11 +254,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1768886240,
-        "narHash": "sha256-C2TjvwYZ2VDxYWeqvvJ5XPPp6U7H66zeJlRaErJKoEM=",
+        "lastModified": 1772963539,
+        "narHash": "sha256-9jVDGZnvCckTGdYT53d/EfznygLskyLQXYwJLKMPsZs=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "80e4adbcf8992d3fd27ad4964fbb84907f9478b0",
+        "rev": "9dcb002ca1690658be4a04645215baea8b95f31d",
         "type": "github"
       },
       "original": {
@@ -270,11 +270,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1768886240,
-        "narHash": "sha256-C2TjvwYZ2VDxYWeqvvJ5XPPp6U7H66zeJlRaErJKoEM=",
+        "lastModified": 1772963539,
+        "narHash": "sha256-9jVDGZnvCckTGdYT53d/EfznygLskyLQXYwJLKMPsZs=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "80e4adbcf8992d3fd27ad4964fbb84907f9478b0",
+        "rev": "9dcb002ca1690658be4a04645215baea8b95f31d",
         "type": "github"
       },
       "original": {
@@ -286,11 +286,11 @@
     },
     "nixpkgs_5": {
       "locked": {
-        "lastModified": 1768886240,
-        "narHash": "sha256-C2TjvwYZ2VDxYWeqvvJ5XPPp6U7H66zeJlRaErJKoEM=",
+        "lastModified": 1772963539,
+        "narHash": "sha256-9jVDGZnvCckTGdYT53d/EfznygLskyLQXYwJLKMPsZs=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "80e4adbcf8992d3fd27ad4964fbb84907f9478b0",
+        "rev": "9dcb002ca1690658be4a04645215baea8b95f31d",
         "type": "github"
       },
       "original": {
@@ -302,11 +302,11 @@
     },
     "nixpkgs_6": {
       "locked": {
-        "lastModified": 1772822230,
-        "narHash": "sha256-yf3iYLGbGVlIthlQIk5/4/EQDZNNEmuqKZkQssMljuw=",
+        "lastModified": 1773068389,
+        "narHash": "sha256-vMrm7Pk2hjBRPnCSjhq1pH0bg350Z+pXhqZ9ICiqqCs=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "71caefce12ba78d84fe618cf61644dce01cf3a96",
+        "rev": "44bae273f9f82d480273bab26f5c50de3724f52f",
         "type": "github"
       },
       "original": {
@@ -454,16 +454,18 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "path": "./nixpkgs/ws4sql",
-        "type": "path"
+        "lastModified": 1773262680,
+        "narHash": "sha256-mOBI+WUDHjd6xf3JhlC+Mkt2Nk8BzN20J0dZfQetHbc=",
+        "owner": "blaix",
+        "repo": "ws4sql-nix",
+        "rev": "4837de181c857cdb9fa015f7fb9a018cceec8532",
+        "type": "github"
       },
       "original": {
-        "path": "./nixpkgs/ws4sql",
-        "type": "path"
-      },
-      "parent": [
-        "doitanyway"
-      ]
+        "owner": "blaix",
+        "repo": "ws4sql-nix",
+        "type": "github"
+      }
     },
     "ws4sql_2": {
       "inputs": {
@@ -471,16 +473,18 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "path": "./nixpkgs/ws4sql",
-        "type": "path"
+        "lastModified": 1773262680,
+        "narHash": "sha256-mOBI+WUDHjd6xf3JhlC+Mkt2Nk8BzN20J0dZfQetHbc=",
+        "owner": "blaix",
+        "repo": "ws4sql-nix",
+        "rev": "4837de181c857cdb9fa015f7fb9a018cceec8532",
+        "type": "github"
       },
       "original": {
-        "path": "./nixpkgs/ws4sql",
-        "type": "path"
-      },
-      "parent": [
-        "growth"
-      ]
+        "owner": "blaix",
+        "repo": "ws4sql-nix",
+        "type": "github"
+      }
     },
     "ws4sql_3": {
       "inputs": {
@@ -488,16 +492,18 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "path": "./nixpkgs/ws4sql",
-        "type": "path"
+        "lastModified": 1773262680,
+        "narHash": "sha256-mOBI+WUDHjd6xf3JhlC+Mkt2Nk8BzN20J0dZfQetHbc=",
+        "owner": "blaix",
+        "repo": "ws4sql-nix",
+        "rev": "4837de181c857cdb9fa015f7fb9a018cceec8532",
+        "type": "github"
       },
       "original": {
-        "path": "./nixpkgs/ws4sql",
-        "type": "path"
-      },
-      "parent": [
-        "mycomics"
-      ]
+        "owner": "blaix",
+        "repo": "ws4sql-nix",
+        "type": "github"
+      }
     },
     "ws4sql_4": {
       "inputs": {
@@ -505,16 +511,18 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "path": "./nixpkgs/ws4sql",
-        "type": "path"
+        "lastModified": 1773262680,
+        "narHash": "sha256-mOBI+WUDHjd6xf3JhlC+Mkt2Nk8BzN20J0dZfQetHbc=",
+        "owner": "blaix",
+        "repo": "ws4sql-nix",
+        "rev": "4837de181c857cdb9fa015f7fb9a018cceec8532",
+        "type": "github"
       },
       "original": {
-        "path": "./nixpkgs/ws4sql",
-        "type": "path"
-      },
-      "parent": [
-        "myrecords"
-      ]
+        "owner": "blaix",
+        "repo": "ws4sql-nix",
+        "type": "github"
+      }
     }
   },
   "root": "root",
