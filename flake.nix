@@ -74,6 +74,7 @@
       darwinConfigurations = {
         arwen = mkDarwinSystem "arwen";
         bilbo = mkDarwinSystem "bilbo";
+        pippin = mkDarwinSystem "pippin";
       };
 
       # nixos
