@@ -21,7 +21,7 @@ It's set up for myself but should be adaptable if you want to use this setup for
 
 ### Mac
 
-1. [Install nix](https://github.com/DeterminateSystems/nix-installer) (or [lix](https://lix.systems/install/)).
+1. [Install nix](https://nixos.org/download/)
 
 2. Clone this repo: 
 
@@ -32,13 +32,15 @@ It's set up for myself but should be adaptable if you want to use this setup for
 3. Choose a host name for your mac.
    Make sure it has a definitionn under `darwinConfigurations` in [`flake.nix`](/flake.nix) pointing to a `[hostname].nix` file under [`hosts/mac`](/hosts/mac).
 
-4. Run the following, replacing `[hostname]` with the name from the previous step (e.g. `.#arwen`):
+4. Activate your system with the following, replacing `[hostname]` with the name from the previous step (e.g. `.#arwen`):
 
   ```
-  nix --extra-experimental-features nix-command --extra-experimental-features flakes run nix-darwin -- switch --flake .#[hostname]
+  sudo nix --extra-experimental-features nix-command --extra-experimental-features flakes run nix-darwin -- switch --flake .#[hostname]
   ```
 
 5. If you are me: Import my gpg key from 1Password.
+
+6. Going forward, you can update your system with `just switch [hostname]`.
 
 ### NixOs VM
 
