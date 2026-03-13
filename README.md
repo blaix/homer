@@ -44,6 +44,9 @@ It's set up for myself but should be adaptable if you want to use this setup for
 
 7. Going forward, you can update your system with `just switch [hostname]`.
 
+NOTE: If some OS X settings don't seem to take affect (e.g. key repeat rate),
+you may need to restart. The workarounds I've tried for this have not worked.
+
 ### NixOs VM
 
 1. You can create a nixos vm on mac with [orbstack](https://orbstack.dev/) (installed via configs in this repo) with:
