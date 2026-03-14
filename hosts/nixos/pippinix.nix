@@ -8,6 +8,16 @@
 
   networking.hostName = "pippinix";
 
+  # mDNS so this machine is reachable as pippinix.local
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    publish = {
+      enable = true;
+      addresses = true;
+    };
+  };
+
   # Justin user configuration
   users.groups.justin = {};
   users.users.justin = {
