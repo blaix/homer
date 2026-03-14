@@ -47,15 +47,15 @@ It's set up for myself but should be adaptable if you want to use this setup for
 NOTE: If some OS X settings don't seem to take affect (e.g. key repeat rate),
 you may need to restart. The workarounds I've tried for this have not worked.
 
-### NixOs VM
+### NixOs
 
-1. You can create a nixos vm on mac with [orbstack](https://orbstack.dev/) (installed via configs in this repo) with:
+1. Optional: You can create a nixos vm on mac with [orbstack](https://orbstack.dev/) (installed via configs in this repo) with:
 
   ```
   orb create nixos
   ```
 
-2. Log in to your nixos vm.
+2. Log in to your nixos vm. If you created it with the orb command above, use:
 
   ```
   ssh orb
@@ -84,7 +84,7 @@ you may need to restart. The workarounds I've tried for this have not worked.
 
 7. If you are me: Import my gpg key from 1Password.
 
-### NixOs Server
+### NixOs Remote Server
 
 Right now I just have one `blaixapps` server on Hetzner.
 Apps hosted on this server maintain their own flake for building the project, but are deployed from here.
