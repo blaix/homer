@@ -1,8 +1,8 @@
-{ pkgs, apple-silicon, ... }:
+{ pkgs, inputs, ... }:
 {
   imports = [
     /etc/nixos/configuration.nix
-    apple-silicon.nixosModules.default
+    inputs.apple-silicon.nixosModules.default
     ./common.nix
   ];
 
