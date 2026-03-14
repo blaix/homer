@@ -6,10 +6,7 @@
     ./common.nix
   ];
 
-  networking = {
-    computerName = "pippinix";
-    hostName = "pippinix";
-  };
+  networking.hostName = "pippinix";
 
   # Justin user configuration
   users.groups.justin = {};
