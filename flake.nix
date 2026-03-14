@@ -42,6 +42,10 @@
     #  url = "https://git.lix.systems/lix-project/nixos-module/archive/2.93.3-1.tar.gz";
     #  inputs.nixpkgs.follows = "nixpkgs";
     #};
+
+    # nixos on apple silicon (currently dual-booting on mac mini (pippin))
+    apple-silicon.url = "github:nix-community/nixos-apple-silicon";
+
   };
 
   #outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, lix-module, ... }: {
