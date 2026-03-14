@@ -19,5 +19,6 @@ switch HOST:
 init-blaixapps:
   nix run github:nix-community/nixos-anywhere -- --flake .#blaixapps-base --target-host root@dia.blaix.com --build-on-remote
   
+# --fast prevents re-exec to target's nixos-rebuild (which is x86_64-linux and can't run on this Mac)
 deploy-blaixapps:
-  nix run nixpkgs#nixos-rebuild -- switch --flake .#blaixapps --target-host dia.blaix.com --build-host dia.blaix.com --use-remote-sudo
+  nix run nixpkgs#nixos-rebuild -- switch --flake .#blaixapps --target-host dia.blaix.com --build-host dia.blaix.com --use-remote-sudo --fast
