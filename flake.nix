@@ -45,7 +45,7 @@
 
     # nixos on apple silicon (currently dual-booting on mac mini (pippin))
     apple-silicon.url = "github:nix-community/nixos-apple-silicon";
-
+    apple-silicon.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   #outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, lix-module, ... }: {
