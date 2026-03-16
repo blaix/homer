@@ -1,10 +1,11 @@
 { pkgs, inputs, ... }:
 {
   imports = [
-    # Machine-specific config set up by the asahi/nix/apple-silicon stuff.
+    # THIS MACHINE WAS SET UP USING:
+    # https://github.com/nix-community/nixos-apple-silicon/blob/main/docs/uefi-standalone.md#uefi-preparation
+    # Below is the machine-specific config set up by that process:
     /etc/nixos/configuration.nix
-
-    # My own common nixos configs.
+    # And here aremy own common nixos configs applied on top of it:
     ./common.nix
   ];
 
