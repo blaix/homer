@@ -116,7 +116,7 @@ For the Software Preparation > Nix step, the path of least resistance is to down
 * Clone this repo:
 
   ```
-  git clone git@github.com:blaix/homer.git && cd homer
+  git clone https://github.com/blaix/homer.git && cd homer
   ```
 
 * Run the following, replacing `[hostname]` with the host name you chose (I'm using "orb" as the hostname in these examples):
