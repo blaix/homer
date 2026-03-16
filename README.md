@@ -47,44 +47,89 @@ It's set up for myself but should be adaptable if you want to use this setup for
 NOTE: If some OS X settings don't seem to take affect (e.g. key repeat rate),
 you may need to restart. The workarounds I've tried for this have not worked.
 
-### NixOs
+### NixOS (local machine or server)
 
-1. Optional: You can create a nixos vm on mac with [orbstack](https://orbstack.dev/) (installed via configs in this repo) with:
+This section is for setting up a local NixOS machine or server you have physical access to.
+For setting up a remote NixOS server, see "NixOS Remote Server" below.
 
-  ```
-  orb create nixos
-  ```
+#### VM on a Mac
 
-2. Log in to your nixos vm. If you created it with the orb command above, use:
+* The easiest way is with [orbstack](https://orbstack.dev/) (installed via the configs in this repo):
 
-  ```
-  ssh orb
-  ```
+```
+orb create nixos
+```
 
-3. Start a shell with `git` available:
+* Choose a host name and create a config at `hosts/nixos/[hostname].nix`.
+  You can base it on my original vm at `hosts/nixos/orb.nix`.
+  Just worry about getting the base system set up for now. It's easy to refine and update later.
+
+* Commit and push your new config.
+
+* Log in to the vm:
+
+```
+ssh orb
+```
+
+* Skip to "Common NixOs Setup" Below
+
+#### Dual-boot Apple Silicon Mac
+
+* Follow the instructions at: https://github.com/nix-community/nixos-apple-silicon/blob/main/docs/uefi-standalone.md
+
+For the Software Preparation > Nix step, the path of least resistance is to download a release iso and copy to a usb stick with `dd` as described in the "Nix" section.
+
+* Choose a host name and create a config at `hosts/nixos/[hostname].nix`.
+  You can base it on `hosts/nixos/pippinix.nix` which is running on my m1 mac mini.
+  Just worry about getting the base system set up for now. It's easy to refine and update later.
+
+* Commit and push your new config.
+
+* Log in to the new nix system as root.
+
+* Skip to "Common NixOs Setup" Below
+
+#### Other
+
+* I don't have any non-mac/non-remote nix setups so no specific instructions here.
+  Just use the nix docs to get a bare-bones base system set up.
+  Don't worry about customizing it yet.
+
+* Choose a host name and create a config at `hosts/nixos/[hostname].nix`.
+  You can base it on `hosts/nixos/orb.nix`.
+  Again, just worry about getting the base system set up for now.
+  It's easy to refine and update later.
+
+* Commit and push your new config.
+
+* Move on to the common setup below.
+ 
+#### Common NixOS Setup
+
+* Start a shell with `git` available:
 
   ```
   nix-shell -p git
   ```
   
-4. Clone this repo:
+* Clone this repo:
 
   ```
   git clone git@github.com:blaix/homer.git && cd homer
   ```
 
-5. Choose a host name.
-   Make sure it has a definitionn under `nixosConfigurations` in [`flake.nix`](/flake.nix) pointing to a `[hostname].nix` file under [`hosts/nixos`](/hosts/nixos).
-
-6. Run the following, replacing `[hostname]` with the name from the previous step (e.g. `.#orb`):
+* Run the following, replacing `[hostname]` with the host name you chose (I'm using "orb" as the hostname in these examples):
   
   ```
   sudo nixos-rebuild switch --impure --flake .#orb
   ```
 
-7. If you are me: Import my gpg key from 1Password.
+This could take a very long time. Subsequent builds shouldn't take nearly as long.
 
-### NixOs Remote Server
+* If you are me: Import my gpg key from 1Password.
+
+### NixOS Remote Server
 
 Right now I just have one `blaixapps` server on Hetzner.
 Apps hosted on this server maintain their own flake for building the project, but are deployed from here.
