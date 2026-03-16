@@ -43,10 +43,6 @@
     #  inputs.nixpkgs.follows = "nixpkgs";
     #};
 
-    # nixos on apple silicon (currently dual-booting on mac mini (pippin))
-    apple-silicon.url = "github:nix-community/nixos-apple-silicon";
-    apple-silicon.inputs.nixpkgs.follows = "nixpkgs";
-
     # claude-code CLI
     claude-code.url = "github:sadjow/claude-code-nix";
     claude-code.inputs.nixpkgs.follows = "nixpkgs";

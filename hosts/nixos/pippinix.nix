@@ -1,8 +1,10 @@
 { pkgs, inputs, ... }:
 {
   imports = [
+    # Machine-specifi config set up by the asahi/nix/apple-silicon stuff.
     /etc/nixos/configuration.nix
-    inputs.apple-silicon.nixosModules.default
+
+    # My own common nixos configs.
     ./common.nix
   ];
 
