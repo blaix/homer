@@ -46,6 +46,10 @@
     # nixos on apple silicon (currently dual-booting on mac mini (pippin))
     apple-silicon.url = "github:nix-community/nixos-apple-silicon";
     apple-silicon.inputs.nixpkgs.follows = "nixpkgs";
+
+    # claude-code CLI
+    claude-code.url = "github:sadjow/claude-code-nix";
+    claude-code.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   #outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, lix-module, ... }: {
@@ -57,6 +61,7 @@
 
       mkDarwinSystem = hostname: nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
+        specialArgs = { inherit inputs; };
         modules = [
           #lix-module.nixosModules.default
           ./hosts/mac/${hostname}.nix

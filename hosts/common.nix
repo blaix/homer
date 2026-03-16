@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, inputs, ... }:
 let
   isLinux = pkgs.stdenv.hostPlatform.isLinux;
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
@@ -43,7 +43,7 @@ in
 
   environment.systemPackages = with pkgs; [
     bat # better cat
-    claude-code
+    inputs.claude-code.packages.${stdenv.hostPlatform.system}.default
     devbox
     devenv
     diff-so-fancy
