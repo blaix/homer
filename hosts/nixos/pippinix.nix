@@ -1,15 +1,16 @@
 { pkgs, inputs, ... }:
 {
   imports = [
-    # THIS MACHINE WAS SET UP USING:
-    # https://github.com/nix-community/nixos-apple-silicon/blob/main/docs/uefi-standalone.md
-    # Below is the machine-specific config set up by that process:
-    /etc/nixos/configuration.nix
-    # And here aremy own common nixos configs applied on top of it:
+    /etc/nixos/hardware-configuration.nix
+    inputs.apple-silicon.nixosModules.default
     ./common.nix
   ];
 
   networking.hostName = "pippinix";
+  networking.networkmanager.enable = true;
+
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = false;
 
   # Enable my wired USB keyboard during boot
   boot.initrd.availableKernelModules = [ "hid-generic" ];
@@ -44,4 +45,3 @@
     };
   };
 }
-
