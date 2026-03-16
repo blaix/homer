@@ -10,6 +10,9 @@
 
   networking.hostName = "pippinix";
 
+  # Enable my wired USB keyboard during boot
+  boot.initrd.availableKernelModules = [ "hid-generic" ];
+
   # mDNS so this machine is reachable as pippinix.local
   services.avahi = {
     enable = true;
