@@ -12,6 +12,8 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = false;
 
+  system.stateVersion = "25.11";
+
   # Enable my wired USB keyboard during boot
   boot.initrd.availableKernelModules = [ "hid-generic" ];
 
