@@ -6,14 +6,18 @@
     #nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     #nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     #home-manager.url = "github:nix-community/home-manager/master";
+    #apple-silicon.url = "github:nix-community/nixos-apple-silicon";
 
     # versioned
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
     home-manager.url = "github:nix-community/home-manager/release-25.11";
+    apple-silicon.url = "github:nix-community/nixos-apple-silicon/release-25.11";
+
 
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    apple-silicon.inputs.nixpkgs.follows = "nixpkgs";
 
     # doitanyway web application
     doitanyway.url = "git+ssh://git@github.com/blaix/doitanyway.new.git";
@@ -42,10 +46,6 @@
     #  url = "https://git.lix.systems/lix-project/nixos-module/archive/2.93.3-1.tar.gz";
     #  inputs.nixpkgs.follows = "nixpkgs";
     #};
-
-    # nixos on apple silicon (dual-booting on mac mini (pippin))
-    apple-silicon.url = "github:nix-community/nixos-apple-silicon";
-    apple-silicon.inputs.nixpkgs.follows = "nixpkgs";
 
     # claude-code CLI
     claude-code.url = "github:sadjow/claude-code-nix";
