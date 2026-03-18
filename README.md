@@ -116,6 +116,12 @@ Don't worry about customizing it yet.
 
 This could take a very long time. Subsequent builds shouldn't take nearly as long.
 
+* Set a password for your user (as root):
+
+  ```
+  passwd justin
+  ```
+
 * If you are me: Import my gpg key from 1Password.
 
 ### NixOS Remote Server
