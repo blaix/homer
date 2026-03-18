@@ -120,4 +120,39 @@
     };
   };
   security.acme.certs."monitor.blaix.com".email = "justin@blaix.com";
+
+  # Forgejo: self-hosted git forge
+  services.forgejo = {
+    enable = true;
+    database.type = "sqlite3";
+    lfs.enable = true;
+    settings = {
+      server = {
+        DOMAIN = "git.blaix.com";
+        ROOT_URL = "https://git.blaix.com/";
+        HTTP_PORT = 3040;
+        HTTP_ADDR = "127.0.0.1";
+      };
+      service.DISABLE_REGISTRATION = false; # flip to true after creating your account
+    };
+    dump = {
+      enable = true;
+      interval = "daily";
+      backupDir = "/var/lib/forgejo/backups";
+      age = "30d";
+    };
+  };
+
+  services.nginx.virtualHosts."git.blaix.com" = {
+    enableACME = true;
+    forceSSL = true;
+    extraConfig = ''
+      client_max_body_size 512M;
+    '';
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:3040";
+      proxyWebsockets = true;
+    };
+  };
+  security.acme.certs."git.blaix.com".email = "justin@blaix.com";
 }
