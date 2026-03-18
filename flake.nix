@@ -19,7 +19,8 @@
 
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    apple-silicon.inputs.nixpkgs.follows = "nixpkgs";
+    # Don't use follows until release-25.11 branch is fixed (issue #427)
+    #apple-silicon.inputs.nixpkgs.follows = "nixpkgs";
 
     # doitanyway web application
     doitanyway.url = "git+ssh://git@github.com/blaix/doitanyway.new.git";
