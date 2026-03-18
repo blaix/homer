@@ -76,6 +76,7 @@ in
     tree
     unzip
     viu # terminal image viewer (beautiful!)
+    wireguard-tools
     #(callPackage taskfiles {})
   ];
 
