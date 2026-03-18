@@ -33,6 +33,18 @@
     };
   }];
 
+  # Compressed RAM swap - faster than disk swap, provides a buffer before OOM
+  zramSwap = {
+    enable = true;
+    memoryPercent = 50;
+  };
+
+  # Firewall - only allow SSH for now, open more ports as services are added
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 22 ];
+  };
+
   # mDNS so this machine is reachable as pippinix.local
   services.avahi = {
     enable = true;
