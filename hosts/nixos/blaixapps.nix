@@ -133,7 +133,7 @@
         HTTP_PORT = 3040;
         HTTP_ADDR = "127.0.0.1";
       };
-      service.DISABLE_REGISTRATION = false; # flip to true after creating your account
+      service.DISABLE_REGISTRATION = true;
     };
     dump = {
       enable = true;
