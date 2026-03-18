@@ -1,8 +1,12 @@
-{ pkgs, inputs, ... }:
+{ pkgs, lib, ... }:
 {
   imports = [
     /etc/nixos/hardware-configuration.nix
-    inputs.apple-silicon.nixosModules.default
+    # Use the local apple-silicon-support module placed by the Asahi installer
+    # instead of the nixos-apple-silicon flake input. The flake's main branch
+    # ships kernel 6.18.x which has a udevd hang on this hardware. The local
+    # module has the known-working kernel 6.17.7.
+    /etc/nixos/apple-silicon-support
     ./common.nix
   ];
 
@@ -16,6 +20,18 @@
 
   # Enable my wired USB keyboard during boot
   boot.initrd.availableKernelModules = [ "hid-generic" ];
+
+  # The local apple-silicon-support module builds linux-asahi 6.17.7, which
+  # doesn't have CONFIG_NOVA_CORE. nixpkgs sets NOVA_CORE as a required kernel
+  # config option, causing a build error. This makes it optional (warning
+  # instead of error). See nixos-apple-silicon issue #427.
+  boot.kernelPatches = [{
+    name = "fix-nova-core";
+    patch = null;
+    extraStructuredConfig = with lib.kernel; {
+      NOVA_CORE = lib.mkForce (option no);
+    };
+  }];
 
   # mDNS so this machine is reachable as pippinix.local
   services.avahi = {
