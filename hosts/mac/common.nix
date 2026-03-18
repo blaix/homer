@@ -52,7 +52,6 @@
       "steam"
       "utm" # for running windows
       "vivaldi"
-      "wireguard"
     ];
   };
 
