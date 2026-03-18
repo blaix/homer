@@ -28,7 +28,7 @@
   boot.kernelPatches = [{
     name = "fix-nova-core";
     patch = null;
-    extraStructuredConfig = with lib.kernel; {
+    structuredExtraConfig = with lib.kernel; {
       NOVA_CORE = lib.mkForce (option no);
     };
   }];
