@@ -10,17 +10,16 @@
 
     # versioned
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
     home-manager.url = "github:nix-community/home-manager/release-25.11";
     # release-25.11 branch has a NOVA_CORE kernel config error (issue #427)
     #apple-silicon.url = "github:nix-community/nixos-apple-silicon/release-25.11";
     apple-silicon.url = "github:nix-community/nixos-apple-silicon";
 
-
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    # Don't use follows until release-25.11 branch is fixed (issue #427)
-    #apple-silicon.inputs.nixpkgs.follows = "nixpkgs";
+    apple-silicon.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
     # doitanyway web application
     doitanyway.url = "git+ssh://git@github.com/blaix/doitanyway.new.git";
@@ -72,7 +71,7 @@
         ];
       };
 
-      mkNixosSystem = { hostname, system ? "aarch64-linux" }: nixpkgs.lib.nixosSystem {
+      mkNixosSystem = { hostname, system ? "aarch64-linux", nixpkgs' ? nixpkgs }: nixpkgs'.lib.nixosSystem {
         inherit system;
         specialArgs = { inherit inputs; };
         modules = [
@@ -94,7 +93,7 @@
         orb = mkNixosSystem { hostname = "orb"; }; # my orbstack vm
         blaixapps = mkNixosSystem { hostname = "blaixapps"; system = "x86_64-linux"; }; # multi-app server
         blaixapps-base = mkNixosSystem { hostname = "blaixapps-base"; system = "x86_64-linux"; }; # base-level nixos server install
-        pippinix = mkNixosSystem { hostname = "pippinix"; }; # nixos on mac mini (apple silicon)
+        pippinix = mkNixosSystem { hostname = "pippinix"; nixpkgs' = inputs.nixpkgs-unstable; }; # nixos on mac mini (apple silicon)
       };
     };
 }
