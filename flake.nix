@@ -12,7 +12,9 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
     home-manager.url = "github:nix-community/home-manager/release-25.11";
-    apple-silicon.url = "github:nix-community/nixos-apple-silicon/release-25.11";
+    # release-25.11 branch has a NOVA_CORE kernel config error (issue #427)
+    #apple-silicon.url = "github:nix-community/nixos-apple-silicon/release-25.11";
+    apple-silicon.url = "github:nix-community/nixos-apple-silicon";
 
 
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
