@@ -47,65 +47,54 @@ It's set up for myself but should be adaptable if you want to use this setup for
 NOTE: If some OS X settings don't seem to take affect (e.g. key repeat rate),
 you may need to restart. The workarounds I've tried for this have not worked.
 
-### NixOS (local machine or server)
+### NixOS (local machine or vm)
 
-This section is for setting up a local NixOS machine or server you have physical access to.
+This section is for setting up a local NixOS instance you have physical access to.
 For setting up a remote NixOS server, see "NixOS Remote Server" below.
 
 #### VM on a Mac
 
-* The easiest way is with [orbstack](https://orbstack.dev/) (installed via the configs in this repo):
+The easiest way is with [orbstack](https://orbstack.dev/) (installed via the configs in this repo):
 
 ```
 orb create nixos
 ```
 
-* Choose a host name and create a config at `hosts/nixos/[hostname].nix`.
-  You can base it on my original vm at `hosts/nixos/orb.nix`.
-  Just worry about getting the base system set up for now. It's easy to refine and update later.
+When you're ready, you can log in to the vm with:
 
-* Commit and push your new config.
-
-* Log in to the vm:
 
 ```
 ssh orb
 ```
 
-* Skip to "Common NixOs Setup" Below
+Skip to "Common NixOs Setup" Below
 
 #### Dual-boot Apple Silicon Mac
 
-* Follow the instructions at: https://github.com/nix-community/nixos-apple-silicon/blob/main/docs/uefi-standalone.md
+Follow the instructions at: https://github.com/nix-community/nixos-apple-silicon/blob/main/docs/uefi-standalone.md
 
 For the Software Preparation > Nix step, the path of least resistance is to download a release iso and copy to a usb stick with `dd` as described in the "Nix" section.
 
-* Choose a host name and create a config at `hosts/nixos/[hostname].nix`.
-  You can base it on `hosts/nixos/pippinix.nix` which is running on my m1 mac mini.
-  Just worry about getting the base system set up for now. It's easy to refine and update later.
-
-* Commit and push your new config.
-
-* Log in to the new nix system as root.
-
-* Skip to "Common NixOs Setup" Below
-
 #### Other
 
-* I don't have any non-mac/non-remote nix setups so no specific instructions here.
-  Just use the nix docs to get a bare-bones base system set up.
-  Don't worry about customizing it yet.
+I don't have any non-mac/non-remote nix setups so no specific instructions here.
+Just use the nix docs to get a bare-bones base system set up.
+Don't worry about customizing it yet.
+
+#### Common NixOS Setup
 
 * Choose a host name and create a config at `hosts/nixos/[hostname].nix`.
-  You can base it on `hosts/nixos/orb.nix`.
-  Again, just worry about getting the base system set up for now.
+  You can base it one of the other files in that directory.
+  If you're using an apple silicon mac, you should base it on `pippinix.nix`.
+  Otherwise, `orb.nix` is a good bare-bones example.
+  Just worry about getting the base system set up for now.
   It's easy to refine and update later.
+ 
+* Point to your new config file under `nixosConfigurations` in [`flake.nix`](/flake.nix).
 
 * Commit and push your new config.
 
-* Move on to the common setup below.
- 
-#### Common NixOS Setup
+* Log in to the new nix system.
 
 * Start a shell with `git` available:
 
