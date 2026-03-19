@@ -30,6 +30,10 @@
     mycomics.url = "github:blaix/mycomics";
     mycomics.inputs.nixpkgs.follows = "nixpkgs";
 
+    # mynotes web application
+    mynotes.url = "github:blaix/mynotes";
+    mynotes.inputs.nixpkgs.follows = "nixpkgs";
+
     # myrecords web application
     myrecords.url = "github:blaix/myrecords";
     myrecords.inputs.nixpkgs.follows = "nixpkgs";

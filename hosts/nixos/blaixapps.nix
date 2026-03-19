@@ -6,6 +6,7 @@
     inputs.doitanyway.nixosModules.doitanyway
     inputs.growth.nixosModules.growth
     inputs.mycomics.nixosModules.mycomics
+    inputs.mynotes.nixosModules.mynotes
     inputs.myrecords.nixosModules.myrecords
   ];
 
@@ -39,6 +40,17 @@
     ws4sqlPort = 12323;
     basicAuth.enable = true;
   };
+
+  # Enable mynotes service
+  services.mynotes = {
+    enable = true;
+    domain = "notes.blaix.com";
+    port_ = 3033;
+    ws4sqlPort = 12325;
+    enableBackups = true;
+    basicAuthFile = "/etc/htpasswd";
+  };
+  security.acme.certs."notes.blaix.com".email = "justin@blaix.com";
 
   # Enable myrecords service
   services.myrecords = {
@@ -79,7 +91,7 @@
     settings = {
       server = {
         http_addr = "127.0.0.1";
-        http_port = 3033;
+        http_port = 3034;
         domain = "monitor.blaix.com";
         root_url = "https://monitor.blaix.com";
       };
@@ -115,7 +127,7 @@
     enableACME = true;
     forceSSL = true;
     locations."/" = {
-      proxyPass = "http://127.0.0.1:3033";
+      proxyPass = "http://127.0.0.1:3034";
       proxyWebsockets = true;
     };
   };
