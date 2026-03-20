@@ -1,10 +1,13 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 {
+  # Settings for ALL of my systems:
   imports = [ ../common.nix ];
   
   # ---------------------------------------------------------------------------
-  #   Settings shared among all my Macs
+  #   Settings shared among all my Macs:
   # ---------------------------------------------------------------------------
+
+  nixpkgs.overlays = [ inputs.komorebi.overlays.default ];
 
   users.users.justin = {
     name = "justin";
@@ -19,6 +22,21 @@
     download-buffer-size = 268435456; # 256 MiB
   };
 
+  # nix packages specific to macs
+  environment.systemPackages = [
+
+    # Promising tiling window manager for mac.
+    # Seems a little too early-stage for daily use.
+    # If I do end up using it, some things I will need to do:
+    # * be sure to grab a license for work usage: https://lgug2z.com/software/komorebi/
+    # * considering sponsoring him: https://github.com/sponsors/LGUG2Z
+    # * manage ~/.config/komorebi declaritively (generated via `komorebic quickstart`)
+    # * enable skhd for hotkeys. See ~/.config/komorebi/skhdrc
+    #pkgs.komorebi-full
+
+  ];
+
+  # homebrew packages
   homebrew = {
     enable = true;
     onActivation = {
@@ -36,7 +54,7 @@
       "amethyst"
       "charles" # watch network requests on mac
       "crystalfetch" # for downloading windows isos
-      "cyberduck"
+      "cyberduck" 
       "discord"
       "drawio"
       "dropbox"

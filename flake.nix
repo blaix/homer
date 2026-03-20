@@ -51,6 +51,11 @@
     # claude-code CLI
     claude-code.url = "github:sadjow/claude-code-nix";
     claude-code.inputs.nixpkgs.follows = "nixpkgs";
+
+    # komorebi tiling window manager (for macs)
+    # see hosts/mac/common for pkg install and settings
+    komorebi.url = "github:LGUG2Z/komorebi-for-mac";
+    komorebi.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   #outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, lix-module, ... }: {
