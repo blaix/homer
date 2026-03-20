@@ -1,28 +1,35 @@
 { pkgs, lib, ... }:
 {
   imports = [
+    # Use the hardware-config placed here by the Asahi installer:
     /etc/nixos/hardware-configuration.nix
-    # Use the local apple-silicon-support module placed by the Asahi installer
-    # instead of the nixos-apple-silicon flake input. The flake's main branch
-    # ships kernel 6.18.x which has a udevd hang on this hardware. The local
-    # module has the known-working kernel 6.17.7.
+
+    # Use the apple-silicon-support module placed here by the Asahi installer.
+    # Specifically *not* using the nixos-apple-silicon flake as I originally
+    # intended. Its main branch ships kernel 6.18.x which hangs on boot on this
+    # hardware. The module from the installer has the known-working kernel 6.17.7:
     /etc/nixos/apple-silicon-support
+
+    # My personal configs:
     ./common.nix
   ];
+
+  system.stateVersion = "25.11";
 
   networking.hostName = "pippinix";
   networking.networkmanager.enable = true;
 
+  # Copied from the original /etc/configruation.nix
+  # Set according to the nixos-apple-silicon instructions at:
+  # https://github.com/nix-community/nixos-apple-silicon/blob/2fbdf62451bcd9fc83ca99c56a6e379df8c47c8d/docs/uefi-standalone.md#nixos-configuration
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = false;
 
-  system.stateVersion = "25.11";
-
-  # Enable my wired USB keyboard during boot
+  # Enable my wired USB keyboard during boot (still not working)
   boot.initrd.availableKernelModules = [ "hid-generic" ];
 
-  # The local apple-silicon-support module builds linux-asahi 6.17.7, which
-  # doesn't have CONFIG_NOVA_CORE. nixpkgs sets NOVA_CORE as a required kernel
+  # The local apple-silicon-support module builds linux-asahi 6.17.7 (see imports above),
+  # which doesn't have CONFIG_NOVA_CORE. nixpkgs sets NOVA_CORE as a required kernel
   # config option, causing a build error. This makes it optional (warning
   # instead of error). See nixos-apple-silicon issue #427.
   boot.kernelPatches = [{
