@@ -14,6 +14,18 @@
     home = "/Users/justin";
   };
 
+  # Add my public ssh keys. nix-darwin doesn't have a setting like nixos does
+  # for managing these, so I'm just writing the file directly.
+  system.activationScripts.postActivation.text = let
+    keys = import ../../users/justin/ssh-keys.nix;
+    keyFile = builtins.concatStringsSep "\n" keys;
+  in ''
+    mkdir -p /Users/justin/.ssh
+    echo '${keyFile}' > /Users/justin/.ssh/authorized_keys
+    chown justin /Users/justin/.ssh/authorized_keys
+    chmod 600 /Users/justin/.ssh/authorized_keys
+  '';
+
   system.primaryUser = "justin";
 
   nix.settings = {

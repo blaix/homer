@@ -61,6 +61,7 @@ in
     htop
     just
     man
+    mosh
     fastfetch # print sys info + ascii logo in cli
     neovim
     nmap
