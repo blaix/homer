@@ -43,6 +43,7 @@
     # * be sure to grab a license for work usage: https://lgug2z.com/software/komorebi/
     # * considering sponsoring him: https://github.com/sponsors/LGUG2Z
     # * manage ~/.config/komorebi declaritively (generated via `komorebic quickstart`)
+    # * ^ sounds like there's a nix module for this: https://hachyderm.io/@LGUG2Z/116265924198093571
     # * enable skhd for hotkeys. See ~/.config/komorebi/skhdrc
     #pkgs.komorebi-full
 
