@@ -62,6 +62,10 @@
         publicKey = "doShLIrZi005B0qsO8aLY4gF06gHSiv4Hw3YmnIe3Co=";
         allowedIPs = [ "10.100.0.3/32" ];
       }
+      { # ipad
+        publicKey = "j+PtMQZe4IBzTOjSCFeknomeeEZXAYd4rhfrX+GQJRQ=";
+        allowedIPs = [ "10.100.0.4/32" ];
+      }
     ];
   };
 
