@@ -72,6 +72,7 @@ in
     python313Packages.pip
     rename
     ripgrep
+    rlwrap
     tig # ncurses git repository browser
     tmux
     tree
