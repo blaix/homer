@@ -58,6 +58,7 @@
     };
     brews = [
       "git-gui" # Bring back gitk: https://www.bstefanski.com/blog/gitk-on-macos
+      "acsandmann/tap/rift" # Rift tiling window manager
     ];
     # Find casks at https://formulae.brew.sh/cask/
     casks = [
@@ -101,7 +102,8 @@
       mru-spaces = false; # don't auto-rearrange spaces
     };
     spaces = {
-      spans-displays = true; # all displays in one space
+      # spans-displays = true; # all displays in one space
+      spans-displays = false; # displays have their own spaces (required for rift window manager)
     };
     NSGlobalDomain = {
       AppleKeyboardUIMode = 3; # full keyboard access
