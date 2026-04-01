@@ -119,8 +119,8 @@
 
   environment.etc."grafana-dashboards/node-exporter.json".source =
     builtins.fetchurl {
-      url = "https://grafana.com/api/dashboards/1860/revisions/latest/download";
-      sha256 = "0phjy96kq4kymzggm0r51y8i2s2z2x3p69bd5nx4n10r33mjgn54";
+      url = "https://grafana.com/api/dashboards/1860/revisions/43/download";
+      sha256 = "1jr2w0lw64781vdl788fl7ir6x6ixkzjcs5cbfll5m77qiv94icq";
     };
 
   services.nginx.virtualHosts."monitor.blaix.com" = {
