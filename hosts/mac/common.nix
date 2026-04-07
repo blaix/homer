@@ -66,6 +66,7 @@
       "aws-vpn-client"
       "amethyst"
       "charles" # watch network requests on mac
+      "claude"
       "crystalfetch" # for downloading windows isos
       "cyberduck" 
       "discord"
