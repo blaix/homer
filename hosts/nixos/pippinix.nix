@@ -18,6 +18,7 @@
 
   networking.hostName = "pippinix";
   networking.networkmanager.enable = true;
+  time.timeZone = "America/New_York";
 
   # Copied from the original /etc/configruation.nix
   # Set according to the nixos-apple-silicon instructions at:
