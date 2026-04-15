@@ -57,12 +57,15 @@
     settings = {
       user.name = "Justin Blake";
       user.email = "justin@blaix.com";
+      user.signingKey = "E70CAC45C816AAEA";
+      commit.gpgSign = true;
+      tag.gpgSign = true;
       alias = {
         b = "branch";
         d = "diff";
         co = "checkout";
         st = "status -sb";
-        ci = "commit -v -S";
+        ci = "commit -v";
         gr = "log --graph --all";
         gmo = "git merge --ff-only origin/master";
         fetch = "fetch -p";
