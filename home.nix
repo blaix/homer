@@ -44,6 +44,8 @@
   programs.direnv = {
     enable = true;
     enableBashIntegration = true;
+    # macOS sandbox is killing direnv's fish shell tests
+    package = pkgs.direnv.overrideAttrs (old: { doCheck = false; });
 
     # faster use_nix implementation
     # https://github.com/nix-community/nix-direnv

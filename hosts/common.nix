@@ -47,7 +47,6 @@ in
     devbox
     devenv
     diff-so-fancy
-    direnv
     entr
     fd
     fzf
