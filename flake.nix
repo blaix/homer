@@ -38,6 +38,10 @@
     myrecords.url = "github:blaix/myrecords";
     myrecords.inputs.nixpkgs.follows = "nixpkgs";
 
+    # blog.blaix.com static site
+    blog.url = "git+ssh://git@github.com/blaix/blog.blaix.com.git";
+    blog.inputs.nixpkgs.follows = "nixpkgs";
+
     # disko for declarative disk management
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";

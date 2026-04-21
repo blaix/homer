@@ -8,6 +8,7 @@
     inputs.mycomics.nixosModules.mycomics
     inputs.mynotes.nixosModules.mynotes
     inputs.myrecords.nixosModules.myrecords
+    inputs.blog.nixosModules.blog
   ];
 
   # Hostname
@@ -60,6 +61,13 @@
     appPort = 3032;
     ws4sqlPort = 12324;
     basicAuth.enable = true;
+  };
+
+  # Enable blog
+  services.blog = {
+    enable = true;
+    domain = "blog.blaix.com";
+    acmeEmail = "justin@blaix.com";
   };
 
   # Monitoring: Prometheus + Grafana
