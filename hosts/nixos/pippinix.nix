@@ -75,10 +75,10 @@
     ];
   };
 
-  # Firewall - allow SSH, local dev server, and WireGuard, trust VPN interface
+  # Firewall - allow SSH, local dev servers, and WireGuard, trust VPN interface
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 3000 ];
+    allowedTCPPorts = [ 22 3000 8000 ];
     allowedUDPPorts = [ 51820 ];
     trustedInterfaces = [ "wg0" ];
   };
