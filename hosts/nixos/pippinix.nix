@@ -41,6 +41,11 @@
     };
   }];
 
+  # Workaround for nixos-apple-silicon#449: nixpkgs' default of 33 is
+  # rejected by this 16K-page kernel. 31 is the value for ARM64_16K_PAGES.
+  # See https://github.com/nix-community/nixos-apple-silicon/issues/449
+  boot.kernel.sysctl."vm.mmap_rnd_bits" = lib.mkForce 31;
+
   # Compressed RAM swap - faster than disk swap, provides a buffer before OOM
   zramSwap = {
     enable = true;
