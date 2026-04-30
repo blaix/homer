@@ -28,11 +28,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777414615,
-        "narHash": "sha256-L2dL8nzSXm3vDn/Y3C4R8oHA/RVisFnW9aZAQdXjHC4=",
+        "lastModified": 1777436347,
+        "narHash": "sha256-RD/HyNMkmeN4zqENph5Xzks/fz/ZwdUyL1x8rr5tQyA=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "bc99ea43d848ee0caad7c82df1dd592b8a529a5b",
+        "rev": "bf3e43090b15d1e335f08e21c80678d6457458e8",
         "type": "github"
       },
       "original": {
@@ -83,11 +83,11 @@
         "ws4sql": "ws4sql"
       },
       "locked": {
-        "lastModified": 1777051562,
-        "narHash": "sha256-AkLP1z4lCjDX1t2YBxMRjPLSpTGQsSmzYW6FxDNaby4=",
+        "lastModified": 1777584523,
+        "narHash": "sha256-O5NnCGBespqVJp6AmlYNvkqFOEJN3HDJLH3i0ld5Dfg=",
         "ref": "refs/heads/main",
-        "rev": "3ad72c90282148dce772e27aa7086a8b302702b0",
-        "revCount": 270,
+        "rev": "984d730ae09c30e56ba94eaa2a05c13d920350ca",
+        "revCount": 271,
         "type": "git",
         "url": "ssh://git@github.com/blaix/doitanyway.new.git"
       },
@@ -404,11 +404,11 @@
         "ws4sql": "ws4sql_5"
       },
       "locked": {
-        "lastModified": 1776771520,
-        "narHash": "sha256-Y9zbwOlCR4MCz+gYgdxXSUx5wII0QaiCpNwBTOtn3Cc=",
+        "lastModified": 1777565131,
+        "narHash": "sha256-XtyLhlW5qJVceTeial9Wm9gLb7vlCoKvLPOywEj97r8=",
         "owner": "blaix",
         "repo": "myrecords",
-        "rev": "09ee79f0e9242bc431baef5e0dfd473302a7b785",
+        "rev": "8dc0eb834b02d4a15da49ab72d19c3e3c6e9603c",
         "type": "github"
       },
       "original": {
@@ -551,11 +551,11 @@
     },
     "nixpkgs_7": {
       "locked": {
-        "lastModified": 1777077449,
-        "narHash": "sha256-AIiMJiqvGrN4HyLEbKAoCSRRYn0rnlW5VbKNIMIYqm4=",
+        "lastModified": 1777428379,
+        "narHash": "sha256-ypxFOeDz+CqADEQNL72haqGjvZQdBR5Vc7pyx2JDttI=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "a4bf06618f0b5ee50f14ed8f0da77d34ecc19160",
+        "rev": "755f5aa91337890c432639c60b6064bb7fe67769",
         "type": "github"
       },
       "original": {
