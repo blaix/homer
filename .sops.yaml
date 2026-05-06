@@ -1,0 +1,34 @@
+# sops-nix recipient configuration.
+#
+# See SECRETS.md for the full workflow.
+#
+# After editing this file, run `sops updatekeys secrets/<file>.yaml` for any
+# existing secret files so the new recipient list takes effect.
+
+keys:
+  # update the shared secret entry below if adding new entries here
+  - &template  REPLACE_WITH_HOSTS_AGE_PUBLIC_KEY
+  - &justin    REPLACE_WITH_PERSONAL_AGE_PUBLIC_KEY
+  - &pippinix  REPLACE_WITH_PIPPINIX_AGE_PUBLIC_KEY
+  - &blaixapps REPLACE_WITH_BLAIXAPPS_AGE_PUBLIC_KEY
+
+creation_rules:
+  - path_regex: secrets/pippinix\.yaml$
+    key_groups:
+      - age:
+          - *justin
+          - *pippinix
+
+  - path_regex: secrets/blaixapps\.yaml$
+    key_groups:
+      - age:
+          - *justin
+          - *blaixapps
+
+  # Secrets that must be readable by every host.
+  - path_regex: secrets/shared\.yaml$
+    key_groups:
+      - age:
+          - *justin
+          - *pippinix
+          - *blaixapps

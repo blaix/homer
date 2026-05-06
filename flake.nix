@@ -46,6 +46,10 @@
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
 
+    # sops-nix for managing secrets in this (public) repo
+    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+
     # lix is failing to build
     #lix-module = {
     #  url = "https://git.lix.systems/lix-project/nixos-module/archive/2.93.3-1.tar.gz";
@@ -86,6 +90,7 @@
           #lix-module.nixosModules.default
           ./hosts/nixos/${hostname}.nix
           home-manager.nixosModules.home-manager homeManagerConfig
+          inputs.sops-nix.nixosModules.sops
         ];
       };
     in {

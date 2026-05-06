@@ -7,6 +7,7 @@ Important files:
 * [`flake.nix`](/flake.nix): Entry point for all configs.
 * [`home.nix`](/home.nix): User environment configs.
 * [`hosts/`](/hosts): System, OS, and machine-specific configs.
+* [`SECRETS.md`](/SECRETS.md): Docs for sops-nix setup.
 
 It's set up for myself but should be adaptable if you want to use this setup for your own systems.
 
@@ -122,6 +123,8 @@ This could take a very long time. Subsequent builds shouldn't take nearly as lon
   passwd justin
   ```
 
+* Register this host as a sops-nix secret recipient (see [SECRETS.md](/SECRETS.md)). Skip if this host doesn't need any secrets yet.
+
 * If you are me: Import my gpg key from 1Password.
 
 ### NixOS Remote Server
@@ -162,6 +165,7 @@ Apps hosted on this server maintain their own flake for building the project, bu
 #### Server Secrets
 
 These files must exist on the server and are not managed by nix:
+(TODO: migrate to the new [sops setup](/SECRETS.md))
 
 - **`/etc/grafana-admin-password`** — Password for the Grafana `admin` user.
   ```bash
@@ -182,4 +186,3 @@ These files must exist on the server and are not managed by nix:
   nix-shell -p apacheHttpd
   sudo htpasswd -c /etc/htpasswd <username>
   ```
-
