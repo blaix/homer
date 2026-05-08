@@ -28,11 +28,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777604373,
-        "narHash": "sha256-cQ+Z/fx5o43bD3PFZaz9yeEOVbAH1jqzdOiEP0ytW4M=",
+        "lastModified": 1778199440,
+        "narHash": "sha256-neEu92AczcHfO4tENmyFnzQXvk5b/Tp+VM7hsevCYOk=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "8bd0a84bcfbd7e76eaa1c3421fc59861eb8a8f24",
+        "rev": "bacfe205bb986634fe4c60d2aaf3e3ce2fe40c11",
         "type": "github"
       },
       "original": {
@@ -338,11 +338,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1777832022,
-        "narHash": "sha256-OiWXoD0BXX8OFuLNFCMPbJ1f0hfzhq2vabHt8/mjTZo=",
+        "lastModified": 1777946799,
+        "narHash": "sha256-uDprEfYaPugY2eJpKRIHJQoyxYKwXmnu/r8VQ7j9Fts=",
         "owner": "LGUG2Z",
         "repo": "komorebi-for-mac",
-        "rev": "0cc4ca7f67d79da0d59d603dde2f6b4445fec85b",
+        "rev": "bdf10452f10ebf15ec1978cb05d0aac79ef5611f",
         "type": "github"
       },
       "original": {
@@ -551,11 +551,11 @@
     },
     "nixpkgs_7": {
       "locked": {
-        "lastModified": 1777673416,
-        "narHash": "sha256-5c2POKPOjU40Kh0MirOdScBLG0bu9TAuPYAtPRNZMBs=",
+        "lastModified": 1778003029,
+        "narHash": "sha256-q/nkKLDtHIyLjZpKhWk3cSK5IYsFqtMd6UtXF3ddjgA=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "26ef669cffa904b6f6832ab57b77892a37c1a671",
+        "rev": "0c88e1f2bdb93d5999019e99cb0e61e1fe2af4c5",
         "type": "github"
       },
       "original": {
@@ -563,6 +563,26 @@
         "ref": "nixos-25.11",
         "repo": "nixpkgs",
         "type": "github"
+      }
+    },
+    "prettynice-software": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1778235641,
+        "narHash": "sha256-RZIOMCFtAcObyJ55tXwsYuwAGvnFHt3QCs6ir4rD9M4=",
+        "ref": "refs/heads/main",
+        "rev": "a5d035bd30739cb2a1a5c6df0576d3088116567b",
+        "revCount": 2,
+        "type": "git",
+        "url": "ssh://forgejo@git.blaix.com/blaix/prettynice.software.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://forgejo@git.blaix.com/blaix/prettynice.software.git"
       }
     },
     "process-compose-flake": {
@@ -654,6 +674,7 @@
         "myrecords": "myrecords",
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs_7",
+        "prettynice-software": "prettynice-software",
         "sops-nix": "sops-nix"
       }
     },

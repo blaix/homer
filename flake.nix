@@ -42,6 +42,10 @@
     blog.url = "git+ssh://git@github.com/blaix/blog.blaix.com.git";
     blog.inputs.nixpkgs.follows = "nixpkgs";
 
+    # prettynice.software website
+    prettynice-software.url = "git+ssh://forgejo@git.blaix.com/blaix/prettynice.software.git";
+    prettynice-software.inputs.nixpkgs.follows = "nixpkgs";
+
     # disko for declarative disk management
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";

@@ -9,6 +9,7 @@
     inputs.mynotes.nixosModules.mynotes
     inputs.myrecords.nixosModules.myrecords
     inputs.blog.nixosModules.blog
+    inputs.prettynice-software.nixosModules.prettynice-software
   ];
 
   # Hostname
@@ -67,6 +68,13 @@
   services.blog = {
     enable = true;
     domain = "blog.blaix.com";
+    acmeEmail = "justin@blaix.com";
+  };
+
+  # Enable prettynice.software website
+  services.prettynice-software = {
+    enable = true;
+    domain = "prettynice.software";
     acmeEmail = "justin@blaix.com";
   };
 
