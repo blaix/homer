@@ -83,6 +83,24 @@
     trustedInterfaces = [ "wg0" ];
   };
 
+  # Jellyfin music server. Bound to all interfaces by default, but port 8096 is
+  # not in allowedTCPPorts above, so it's only reachable over wg0 (which is in
+  # trustedInterfaces and bypasses the port allowlist). No public exposure.
+  # Reach it from a wg peer at http://10.100.0.1:8096
+  services.jellyfin = {
+    enable = true;
+    openFirewall = false;
+  };
+
+  # Media directory placeholder. Owned by jellyfin so it can scan/read.
+  # When the persistent USB-drive storage plan lands, replace this with a
+  # bind-mount or symlink from the music drive's mount point — keep the path
+  # the same so Jellyfin's library config doesn't need to change.
+  systemd.tmpfiles.rules = [
+    "d /var/lib/jellyfin-media       0755 jellyfin jellyfin -"
+    "d /var/lib/jellyfin-media/music 0755 jellyfin jellyfin -"
+  ];
+
   # mDNS so this machine is reachable as pippinix.local
   services.avahi = {
     enable = true;
