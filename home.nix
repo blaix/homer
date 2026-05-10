@@ -200,6 +200,10 @@
     initContent = ''
       # https://github.com/jeffreytse/zsh-vi-mode#nix
       source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+
+      # Fixes case-swap bug when pasting with zsh-vi-mode plugin enabled.
+      # See: https://github.com/jeffreytse/zsh-vi-mode/issues/238
+      zvm_after_init_commands+=("bindkey -M viins '^[[200~' bracketed-paste")
     '';
     oh-my-zsh = {
       enable = true;
