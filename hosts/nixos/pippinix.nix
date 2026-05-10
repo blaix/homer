@@ -93,12 +93,15 @@
   };
 
   # Media directory placeholder. Owned by jellyfin so it can scan/read.
+  # Mode 2775: group-writable plus setgid so anything dropped in here inherits
+  # the jellyfin group automatically. Justin is added to that group below, so
+  # he can scp/rsync music in without sudo while jellyfin still reads it.
   # When the persistent USB-drive storage plan lands, replace this with a
   # bind-mount or symlink from the music drive's mount point — keep the path
   # the same so Jellyfin's library config doesn't need to change.
   systemd.tmpfiles.rules = [
-    "d /var/lib/jellyfin-media       0755 jellyfin jellyfin -"
-    "d /var/lib/jellyfin-media/music 0755 jellyfin jellyfin -"
+    "d /var/lib/jellyfin-media       2775 jellyfin jellyfin -"
+    "d /var/lib/jellyfin-media/music 2775 jellyfin jellyfin -"
   ];
 
   # mDNS so this machine is reachable as pippinix.local
@@ -115,7 +118,10 @@
   users.groups.justin = {};
   users.users.justin = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ];
+    # `jellyfin` group lets justin write into /var/lib/jellyfin-media (see
+    # tmpfiles rules above) without sudo, so music can be scp'd/rsync'd in
+    # from another machine.
+    extraGroups = [ "wheel" "jellyfin" ];
     group = "justin";
     openssh.authorizedKeys.keys = import ../../users/justin/ssh-keys.nix;
   };
