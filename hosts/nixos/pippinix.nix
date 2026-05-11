@@ -75,34 +75,64 @@
     ];
   };
 
-  # Firewall - allow SSH, local dev servers, and WireGuard, trust VPN interface
+  # Firewall - allow SSH, local dev servers, Jellyfin (web + LAN auto-discovery),
+  # and WireGuard, trust VPN interface
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 3000 8000 ];
-    allowedUDPPorts = [ 51820 ];
+    allowedTCPPorts = [ 22 3000 8000 8096 ];
+    allowedUDPPorts = [ 51820 7359 ];
     trustedInterfaces = [ "wg0" ];
   };
 
-  # Jellyfin music server. Bound to all interfaces by default, but port 8096 is
-  # not in allowedTCPPorts above, so it's only reachable over wg0 (which is in
-  # trustedInterfaces and bypasses the port allowlist). No public exposure.
-  # Reach it from a wg peer at http://10.100.0.1:8096
+  # Jellyfin music server. Reachable on the LAN (8096) and from wg peers
+  # (10.100.0.1:8096). UDP 7359 is opened above so LAN clients like the Roku
+  # Jellyfin app can auto-discover the server.
   services.jellyfin = {
     enable = true;
     openFirewall = false;
   };
 
-  # Media directory placeholder. Owned by jellyfin so it can scan/read.
-  # Mode 2775: group-writable plus setgid so anything dropped in here inherits
-  # the jellyfin group automatically. Justin is added to that group below, so
-  # he can scp/rsync music in without sudo while jellyfin still reads it.
-  # When the persistent USB-drive storage plan lands, replace this with a
-  # bind-mount or symlink from the music drive's mount point — keep the path
-  # the same so Jellyfin's library config doesn't need to change.
+  # Music library on dedicated USB drive (ext4, labeled "music").
+  fileSystems."/mnt/music" = {
+    device = "/dev/disk/by-label/music";
+    fsType = "ext4";
+    # nofail = server still boots if the drive is unplugged.
+    options = [ "nofail" "x-systemd.device-timeout=10s" ];
+  };
   systemd.tmpfiles.rules = [
-    "d /var/lib/jellyfin-media       2775 jellyfin jellyfin -"
-    "d /var/lib/jellyfin-media/music 2775 jellyfin jellyfin -"
+    "d /mnt/music 2775 jellyfin jellyfin -"
   ];
+
+  # SMB share for the music drive, reachable from Macs as smb://pippinix.local.
+  #
+  # First-time machine setup (not declarative):
+  #   - sudo smbpasswd -a justin to set the Samba password
+  #   - In Jellyfin's web UI, add a Music library pointing at /mnt/music
+  services.samba = {
+    enable = true;
+    openFirewall = true;
+    settings = {
+      global = {
+        "workgroup" = "WORKGROUP";
+        "server string" = "pippinix";
+        "netbios name" = "pippinix";
+        "security" = "user";
+        # No anonymous access; we want auth so Finder caches creds in Keychain.
+        "guest account" = "nobody";
+        "map to guest" = "never";
+      };
+      music = {
+        "path" = "/mnt/music";
+        "browseable" = "yes";
+        "read only" = "no";
+        "guest ok" = "no";
+        "valid users" = "justin";
+        "force group" = "jellyfin";
+        "create mask" = "0664";
+        "directory mask" = "2775";
+      };
+    };
+  };
 
   # mDNS so this machine is reachable as pippinix.local
   services.avahi = {
@@ -111,7 +141,20 @@
     publish = {
       enable = true;
       addresses = true;
+      userServices = true;          # required for extraServiceFiles
     };
+    # so pippinix appears in the Finder Network sidebar automatically:
+    extraServiceFiles.smb = ''
+      <?xml version="1.0" standalone='no'?>
+      <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+      <service-group>
+        <name replace-wildcards="yes">%h</name>
+        <service>
+          <type>_smb._tcp</type>
+          <port>445</port>
+        </service>
+      </service-group>
+    '';
   };
 
   # Justin user configuration

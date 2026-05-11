@@ -85,8 +85,9 @@ Don't worry about customizing it yet.
 #### Common NixOS Setup
 
 * Choose a host name and create a config at `hosts/nixos/[hostname].nix`.
-  You can base it one of the other files in that directory.
+  You can base it on one of the other files in that directory.
   If you're using an apple silicon mac, you should base it on `pippinix.nix`.
+  `pippinix.nix` is also a good reference for a home server setup (Jellyfin, SMB share, mDNS, WireGuard).
   Otherwise, `orb.nix` is a good bare-bones example.
   Just worry about getting the base system set up for now.
   It's easy to refine and update later.
