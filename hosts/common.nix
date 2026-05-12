@@ -72,6 +72,7 @@ in
     rename
     ripgrep
     rlwrap
+    (callPackage ../pkgs/tag-music.nix {})
     tig # ncurses git repository browser
     tmux
     tree
