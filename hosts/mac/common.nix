@@ -76,6 +76,7 @@
       "ghostty"
       "google-chrome"
       "michaelvillar-timer"
+      "musicbrainz-picard"
       "netnewswire"
       "obsidian"
       "orbstack"
