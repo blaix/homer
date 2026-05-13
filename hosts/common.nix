@@ -45,7 +45,6 @@ in
     bat # better cat
     inputs.claude-code.packages.${stdenv.hostPlatform.system}.default
     devbox
-    devenv
     diff-so-fancy
     entr
     fd
@@ -64,20 +63,14 @@ in
     fastfetch # print sys info + ascii logo in cli
     neovim
     nmap
-    nodejs_22
     # failing to build on unstable
     #nodePackages.degit
-    python3
-    python313Packages.pip
-    rename
     ripgrep
     rlwrap
     (callPackage ../pkgs/tag-music.nix {})
-    tig # ncurses git repository browser
     tmux
     tree
     unzip
-    viu # terminal image viewer (beautiful!)
     wireguard-tools
     #(callPackage taskfiles {})
   ];
