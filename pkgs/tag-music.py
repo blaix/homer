@@ -1,23 +1,24 @@
-"""Tag music: fill in missing artist/album/title/tracknumber tags.
+"""Tag music: fill in missing artist/albumartist/album/title/tracknumber.
 
 Walks a music root assumed to look like:
 
     root/Artist Name/Album Name/[NN - ]Track Title.ext
 
 Only missing tags get written; existing tags are left alone. The first
-time an artist or album folder is encountered, MusicBrainz is queried
-and you're prompted to choose between the folder name, the canonical MB
-name, or a custom value. That choice is reused for the rest of the
-folder. Missing titles get a per-file MB lookup (prompting only when MB
-differs significantly from the filename). Missing track numbers are
-filled in silently from MB or the filename — but only when we're
-already fixing artist or album on that file.
+time an artist, albumartist, or album folder is encountered,
+MusicBrainz is queried and you're prompted to choose between the folder
+name, the canonical MB name, or a custom value. That choice is reused
+for the rest of the folder. Missing titles get a per-file MB lookup
+(prompting only when MB differs significantly from the filename).
+Missing track numbers are filled in silently from MB or the filename —
+but only when we're already fixing artist or album on that file.
 """
 import argparse
 import re
 import sys
 import time
 from difflib import SequenceMatcher
+from functools import lru_cache
 from pathlib import Path
 
 import mutagen
@@ -25,7 +26,7 @@ import requests
 
 
 AUDIO_EXTENSIONS = {".mp3", ".flac", ".m4a", ".ogg", ".opus", ".wav", ".aac"}
-TAG_FIELDS = ("artist", "album", "title", "tracknumber")
+TAG_FIELDS = ("artist", "albumartist", "album", "title", "tracknumber")
 MB_BASE = "https://musicbrainz.org/ws/2"
 USER_AGENT = "homer-tag-music/2.0 ( https://github.com/blaix/homer )"
 MB_RATE_LIMIT_S = 1.1
@@ -66,14 +67,15 @@ def main():
 
 
 def run(root, dry_run):
-    artist_cache = {}  # artist_dir Path -> chosen artist string
-    album_cache = {}   # album_dir Path -> chosen album string
+    artist_cache = {}        # artist_dir Path -> chosen artist string
+    albumartist_cache = {}   # artist_dir Path -> chosen albumartist string
+    album_cache = {}         # album_dir Path -> chosen album string
     counts = {"written": 0, "complete": 0, "skipped": 0}
 
     for path in iter_audio(root):
         try:
-            process_file(path, root, artist_cache, album_cache,
-                         dry_run, counts)
+            process_file(path, root, artist_cache, albumartist_cache,
+                         album_cache, dry_run, counts)
         except Exception as e:
             print(f"[!] {path}: {e}", file=sys.stderr)
             counts["skipped"] += 1
@@ -83,13 +85,13 @@ def run(root, dry_run):
           f"complete={counts['complete']} skipped={counts['skipped']}")
 
 
-def process_file(path, root, artist_cache, album_cache, dry_run, counts):
+def process_file(path, root, artist_cache, albumartist_cache, album_cache,
+                 dry_run, counts):
     current = read_tags(path)
     missing = {f for f in TAG_FIELDS if not current.get(f)}
 
-    # Only artist, album, or title trigger processing. Track number alone
-    # never does — by the user's spec.
-    if not (missing & {"artist", "album", "title"}):
+    # Track number alone never triggers processing — by the user's spec.
+    if not (missing & {"artist", "albumartist", "album", "title"}):
         counts["complete"] += 1
         return
 
@@ -111,6 +113,16 @@ def process_file(path, root, artist_cache, album_cache, dry_run, counts):
             artist_cache[artist_dir] = resolve_artist(artist_dir.name)
         effective_artist = artist_cache[artist_dir]
         changes["artist"] = effective_artist
+
+    if "albumartist" in missing:
+        if artist_dir is None:
+            print(f"  {DIM}skip: cannot derive albumartist from path{RESET}")
+            counts["skipped"] += 1
+            return
+        if artist_dir not in albumartist_cache:
+            albumartist_cache[artist_dir] = resolve_artist(
+                artist_dir.name, label="albumartist")
+        changes["albumartist"] = albumartist_cache[artist_dir]
 
     if "album" in missing:
         if album_dir is None:
@@ -166,9 +178,9 @@ def process_file(path, root, artist_cache, album_cache, dry_run, counts):
     counts["written"] += 1
 
 
-def resolve_artist(folder_name):
+def resolve_artist(folder_name, label="artist"):
     mb_name = mb_search_artist(folder_name)
-    return prompt_choose("artist", folder_name, mb_name)
+    return prompt_choose(label, folder_name, mb_name)
 
 
 def resolve_album(folder_name, artist):
@@ -262,6 +274,7 @@ def mb_get(endpoint, params):
         return None
 
 
+@lru_cache(maxsize=None)
 def mb_search_artist(name):
     data = mb_get("artist", {
         "query": f'artist:"{escape(name)}"',
