@@ -1,17 +1,29 @@
-"""Tag music: fill in missing artist/albumartist/album/title/tracknumber.
+"""Tag music: fill in missing tags, or fix inconsistencies across the library.
 
-Walks a music root assumed to look like:
+Two modes:
 
-    root/Artist Name/Album Name/[NN - ]Track Title.ext
+Default — fill in missing artist/albumartist/album/title/tracknumber:
+    Walks a music root assumed to look like:
+        root/Artist Name/Album Name/[NN - ]Track Title.ext
+    Only missing tags get written; existing tags are left alone. The
+    first time an artist, albumartist, or album folder is encountered,
+    MusicBrainz is queried and you're prompted to choose between folder
+    name, canonical MB name, or custom value. That choice is reused for
+    the rest of the folder. Missing titles get a per-file MB lookup
+    (prompting only when MB differs significantly from the filename).
+    Missing track numbers are filled in silently from MB or filename —
+    but only when we're already fixing artist or album on that file.
 
-Only missing tags get written; existing tags are left alone. The first
-time an artist, albumartist, or album folder is encountered,
-MusicBrainz is queried and you're prompted to choose between the folder
-name, the canonical MB name, or a custom value. That choice is reused
-for the rest of the folder. Missing titles get a per-file MB lookup
-(prompting only when MB differs significantly from the filename).
-Missing track numbers are filled in silently from MB or the filename —
-but only when we're already fixing artist or album on that file.
+--fix — find and resolve inconsistencies in tags that already exist:
+    Scans the whole library and surfaces (a) cross-file variant
+    clusters: values that normalize to the same name but disagree in
+    spelling (e.g. "Capn Jazz" vs "Cap'n Jazz" across files), and (b)
+    within-file mismatches where artist and albumartist disagree but
+    are similar (single combined prompt sets both). Clusters are
+    handled per field — artist, albumartist (global) and album
+    (scoped per artist). Finishes with a list of filesystem warnings
+    (folder names that disagree with chosen tags, sibling folders that
+    normalize to the same name) for you to fix by hand.
 """
 import argparse
 import re
@@ -36,9 +48,14 @@ SIMILAR_THRESHOLD = 0.85
 DISC_TRACK_RE = re.compile(r"^(\d+)[-_.](\d+)[-_.\s]+(.+?)$")
 TRACK_PREFIX_RE = re.compile(r"^(\d+)[-_.\s]+(.+?)$")
 NORM_RE = re.compile(r"[^\w]+")
+COSMETIC_RE = re.compile(r"[^\w\s]+")  # strip punctuation, keep letters/whitespace
 
 BOLD = "\033[1m"
 DIM = "\033[2m"
+RED = "\033[1;31m"
+GREEN = "\033[1;32m"
+YELLOW = "\033[33m"
+CYAN = "\033[36m"
 RESET = "\033[0m"
 
 _last_mb_at = 0.0
@@ -53,7 +70,13 @@ def main():
                         help="music folder (prompts if omitted)")
     parser.add_argument("--dry-run", action="store_true",
                         help="show proposed changes without writing")
+    parser.add_argument("--fix", action="store_true",
+                        help="scan for inconsistent tags across the "
+                             "library and resolve them (independent of "
+                             "the default missing-tag pass)")
     args = parser.parse_args()
+
+    maybe_disable_color()
 
     raw = args.path or input("Music folder: ").strip()
     root = Path(raw).expanduser().resolve()
@@ -61,28 +84,44 @@ def main():
         sys.exit(f"not a directory: {root}")
 
     try:
-        run(root, dry_run=args.dry_run)
+        if args.fix:
+            run_fix(root, dry_run=args.dry_run)
+        else:
+            run(root, dry_run=args.dry_run)
     except KeyboardInterrupt:
         print("\ninterrupted.")
 
+
+def maybe_disable_color():
+    if sys.stdout.isatty():
+        return
+    global BOLD, DIM, RED, GREEN, YELLOW, CYAN, RESET
+    BOLD = DIM = RED = GREEN = YELLOW = CYAN = RESET = ""
+
+
+# ----- default missing-tag mode -----
 
 def run(root, dry_run):
     artist_cache = {}        # artist_dir Path -> chosen artist string
     albumartist_cache = {}   # artist_dir Path -> chosen albumartist string
     album_cache = {}         # album_dir Path -> chosen album string
-    counts = {"written": 0, "complete": 0, "skipped": 0}
+    counts = {"written": 0, "complete": 0, "skipped": 0, "errors": 0}
 
     for path in iter_audio(root):
         try:
             process_file(path, root, artist_cache, albumartist_cache,
                          album_cache, dry_run, counts)
         except Exception as e:
-            print(f"[!] {path}: {e}", file=sys.stderr)
-            counts["skipped"] += 1
+            print(f"{RED}[!] {path}: {e}{RESET}", file=sys.stderr)
+            counts["errors"] += 1
 
     print()
-    print(f"done. written={counts['written']} "
-          f"complete={counts['complete']} skipped={counts['skipped']}")
+    err = (f" {RED}errors={counts['errors']}{RESET}"
+           if counts["errors"] else "")
+    print(f"{BOLD}done.{RESET} "
+          f"{GREEN}written={counts['written']}{RESET} "
+          f"complete={counts['complete']} "
+          f"skipped={counts['skipped']}{err}")
 
 
 def process_file(path, root, artist_cache, albumartist_cache, album_cache,
@@ -174,8 +213,13 @@ def process_file(path, root, artist_cache, albumartist_cache, album_cache,
         counts["written"] += 1
         return
 
-    write_tags(path, changes)
-    counts["written"] += 1
+    try:
+        write_tags(path, changes)
+        print(f"  {GREEN}written.{RESET}")
+        counts["written"] += 1
+    except Exception as e:
+        print(f"  {RED}[!] write failed: {e}{RESET}", file=sys.stderr)
+        counts["errors"] += 1
 
 
 def resolve_artist(folder_name, label="artist"):
@@ -193,7 +237,7 @@ def prompt_choose(label, folder_name, mb_name):
     print(f"    [f] folder      : {folder_name}")
     has_distinct_mb = bool(mb_name and mb_name != folder_name)
     if has_distinct_mb:
-        print(f"    [m] musicbrainz : {mb_name}")
+        print(f"    [m] musicbrainz : {CYAN}{mb_name}{RESET}")
         default = "m"
     else:
         if mb_name:
@@ -238,7 +282,7 @@ def resolve_title(filename_title, mb_title):
 
     print(f"  {BOLD}title differs from filename{RESET}")
     print(f"    [f] filename    : {filename_title}")
-    print(f"    [m] musicbrainz : {mb_title}")
+    print(f"    [m] musicbrainz : {CYAN}{mb_title}{RESET}")
     print("    [t] type custom")
     while True:
         choice = (input("    choose [default: m]: ")
@@ -256,6 +300,422 @@ def resolve_title(filename_title, mb_title):
         print(f"    unrecognized: {choice!r}")
 
 
+# ----- --fix mode -----
+
+def run_fix(root, dry_run):
+    print(f"{BOLD}scanning library...{RESET}")
+    library = scan_library(root)
+    print(f"  {len(library)} audio files read")
+
+    counts = {"written": 0, "errors": 0}
+
+    artist_clusters = find_clusters(library, "artist")
+    albumartist_clusters = find_clusters(library, "albumartist")
+    album_clusters = find_album_clusters_per_artist(library)
+
+    print()
+    print(f"  artist clusters     : {len(artist_clusters)}")
+    print(f"  albumartist clusters: {len(albumartist_clusters)}")
+    print(f"  album clusters      : {len(album_clusters)}")
+
+    resolve_clusters("artist", artist_clusters, dry_run, counts)
+    resolve_clusters("albumartist", albumartist_clusters, dry_run, counts)
+    resolve_album_clusters(album_clusters, dry_run, counts)
+
+    # After cluster cleanup; mismatches are computed off the updated state.
+    mismatches = find_within_file_mismatches(library)
+    print()
+    print(f"{BOLD}within-file mismatches: {len(mismatches)}{RESET}")
+    resolve_mismatches(mismatches, dry_run, counts)
+
+    warnings = collect_fs_warnings(root, library)
+    if warnings:
+        print()
+        print(f"{BOLD}{YELLOW}filesystem warnings (fix by hand):{RESET}")
+        for w in warnings:
+            print(f"  {YELLOW}{w}{RESET}")
+
+    print()
+    err = (f" {RED}errors={counts['errors']}{RESET}"
+           if counts["errors"] else "")
+    print(f"{BOLD}done.{RESET} "
+          f"{GREEN}written={counts['written']}{RESET}"
+          f"{err}")
+
+
+def scan_library(root):
+    library = []
+    for path in iter_audio(root):
+        try:
+            tags = read_tags(path)
+        except Exception as e:
+            print(f"{RED}[!] {path}: {e}{RESET}", file=sys.stderr)
+            continue
+        library.append({"path": path, "tags": tags})
+    return library
+
+
+def find_clusters(library, field):
+    """Return list of clusters for the given field.
+
+    A cluster is a normalized form with two or more raw spellings. Each
+    cluster is {"variants": [(raw, [entries]), ...]}, variants sorted
+    by file count descending.
+    """
+    by_norm = {}
+    for entry in library:
+        raw = entry["tags"].get(field)
+        if not raw:
+            continue
+        norm = NORM_RE.sub("", raw.lower())
+        if not norm:
+            continue
+        by_norm.setdefault(norm, {}).setdefault(raw, []).append(entry)
+
+    clusters = []
+    for variants in by_norm.values():
+        if len(variants) < 2:
+            continue
+        sorted_variants = sorted(variants.items(), key=lambda x: -len(x[1]))
+        clusters.append({"variants": sorted_variants})
+    return clusters
+
+
+def find_album_clusters_per_artist(library):
+    """Album clusters scoped to one artist at a time.
+
+    Files are bucketed by normalized albumartist (falling back to
+    artist), then album clusters are computed within each bucket. This
+    keeps self-titled albums by different artists from colliding.
+    """
+    by_artist = {}
+    for entry in library:
+        a = entry["tags"].get("albumartist") or entry["tags"].get("artist")
+        if not a:
+            continue
+        a_norm = NORM_RE.sub("", a.lower())
+        if not a_norm:
+            continue
+        by_artist.setdefault(a_norm, []).append(entry)
+
+    clusters = []
+    for entries in by_artist.values():
+        by_album_norm = {}
+        for e in entries:
+            album = e["tags"].get("album")
+            if not album:
+                continue
+            al_norm = NORM_RE.sub("", album.lower())
+            if not al_norm:
+                continue
+            by_album_norm.setdefault(al_norm, {}).setdefault(album, []).append(e)
+        for variants in by_album_norm.values():
+            if len(variants) < 2:
+                continue
+            sorted_variants = sorted(variants.items(),
+                                     key=lambda x: -len(x[1]))
+            sample = sorted_variants[0][1][0]
+            context_artist = (sample["tags"].get("albumartist")
+                              or sample["tags"].get("artist"))
+            clusters.append({
+                "variants": sorted_variants,
+                "context_artist": context_artist,
+            })
+    return clusters
+
+
+def find_within_file_mismatches(library):
+    out = []
+    for entry in library:
+        a = entry["tags"].get("artist")
+        aa = entry["tags"].get("albumartist")
+        if not a or not aa or a == aa:
+            continue
+        if similar(a, aa):
+            out.append(entry)
+    return out
+
+
+def resolve_clusters(field, clusters, dry_run, counts):
+    if not clusters:
+        return
+    print()
+    print(f"{BOLD}resolving {field} clusters ({len(clusters)}){RESET}")
+    for cluster in clusters:
+        chosen = prompt_cluster(field, cluster, context_artist=None)
+        if chosen is None:
+            continue
+        apply_cluster_choice(field, cluster, chosen, dry_run, counts)
+
+
+def resolve_album_clusters(clusters, dry_run, counts):
+    if not clusters:
+        return
+    print()
+    print(f"{BOLD}resolving album clusters ({len(clusters)}){RESET}")
+    for cluster in clusters:
+        chosen = prompt_cluster("album", cluster, cluster["context_artist"])
+        if chosen is None:
+            continue
+        apply_cluster_choice("album", cluster, chosen, dry_run, counts)
+
+
+def prompt_cluster(field, cluster, context_artist):
+    variants = cluster["variants"]
+    total = sum(len(entries) for _, entries in variants)
+
+    print()
+    title_ctx = f" [{context_artist}]" if context_artist else ""
+    print(f"  {BOLD}{field} cluster{RESET}{title_ctx} "
+          f"({len(variants)} variants, {total} files)")
+
+    seed = variants[0][0]
+    if field in ("artist", "albumartist"):
+        mb_name = mb_search_artist(seed)
+    elif field == "album":
+        mb_name = (mb_search_album(seed, context_artist)
+                   if context_artist else None)
+    else:
+        mb_name = None
+
+    matching_variant_idx = None
+    if mb_name:
+        for i, (raw, _) in enumerate(variants):
+            if raw == mb_name:
+                matching_variant_idx = i
+                break
+
+    for i, (raw, entries) in enumerate(variants, 1):
+        print(f"    [{i}] {YELLOW}{raw}{RESET} ({len(entries)} files)")
+
+    if mb_name and matching_variant_idx is None:
+        print(f"    [m] musicbrainz : {CYAN}{mb_name}{RESET}")
+        default = "m"
+    elif mb_name:
+        print(f"    {DIM}(musicbrainz matches "
+              f"variant [{matching_variant_idx + 1}]){RESET}")
+        default = str(matching_variant_idx + 1)
+    else:
+        print(f"    {DIM}(musicbrainz: no match){RESET}")
+        default = "1"
+    print("    [t] type custom")
+    print("    [s] skip")
+
+    while True:
+        choice = (input(f"    choose [default: {default}]: ")
+                  .strip().lower() or default)
+        if choice == "s":
+            return None
+        if choice == "m" and mb_name and matching_variant_idx is None:
+            return mb_name
+        if choice == "t":
+            val = input(f"    enter {field}: ").strip()
+            if val:
+                return val
+            print("    (empty input)")
+            continue
+        if choice.isdigit():
+            idx = int(choice) - 1
+            if 0 <= idx < len(variants):
+                return variants[idx][0]
+        print(f"    unrecognized: {choice!r}")
+
+
+def apply_cluster_choice(field, cluster, chosen, dry_run, counts):
+    for raw, entries in cluster["variants"]:
+        if raw == chosen:
+            continue
+        for entry in entries:
+            write_one(entry, {field: chosen}, dry_run, counts)
+
+
+def resolve_mismatches(mismatches, dry_run, counts):
+    if not mismatches:
+        return
+    decisions = {}  # frozenset({a, aa}) -> chosen value (or None if skipped)
+    for entry in mismatches:
+        # Re-check in case cluster cleanup has already resolved this one.
+        a = entry["tags"].get("artist")
+        aa = entry["tags"].get("albumartist")
+        if not a or not aa or a == aa or not similar(a, aa):
+            continue
+        key = frozenset((a, aa))
+        if key in decisions:
+            chosen = decisions[key]
+        else:
+            chosen = prompt_mismatch(entry)
+            decisions[key] = chosen
+        if chosen is None:
+            continue
+        updates = {}
+        if entry["tags"].get("artist") != chosen:
+            updates["artist"] = chosen
+        if entry["tags"].get("albumartist") != chosen:
+            updates["albumartist"] = chosen
+        if updates:
+            write_one(entry, updates, dry_run, counts)
+
+
+def prompt_mismatch(entry):
+    a = entry["tags"]["artist"]
+    aa = entry["tags"]["albumartist"]
+    print()
+    print(f"  {BOLD}{entry['path']}{RESET}")
+    print(f"    {YELLOW}artist     : {a}{RESET}")
+    print(f"    {YELLOW}albumartist: {aa}{RESET}")
+
+    mb_name = mb_search_artist(a)
+    has_distinct_mb = bool(mb_name and mb_name not in (a, aa))
+
+    print(f"    [1] {a}")
+    print(f"    [2] {aa}")
+    if has_distinct_mb:
+        print(f"    [m] musicbrainz : {CYAN}{mb_name}{RESET}")
+        default = "m"
+    elif mb_name:
+        if mb_name == a:
+            default = "1"
+        else:
+            default = "2"
+        print(f"    {DIM}(musicbrainz matches variant [{default}]){RESET}")
+    else:
+        print(f"    {DIM}(musicbrainz: no match){RESET}")
+        default = "1"
+    print("    [t] type custom")
+    print("    [s] skip")
+
+    while True:
+        choice = (input(f"    set both fields to [default: {default}]: ")
+                  .strip().lower() or default)
+        if choice == "s":
+            return None
+        if choice == "1":
+            return a
+        if choice == "2":
+            return aa
+        if choice == "m" and has_distinct_mb:
+            return mb_name
+        if choice == "t":
+            val = input("    enter value: ").strip()
+            if val:
+                return val
+            print("    (empty input)")
+            continue
+        print(f"    unrecognized: {choice!r}")
+
+
+def write_one(entry, updates, dry_run, counts):
+    path = entry["path"]
+    summary = ", ".join(f"{k}={v}" for k, v in updates.items())
+    if dry_run:
+        print(f"    {DIM}(dry-run){RESET} {path} → {summary}")
+        for k, v in updates.items():
+            entry["tags"][k] = v
+        counts["written"] += 1
+        return
+    try:
+        write_tags(path, updates)
+        for k, v in updates.items():
+            entry["tags"][k] = v
+        print(f"    {GREEN}written{RESET} {path} → {summary}")
+        counts["written"] += 1
+    except Exception as e:
+        print(f"    {RED}[!] {path}: {e}{RESET}", file=sys.stderr)
+        counts["errors"] += 1
+
+
+def collect_fs_warnings(root, library):
+    """Filesystem mistakes for the user to fix by hand."""
+    warnings = []
+
+    # Group entries by their artist/album folder paths.
+    by_artist_folder = {}
+    by_album_folder = {}
+    for entry in library:
+        path = entry["path"]
+        try:
+            rel = path.relative_to(root)
+        except ValueError:
+            continue
+        if len(rel.parts) >= 3:
+            by_artist_folder.setdefault(path.parent.parent, []).append(entry)
+            by_album_folder.setdefault(path.parent, []).append(entry)
+        elif len(rel.parts) == 2:
+            by_artist_folder.setdefault(path.parent, []).append(entry)
+
+    try:
+        artist_folders = sorted([p for p in root.iterdir() if p.is_dir()])
+    except OSError:
+        artist_folders = []
+
+    # Sibling artist folders that normalize to the same name.
+    sib_norm = {}
+    for af in artist_folders:
+        norm = NORM_RE.sub("", af.name.lower())
+        if norm:
+            sib_norm.setdefault(norm, []).append(af)
+    for folders in sib_norm.values():
+        if len(folders) > 1:
+            names = ", ".join(str(f) for f in folders)
+            warnings.append(f"merge sibling artist folders: {names}")
+
+    # Artist folder name disagrees with the (now-unified) tag value.
+    for af, entries in by_artist_folder.items():
+        values = set()
+        for e in entries:
+            v = e["tags"].get("albumartist") or e["tags"].get("artist")
+            if v:
+                values.add(v)
+        if len(values) != 1:
+            continue
+        only = next(iter(values))
+        if (NORM_RE.sub("", only.lower()) == NORM_RE.sub("", af.name.lower())
+                and only != af.name
+                and not cosmetic_only_diff(only, af.name)):
+            new_path = af.parent / sanitize_folder_name(only)
+            warnings.append(f"rename folder: {af} → {new_path}")
+
+    # Sibling album folders that normalize to the same name (per artist).
+    for af in artist_folders:
+        try:
+            album_folders = sorted([p for p in af.iterdir() if p.is_dir()])
+        except OSError:
+            continue
+        sib_norm = {}
+        for alf in album_folders:
+            norm = NORM_RE.sub("", alf.name.lower())
+            if norm:
+                sib_norm.setdefault(norm, []).append(alf)
+        for folders in sib_norm.values():
+            if len(folders) > 1:
+                names = ", ".join(str(f) for f in folders)
+                warnings.append(f"merge sibling album folders: {names}")
+
+    # Album folder name disagrees with the tag value.
+    for alf, entries in by_album_folder.items():
+        values = set()
+        for e in entries:
+            v = e["tags"].get("album")
+            if v:
+                values.add(v)
+        if len(values) != 1:
+            continue
+        only = next(iter(values))
+        if (NORM_RE.sub("", only.lower()) == NORM_RE.sub("", alf.name.lower())
+                and only != alf.name
+                and not cosmetic_only_diff(only, alf.name)):
+            new_path = alf.parent / sanitize_folder_name(only)
+            warnings.append(f"rename folder: {alf} → {new_path}")
+
+    return warnings
+
+
+def sanitize_folder_name(name):
+    return name.replace("/", "-")
+
+
+# ----- MusicBrainz -----
+
 def mb_get(endpoint, params):
     global _last_mb_at
     wait = MB_RATE_LIMIT_S - (time.monotonic() - _last_mb_at)
@@ -269,7 +729,8 @@ def mb_get(endpoint, params):
         _last_mb_at = time.monotonic()
         return r.json()
     except Exception as e:
-        print(f"    (MB {endpoint} lookup failed: {e})", file=sys.stderr)
+        print(f"    {DIM}(MB {endpoint} lookup failed: {e}){RESET}",
+              file=sys.stderr)
         _last_mb_at = time.monotonic()
         return None
 
@@ -336,6 +797,8 @@ def mb_search_recording(artist, album, title):
             return {"title": rec_title, "tracknumber": None}
     return None
 
+
+# ----- I/O and string helpers -----
 
 def iter_audio(root):
     for p in sorted(root.rglob("*")):
@@ -405,6 +868,18 @@ def parse_stem(stem):
 
 def lucene_terms(s):
     return re.sub(r'[+\-&|!(){}\[\]^"~*?:\\]', " ", s).strip()
+
+
+def cosmetic_only_diff(a, b):
+    """True iff a and b are equal once case and punctuation are ignored.
+
+    Used to suppress filesystem-rename warnings for folders that only
+    differ from the tag value in case or in stripped punctuation
+    (apostrophes, periods, etc.) — the kind of cosmetic mismatch that
+    isn't worth renaming.
+    """
+    return (COSMETIC_RE.sub("", a.lower())
+            == COSMETIC_RE.sub("", b.lower()))
 
 
 def similar(a, b):
