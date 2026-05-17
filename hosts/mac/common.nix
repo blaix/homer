@@ -79,6 +79,7 @@
       "postman"
       "slack"
       "steam"
+      "transmission"
       "vivaldi"
     ];
   };
