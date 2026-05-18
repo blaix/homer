@@ -1,7 +1,10 @@
 { pkgs, inputs, ... }:
 {
   # Settings for ALL of my systems:
-  imports = [ ../common.nix ];
+  imports = [
+    ../common.nix
+    ./proton-portforward.nix
+  ];
   
   # ---------------------------------------------------------------------------
   #   Settings shared among all my Macs:
@@ -78,8 +81,8 @@
       "orbstack"
       "postman"
       "slack"
+      "qbittorrent"
       "steam"
-      "transmission"
       "vivaldi"
     ];
   };

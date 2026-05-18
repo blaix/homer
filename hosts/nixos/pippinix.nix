@@ -103,15 +103,25 @@
     # nofail = server still boots if the drive is unplugged.
     options = [ "nofail" "x-systemd.device-timeout=10s" ];
   };
+
+  # Video library on the root filesystem (TODO: move to dedicated USB drive
+  # when one is available; mirror the music fileSystems block above).
   systemd.tmpfiles.rules = [
-    "d /mnt/music 2775 jellyfin jellyfin -"
+    "d /mnt/music        2775 jellyfin jellyfin -"
+    "d /mnt/media        2775 jellyfin jellyfin -"
+    "d /mnt/media/inbox  2775 jellyfin jellyfin -"
+    "d /mnt/media/movies 2775 jellyfin jellyfin -"
+    "d /mnt/media/tv     2775 jellyfin jellyfin -"
   ];
 
-  # SMB share for the music drive, reachable from Macs as smb://pippinix.local.
+  # SMB shares reachable from Macs as smb://pippinix.local.
   #
   # First-time machine setup (not declarative):
   #   - sudo smbpasswd -a justin to set the Samba password
-  #   - In Jellyfin's web UI, add a Music library pointing at /mnt/music
+  #   - In Jellyfin's web UI, add libraries:
+  #       Music  -> /mnt/music
+  #       Movies -> /mnt/media/movies   (do NOT include /mnt/media/inbox)
+  #       Shows  -> /mnt/media/tv
   services.samba = {
     enable = true;
     openFirewall = true;
@@ -127,6 +137,16 @@
       };
       music = {
         "path" = "/mnt/music";
+        "browseable" = "yes";
+        "read only" = "no";
+        "guest ok" = "no";
+        "valid users" = "justin";
+        "force group" = "jellyfin";
+        "create mask" = "0664";
+        "directory mask" = "2775";
+      };
+      media = {
+        "path" = "/mnt/media";
         "browseable" = "yes";
         "read only" = "no";
         "guest ok" = "no";
