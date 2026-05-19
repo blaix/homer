@@ -48,6 +48,11 @@ It's set up for myself but should be adaptable if you want to use this setup for
 NOTE: If some OS X settings don't seem to take affect (e.g. key repeat rate),
 you may need to restart. The workarounds I've tried for this have not worked.
 
+#### Torrents and Jellyfin
+
+There's some manual setup required if you're going to use this mac to download
+media. See [`hosts/mac/proton-portforward.nix`](hosts/mac/proton-portforward.nix).
+
 ### NixOS (local machine or vm)
 
 This section is for setting up a local NixOS instance you have physical access to.
