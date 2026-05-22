@@ -4,6 +4,7 @@
   imports = [
     ../common.nix
     ./proton-portforward.nix
+    ./proton-ipv6-toggle.nix
   ];
   
   # ---------------------------------------------------------------------------

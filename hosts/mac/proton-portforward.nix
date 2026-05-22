@@ -21,6 +21,10 @@ let
   #   5. Save to a .conf file (can be deleted when done).
   #   6. In the WireGuard app File -> Import Tunnel(s) from File.
   #
+  # Note: If DNS or TLS handshakes hang after connecting (high bandwidth but
+  # slow page loads), strip the IPv6 entries from Address/AllowedIPs/DNS in
+  # the conf and set MTU = 1280 in the [Interface] block.
+  #
   # Now tell qBittorrent to only run when we're using the tunnel:
   #
   #   1. Start the wireguard tunnel so it's available in qbittorrent options.
@@ -42,20 +46,25 @@ let
   #          (it would talk to the LAN router, not Proton's gateway)
   protonPortForward = pkgs.writeShellScript "proton-portforward" ''
     set -u
-    GATEWAY=10.2.0.1
     NATPMPC=${natpmpc}/bin/natpmpc
     CURL=${pkgs.curl}/bin/curl
+    IFCONFIG=/sbin/ifconfig
     QB_URL=http://127.0.0.1:8080
     last=""
     while true; do
-      if out=$("$NATPMPC" -a 1 0 udp 60 -g "$GATEWAY" 2>/dev/null); then
-        "$NATPMPC" -a 1 0 tcp 60 -g "$GATEWAY" >/dev/null 2>&1 || true
-        port=$(printf '%s\n' "$out" | sed -n 's/.*Mapped public port \([0-9]*\).*/\1/p' | head -n1)
-        if [ -n "$port" ] && [ "$port" != "$last" ]; then
-          "$CURL" -fsS -X POST \
-            --data-urlencode "json={\"listen_port\":$port}" \
-            "$QB_URL/api/v2/app/setPreferences" >/dev/null 2>&1 || true
-          last="$port"
+      # Discover tunnel: Proton assigns 10.X.Y.2/32 to the client; gateway is 10.X.Y.1.
+      TUNNEL_ADDR=$("$IFCONFIG" | grep -oE 'inet 10\.[0-9]+\.[0-9]+\.2 ' | awk '{print $2}' | head -n1)
+      if [ -n "$TUNNEL_ADDR" ]; then
+        GATEWAY=$(echo "$TUNNEL_ADDR" | sed 's/\.2$/.1/')
+        if out=$("$NATPMPC" -a 1 0 udp 60 -g "$GATEWAY" 2>/dev/null); then
+          "$NATPMPC" -a 1 0 tcp 60 -g "$GATEWAY" >/dev/null 2>&1 || true
+          port=$(printf '%s\n' "$out" | sed -n 's/.*Mapped public port \([0-9]*\).*/\1/p' | head -n1)
+          if [ -n "$port" ] && [ "$port" != "$last" ]; then
+            "$CURL" -fsS -X POST \
+              --data-urlencode "json={\"listen_port\":$port}" \
+              "$QB_URL/api/v2/app/setPreferences" >/dev/null 2>&1 || true
+            last="$port"
+          fi
         fi
       fi
       sleep 45
