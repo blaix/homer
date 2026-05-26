@@ -88,6 +88,9 @@
     trustedInterfaces = [ "wg0" ];
   };
 
+  # Enable mosh connections (opens UDP ports)
+  programs.mosh.enable = true;
+
   # Jellyfin music server. Reachable on the LAN (8096) and from wg peers
   # (10.100.0.1:8096). UDP 7359 is opened above so LAN clients like the Roku
   # Jellyfin app can auto-discover the server.
