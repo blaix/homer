@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1776767287,
-        "narHash": "sha256-61JuemplVBV0hfmraiIkjvP0s6cml1j8Cj6TDagGY9s=",
+        "lastModified": 1779877912,
+        "narHash": "sha256-ZOH429qn2NvVTIzZlIusN4PnGpcdQT/t8refmiv4UwE=",
         "ref": "refs/heads/main",
-        "rev": "039a0631d3110c9bbe4ff64899377b463bebcc02",
-        "revCount": 80,
+        "rev": "31f3b5ac6b27e8fe6fb40867824465169bfd6eb4",
+        "revCount": 81,
         "type": "git",
         "url": "ssh://git@github.com/blaix/blog.blaix.com.git"
       },
@@ -28,11 +28,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779510126,
-        "narHash": "sha256-AN19hN63A3nuuUsOo42dERR/fmMt/rSEqNc1F3xjpAs=",
+        "lastModified": 1779845892,
+        "narHash": "sha256-s1vbh/lcCP7Cu0fdIiJhk3UO75W484EtYgZ9L2YGE/E=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "304b96c0998c76633bacbb44daa6a5de40f92273",
+        "rev": "b70482664c9b6f50b745a83539676905ae41fb6b",
         "type": "github"
       },
       "original": {
@@ -83,11 +83,11 @@
         "ws4sql": "ws4sql"
       },
       "locked": {
-        "lastModified": 1779703024,
-        "narHash": "sha256-nqkdT8xuXSwc24bXcb41yQwADR7wwiqI+0MUgQZRIjI=",
+        "lastModified": 1779878339,
+        "narHash": "sha256-1MSaIXq08wem8uYuINNeFfh90hv/AWSTOOruW1nC8F0=",
         "ref": "refs/heads/main",
-        "rev": "08ba8be478fbf75cecef088dc99e4d03647bebe4",
-        "revCount": 274,
+        "rev": "e561e8a0180ae5d1745b4d82eb9f967c2e9a6024",
+        "revCount": 275,
         "type": "git",
         "url": "ssh://git@github.com/blaix/doitanyway.new.git"
       },
@@ -404,11 +404,11 @@
         "ws4sql": "ws4sql_5"
       },
       "locked": {
-        "lastModified": 1778770680,
-        "narHash": "sha256-P6uM4XFLlmHt0EU27E3c4NVJiVuRB6yuDtBpCNwSUN8=",
+        "lastModified": 1779877479,
+        "narHash": "sha256-VO2witL/FAN2SggG135HU9Zye904ncK+n6i2OctQiEE=",
         "owner": "blaix",
         "repo": "myrecords",
-        "rev": "9b9f17c67921e8eb6cd0bb944af2b51b17b90e23",
+        "rev": "8d79fb97da966137b212b777b26b456b993bf39e",
         "type": "github"
       },
       "original": {
@@ -572,11 +572,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778235641,
-        "narHash": "sha256-RZIOMCFtAcObyJ55tXwsYuwAGvnFHt3QCs6ir4rD9M4=",
+        "lastModified": 1779877974,
+        "narHash": "sha256-ygGxuLW7sqOiXIQUtYjbJ04bzPF9ugCs/Qv75LxHJ6M=",
         "ref": "refs/heads/main",
-        "rev": "a5d035bd30739cb2a1a5c6df0576d3088116567b",
-        "revCount": 2,
+        "rev": "bbdabce4e6517604d21a357b9b3d801f4d946a5b",
+        "revCount": 3,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/prettynice.software.git"
       },
