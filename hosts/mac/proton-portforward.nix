@@ -41,6 +41,7 @@ let
   #        - IP address: 127.0.0.1, Port: 8080
   #        - Check "Bypass authentication for clients on localhost"
   #          (this script posts to the API without logging in)
+  #        - Choose an admin password (if you are me, see 1Password)
   #   2. In qBittorrent -> Preferences -> Connection:
   #        - Turn OFF "Use UPnP / NAT-PMP port forwarding from my router"
   #          (it would talk to the LAN router, not Proton's gateway)
