@@ -1,6 +1,9 @@
 - [X] Switch to a Flakes setup
 - [X] Use Mae's gren-treesitter (officially added to the nvim-treesitter plugin)
-- [ ] Remove duplication under the various hosts/ files. Especially with my user setup.
+- [X] Remove duplication under the various hosts/ files. Especially with my user setup.
+- [.] Set up pippinix as a router for cameras
+    - [ ] Switch to wifi for incoming
+    - [ ] Switch nic to output for switch / router setup
 - [ ] See TODO comments in code.
 
 Maybe:
