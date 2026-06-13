@@ -83,6 +83,7 @@
       "postman"
       "slack"
       "qbittorrent"
+      "soulseek"
       "steam"
       "vivaldi"
     ];
