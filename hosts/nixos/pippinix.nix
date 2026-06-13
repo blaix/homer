@@ -80,10 +80,10 @@
   };
 
   # Firewall - allow SSH, local dev servers, Jellyfin (web + LAN auto-discovery),
-  # and WireGuard, trust VPN interface
+  # Navidrome (4533), and WireGuard, trust VPN interface
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 3000 8000 8096 ];
+    allowedTCPPorts = [ 22 3000 8000 8096 4533 ];
     allowedUDPPorts = [ 51820 7359 ];
     trustedInterfaces = [ "wg0" ];
   };
@@ -91,12 +91,24 @@
   # Enable mosh connections (opens UDP ports)
   programs.mosh.enable = true;
 
-  # Jellyfin music server. Reachable on the LAN (8096) and from wg peers
+  # Jellyfin TV/movies server. Reachable on the LAN (8096) and from wg peers
   # (10.100.0.1:8096). UDP 7359 is opened above so LAN clients like the Roku
   # Jellyfin app can auto-discover the server.
   services.jellyfin = {
     enable = true;
     openFirewall = false;
+  };
+
+  # Navidrome music server. Reachable on the LAN
+  # (4533) and from wg peers (10.100.0.1:4533).
+  services.navidrome = {
+    enable = true;
+    openFirewall = false;
+    settings = {
+      MusicFolder = "/mnt/music";
+      Address = "0.0.0.0";
+      Port = 4533;
+    };
   };
 
   # Music library on dedicated USB drive (ext4, labeled "music").
@@ -107,10 +119,9 @@
     options = [ "nofail" "x-systemd.device-timeout=10s" ];
   };
 
-  # Video library on the root filesystem (TODO: move to dedicated USB drive
-  # when one is available; mirror the music fileSystems block above).
+  # Media libraries on the root filesystem (TODO: move to dedicated USB drive)
   systemd.tmpfiles.rules = [
-    "d /mnt/music        2775 jellyfin jellyfin -"
+    "d /mnt/music        0755 justin justin -"
     "d /mnt/media        2775 jellyfin jellyfin -"
     "d /mnt/media/inbox  2775 jellyfin jellyfin -"
     "d /mnt/media/movies 2775 jellyfin jellyfin -"
@@ -122,9 +133,10 @@
   # First-time machine setup (not declarative):
   #   - sudo smbpasswd -a justin to set the Samba password
   #   - In Jellyfin's web UI, add libraries:
-  #       Music  -> /mnt/music
   #       Movies -> /mnt/media/movies   (do NOT include /mnt/media/inbox)
   #       Shows  -> /mnt/media/tv
+  #   - In Navidrome's web UI, complete first-run admin setup.
+  #     The /mnt/music folder is scanned automatically.
   services.samba = {
     enable = true;
     openFirewall = true;
@@ -144,9 +156,8 @@
         "read only" = "no";
         "guest ok" = "no";
         "valid users" = "justin";
-        "force group" = "jellyfin";
-        "create mask" = "0664";
-        "directory mask" = "2775";
+        "create mask" = "0644";
+        "directory mask" = "0755";
       };
       media = {
         "path" = "/mnt/media";
@@ -188,9 +199,9 @@
   users.groups.justin = {};
   users.users.justin = {
     isNormalUser = true;
-    # `jellyfin` group lets justin write into /var/lib/jellyfin-media (see
-    # tmpfiles rules above) without sudo, so music can be scp'd/rsync'd in
-    # from another machine.
+    # `jellyfin` group lets justin write into /mnt/media/* (see tmpfiles
+    # rules above) without sudo, so TV/movies can be scp'd/rsync'd in from
+    # another machine.
     extraGroups = [ "wheel" "jellyfin" ];
     group = "justin";
     openssh.authorizedKeys.keys = import ../../users/justin/ssh-keys.nix;
