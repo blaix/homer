@@ -17,13 +17,16 @@ Default — fill in missing artist/albumartist/album/title/tracknumber:
 --fix — find and resolve inconsistencies in tags that already exist:
     Scans the whole library and surfaces (a) cross-file variant
     clusters: values that normalize to the same name but disagree in
-    spelling (e.g. "Capn Jazz" vs "Cap'n Jazz" across files), and (b)
-    within-file mismatches where artist and albumartist disagree but
-    are similar (single combined prompt sets both). Clusters are
-    handled per field — artist, albumartist (global) and album
-    (scoped per artist). Finishes with a list of filesystem warnings
-    (folder names that disagree with chosen tags, sibling folders that
-    normalize to the same name) for you to fix by hand.
+    spelling (e.g. "Capn Jazz" vs "Cap'n Jazz" across files), (b)
+    release-date clusters: tracks of one album that carry disagreeing
+    date tags (which makes players like Navidrome split a single album
+    into several), and (c) within-file mismatches where artist and
+    albumartist disagree but are similar (single combined prompt sets
+    both). Clusters are handled per field — artist, albumartist
+    (global), album (scoped per artist) and date (scoped per album).
+    Finishes with a list of filesystem warnings (folder names that
+    disagree with chosen tags, sibling folders that normalize to the
+    same name) for you to fix by hand.
 """
 import argparse
 import re
@@ -39,6 +42,10 @@ import requests
 
 AUDIO_EXTENSIONS = {".mp3", ".flac", ".m4a", ".ogg", ".opus", ".wav", ".aac"}
 TAG_FIELDS = ("artist", "albumartist", "album", "title", "tracknumber")
+# Fields read off every file. The default missing-tag pass only fills
+# TAG_FIELDS, but --fix also needs the release date to spot albums that
+# have been split across inconsistent date tags.
+READ_FIELDS = TAG_FIELDS + ("date",)
 MB_BASE = "https://musicbrainz.org/ws/2"
 USER_AGENT = "homer-tag-music/2.0 ( https://github.com/blaix/homer )"
 MB_RATE_LIMIT_S = 1.1
@@ -312,15 +319,18 @@ def run_fix(root, dry_run):
     artist_clusters = find_clusters(library, "artist")
     albumartist_clusters = find_clusters(library, "albumartist")
     album_clusters = find_album_clusters_per_artist(library)
+    date_clusters = find_date_clusters_per_album(library)
 
     print()
     print(f"  artist clusters     : {len(artist_clusters)}")
     print(f"  albumartist clusters: {len(albumartist_clusters)}")
     print(f"  album clusters      : {len(album_clusters)}")
+    print(f"  date clusters       : {len(date_clusters)}")
 
     resolve_clusters("artist", artist_clusters, dry_run, counts)
     resolve_clusters("albumartist", albumartist_clusters, dry_run, counts)
     resolve_album_clusters(album_clusters, dry_run, counts)
+    resolve_date_clusters(date_clusters, dry_run, counts)
 
     # After cluster cleanup; mismatches are computed off the updated state.
     mismatches = find_within_file_mismatches(library)
@@ -424,6 +434,50 @@ def find_album_clusters_per_artist(library):
     return clusters
 
 
+def find_date_clusters_per_album(library):
+    """Release-date clusters scoped to one album at a time.
+
+    Tracks of the same album (same albumartist, falling back to artist,
+    plus album name — both normalized) should all carry the same release
+    date. Files are bucketed by that pair, then the distinct date values
+    within each bucket are surfaced. A bucket with two or more distinct
+    dates is a cluster — the kind of split that makes Navidrome treat one
+    album as several. Files with no date tag at all are ignored here;
+    filling absent tags is the default pass's job, not --fix's.
+    """
+    by_album = {}
+    for entry in library:
+        a = entry["tags"].get("albumartist") or entry["tags"].get("artist")
+        album = entry["tags"].get("album")
+        if not a or not album:
+            continue
+        a_norm = NORM_RE.sub("", a.lower())
+        al_norm = NORM_RE.sub("", album.lower())
+        if not a_norm or not al_norm:
+            continue
+        by_album.setdefault((a_norm, al_norm), []).append(entry)
+
+    clusters = []
+    for entries in by_album.values():
+        by_date = {}
+        for e in entries:
+            date = e["tags"].get("date")
+            if not date:
+                continue
+            by_date.setdefault(date, []).append(e)
+        if len(by_date) < 2:
+            continue
+        sorted_variants = sorted(by_date.items(), key=lambda x: -len(x[1]))
+        sample = sorted_variants[0][1][0]
+        clusters.append({
+            "variants": sorted_variants,
+            "context_artist": (sample["tags"].get("albumartist")
+                               or sample["tags"].get("artist")),
+            "context_album": sample["tags"].get("album"),
+        })
+    return clusters
+
+
 def find_within_file_mismatches(library):
     out = []
     for entry in library:
@@ -460,6 +514,21 @@ def resolve_album_clusters(clusters, dry_run, counts):
         apply_cluster_choice("album", cluster, chosen, dry_run, counts)
 
 
+def resolve_date_clusters(clusters, dry_run, counts):
+    if not clusters:
+        return
+    print()
+    print(f"{BOLD}resolving release-date clusters ({len(clusters)}){RESET}")
+    for cluster in clusters:
+        ctx = cluster["context_artist"]
+        if cluster.get("context_album"):
+            ctx = f"{ctx} — {cluster['context_album']}"
+        chosen = prompt_cluster("date", cluster, ctx)
+        if chosen is None:
+            continue
+        apply_cluster_choice("date", cluster, chosen, dry_run, counts)
+
+
 def prompt_cluster(field, cluster, context_artist):
     variants = cluster["variants"]
     total = sum(len(entries) for _, entries in variants)
@@ -470,6 +539,7 @@ def prompt_cluster(field, cluster, context_artist):
           f"({len(variants)} variants, {total} files)")
 
     seed = variants[0][0]
+    uses_mb = field in ("artist", "albumartist", "album")
     if field in ("artist", "albumartist"):
         mb_name = mb_search_artist(seed)
     elif field == "album":
@@ -496,7 +566,8 @@ def prompt_cluster(field, cluster, context_artist):
               f"variant [{matching_variant_idx + 1}]){RESET}")
         default = str(matching_variant_idx + 1)
     else:
-        print(f"    {DIM}(musicbrainz: no match){RESET}")
+        if uses_mb:
+            print(f"    {DIM}(musicbrainz: no match){RESET}")
         default = "1"
     print("    [t] type custom")
     print("    [s] skip")
@@ -816,7 +887,7 @@ def read_tags(path):
     if f is None or f.tags is None:
         return {}
     out = {}
-    for k in TAG_FIELDS:
+    for k in READ_FIELDS:
         val = f.tags.get(k)
         if val:
             out[k] = val[0] if isinstance(val, list) else str(val)
