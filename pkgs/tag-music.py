@@ -1,6 +1,6 @@
 """Tag music: fill in missing tags, or fix inconsistencies across the library.
 
-Two modes:
+Three modes:
 
 Default — fill in missing artist/albumartist/album/title/tracknumber:
     Walks a music root assumed to look like:
@@ -27,8 +27,22 @@ Default — fill in missing artist/albumartist/album/title/tracknumber:
     Finishes with a list of filesystem warnings (folder names that
     disagree with chosen tags, sibling folders that normalize to the
     same name) for you to fix by hand.
+
+--art — fill in missing album cover art:
+    Walks each album folder and, for any that has no cover image yet
+    (cover/folder/front.*), reads the album+artist tags off its tracks,
+    looks the release up across several sources — the MusicBrainz Cover
+    Art Archive first, then iTunes and Deezer as fallbacks — and saves
+    the first front cover found into the folder as cover.jpg. Every
+    source is gated by the same artist+album similarity check so a loose
+    text match can't drop the wrong cover in. Navidrome picks up cover.*
+    automatically, so the art is added without rewriting any track.
+    Non-interactive: it takes the best match or reports no match. Artist
+    images aren't handled here — Navidrome fetches those itself via its
+    external agents.
 """
 import argparse
+import os
 import re
 import sys
 import time
@@ -41,14 +55,20 @@ import requests
 
 
 AUDIO_EXTENSIONS = {".mp3", ".flac", ".m4a", ".ogg", ".opus", ".wav", ".aac"}
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+# Filename stems (case-insensitive) that count as an existing cover, so
+# --art leaves those folders alone. Matches Navidrome's default lookup.
+COVER_STEMS = {"cover", "folder", "front", "album", "albumart"}
 TAG_FIELDS = ("artist", "albumartist", "album", "title", "tracknumber")
 # Fields read off every file. The default missing-tag pass only fills
 # TAG_FIELDS, but --fix also needs the release date to spot albums that
 # have been split across inconsistent date tags.
 READ_FIELDS = TAG_FIELDS + ("date",)
 MB_BASE = "https://musicbrainz.org/ws/2"
+CAA_BASE = "https://coverartarchive.org"
 USER_AGENT = "homer-tag-music/2.0 ( https://github.com/blaix/homer )"
 MB_RATE_LIMIT_S = 1.1
+CAA_RATE_LIMIT_S = 0.5
 MB_MIN_SCORE = 80
 SIMILAR_THRESHOLD = 0.85
 
@@ -66,6 +86,7 @@ CYAN = "\033[36m"
 RESET = "\033[0m"
 
 _last_mb_at = 0.0
+_last_caa_at = 0.0
 
 
 def main():
@@ -81,6 +102,9 @@ def main():
                         help="scan for inconsistent tags across the "
                              "library and resolve them (independent of "
                              "the default missing-tag pass)")
+    parser.add_argument("--art", action="store_true",
+                        help="download missing album cover art from the "
+                             "Cover Art Archive into each album folder")
     args = parser.parse_args()
 
     maybe_disable_color()
@@ -91,7 +115,9 @@ def main():
         sys.exit(f"not a directory: {root}")
 
     try:
-        if args.fix:
+        if args.art:
+            run_art(root, dry_run=args.dry_run)
+        elif args.fix:
             run_fix(root, dry_run=args.dry_run)
         else:
             run(root, dry_run=args.dry_run)
@@ -785,6 +811,169 @@ def sanitize_folder_name(name):
     return name.replace("/", "-")
 
 
+# ----- --art mode -----
+
+def run_art(root, dry_run):
+    print(f"{BOLD}scanning album folders...{RESET}")
+    albums = {}  # album folder Path -> [track paths]
+    for path in iter_audio(root):
+        artist_dir, album_dir = get_artist_album_dirs(path, root)
+        folder = album_dir or artist_dir
+        if folder is None:
+            continue
+        albums.setdefault(folder, []).append(path)
+    print(f"  {len(albums)} album folders")
+
+    counts = {"written": 0, "have": 0, "skipped": 0,
+              "nomatch": 0, "errors": 0}
+
+    for folder, paths in sorted(albums.items()):
+        if folder_cover(folder):
+            counts["have"] += 1
+            continue
+
+        album, artist = album_artist_for_folder(paths)
+        print()
+        print(f"{BOLD}{folder}{RESET}")
+        if not album or not artist:
+            print(f"  {DIM}skip: missing album/artist tags{RESET}")
+            counts["skipped"] += 1
+            continue
+        print(f"  {DIM}{artist} — {album}{RESET}")
+
+        img = find_cover_art(album, artist)
+        if img is None:
+            print(f"  {YELLOW}no cover art found "
+                  f"(tried musicbrainz, itunes, deezer){RESET}")
+            counts["nomatch"] += 1
+            continue
+
+        dest = folder / f"cover{ext_for_content_type(img['content_type'])}"
+        size_kb = len(img["data"]) // 1024
+        if dry_run:
+            print(f"  {DIM}(dry-run){RESET} would write "
+                  f"{dest.name} ({size_kb} KB, via {img['source']})")
+            counts["written"] += 1
+            continue
+        try:
+            dest.write_bytes(img["data"])
+            print(f"  {GREEN}wrote {dest.name}{RESET} "
+                  f"({size_kb} KB, via {img['source']})")
+            counts["written"] += 1
+            # Bump the tracks' mtimes so Navidrome's next scan treats the
+            # album as changed and refreshes its cached cover art — a new
+            # sibling cover.jpg alone wouldn't trigger that.
+            bump_mtimes(folder, paths)
+        except Exception as e:
+            print(f"  {RED}[!] write failed: {e}{RESET}", file=sys.stderr)
+            counts["errors"] += 1
+
+    print()
+    err = (f" {RED}errors={counts['errors']}{RESET}"
+           if counts["errors"] else "")
+    print(f"{BOLD}done.{RESET} "
+          f"{GREEN}written={counts['written']}{RESET} "
+          f"have-art={counts['have']} "
+          f"no-match={counts['nomatch']} "
+          f"skipped={counts['skipped']}{err}")
+
+
+def find_cover_art(album, artist):
+    """Walk art sources in order, returning the first front cover found.
+
+    Each candidate is gated by similar() on both artist and album so a
+    loose text search can't return a wrong cover. Result is the image
+    dict {"data", "content_type", "source"} or None if every source
+    came up empty.
+    """
+    rel = mb_find_release(album, artist)
+    if rel is not None:
+        img = None
+        if rel.get("release"):
+            img = caa_fetch_front("release", rel["release"])
+        if img is None and rel.get("release_group"):
+            img = caa_fetch_front("release-group", rel["release_group"])
+        if img is not None:
+            img["source"] = "musicbrainz"
+            return img
+
+    img = itunes_fetch_front(album, artist)
+    if img is not None:
+        img["source"] = "itunes"
+        return img
+
+    img = deezer_fetch_front(album, artist)
+    if img is not None:
+        img["source"] = "deezer"
+        return img
+
+    return None
+
+
+def folder_cover(folder):
+    """Return an existing cover image in folder, or None."""
+    try:
+        for p in folder.iterdir():
+            if (p.is_file()
+                    and p.suffix.lower() in IMAGE_EXTENSIONS
+                    and p.stem.lower() in COVER_STEMS):
+                return p
+    except OSError:
+        pass
+    return None
+
+
+def album_artist_for_folder(paths):
+    """Most common (album, albumartist-or-artist) across a folder's tracks."""
+    albums = {}
+    artists = {}
+    for path in paths:
+        try:
+            tags = read_tags(path)
+        except Exception:
+            continue
+        album = tags.get("album")
+        if album:
+            albums[album] = albums.get(album, 0) + 1
+        artist = tags.get("albumartist") or tags.get("artist")
+        if artist:
+            artists[artist] = artists.get(artist, 0) + 1
+    album = max(albums, key=albums.get) if albums else None
+    artist = max(artists, key=artists.get) if artists else None
+    return album, artist
+
+
+def bump_mtimes(folder, paths):
+    """Touch the album's tracks (and its folder) to the current time.
+
+    A folder cover.jpg added beside unchanged audio files won't trip
+    Navidrome's quick scan, so the album's updated_at never moves and the
+    cached grid thumbnail stays stale. Touching the tracks makes the next
+    scan re-import them, which bumps the album's updated_at, changes its
+    artwork id, and invalidates the old cached cover.
+    """
+    for p in paths:
+        try:
+            os.utime(p, None)
+        except OSError:
+            pass
+    try:
+        os.utime(folder, None)
+    except OSError:
+        pass
+
+
+def ext_for_content_type(content_type):
+    ct = (content_type or "").lower()
+    if "png" in ct:
+        return ".png"
+    if "gif" in ct:
+        return ".gif"
+    if "webp" in ct:
+        return ".webp"
+    return ".jpg"
+
+
 # ----- MusicBrainz -----
 
 def mb_get(endpoint, params):
@@ -867,6 +1056,127 @@ def mb_search_recording(artist, album, title):
                         }
             return {"title": rec_title, "tracknumber": None}
     return None
+
+
+def mb_find_release(album, artist):
+    """Best-matching release MBID (plus its release-group MBID) for cover art."""
+    q = f'release:"{escape(album)}" AND artist:({lucene_terms(artist)})'
+    data = mb_get("release", {"query": q, "fmt": "json", "limit": "5"})
+    if not data:
+        return None
+    for item in data.get("releases", []) or []:
+        if item.get("score", 0) < MB_MIN_SCORE:
+            continue
+        if not similar(item.get("title", ""), album):
+            continue
+        rg = item.get("release-group") or {}
+        return {
+            "release": item.get("id"),
+            "release_group": rg.get("id"),
+            "title": item.get("title"),
+        }
+    return None
+
+
+# ----- Cover Art Archive -----
+
+def caa_fetch_front(kind, mbid):
+    """Download the front cover for a release / release-group MBID.
+
+    Returns {"data": bytes, "content_type": str} or None (404 / error).
+    """
+    global _last_caa_at
+    wait = CAA_RATE_LIMIT_S - (time.monotonic() - _last_caa_at)
+    if wait > 0:
+        time.sleep(wait)
+    url = f"{CAA_BASE}/{kind}/{mbid}/front"
+    headers = {"User-Agent": USER_AGENT}
+    try:
+        r = requests.get(url, headers=headers, timeout=30)
+        _last_caa_at = time.monotonic()
+        if r.status_code == 404:
+            return None
+        r.raise_for_status()
+        return {
+            "data": r.content,
+            "content_type": r.headers.get("Content-Type", ""),
+        }
+    except Exception as e:
+        print(f"    {DIM}(CAA {kind} fetch failed: {e}){RESET}",
+              file=sys.stderr)
+        _last_caa_at = time.monotonic()
+        return None
+
+
+# ----- art fallbacks (iTunes, Deezer) -----
+
+def itunes_fetch_front(album, artist):
+    """Front cover via the keyless iTunes Search API, or None."""
+    data = http_get_json("https://itunes.apple.com/search", {
+        "term": f"{artist} {album}",
+        "entity": "album",
+        "limit": "10",
+    })
+    if not data:
+        return None
+    for item in data.get("results", []) or []:
+        if not similar(item.get("collectionName", ""), album):
+            continue
+        if not similar(item.get("artistName", ""), artist):
+            continue
+        url = item.get("artworkUrl100")
+        if not url:
+            continue
+        # The 100x100 thumbnail URL upscales by swapping the dimensions.
+        url = url.replace("100x100bb", "600x600bb")
+        return download_image(url)
+    return None
+
+
+def deezer_fetch_front(album, artist):
+    """Front cover via the keyless Deezer API, or None."""
+    data = http_get_json("https://api.deezer.com/search/album", {
+        "q": f'artist:"{artist}" album:"{album}"',
+    })
+    if not data:
+        return None
+    for item in data.get("data", []) or []:
+        if not similar(item.get("title", ""), album):
+            continue
+        art = item.get("artist") or {}
+        if not similar(art.get("name", ""), artist):
+            continue
+        url = item.get("cover_xl") or item.get("cover_big")
+        if not url:
+            continue
+        return download_image(url)
+    return None
+
+
+def http_get_json(url, params):
+    headers = {"User-Agent": USER_AGENT}
+    try:
+        r = requests.get(url, params=params, headers=headers, timeout=10)
+        r.raise_for_status()
+        return r.json()
+    except Exception as e:
+        print(f"    {DIM}(art search failed: {e}){RESET}", file=sys.stderr)
+        return None
+
+
+def download_image(url):
+    headers = {"User-Agent": USER_AGENT}
+    try:
+        r = requests.get(url, headers=headers, timeout=30)
+        r.raise_for_status()
+        return {
+            "data": r.content,
+            "content_type": r.headers.get("Content-Type", ""),
+        }
+    except Exception as e:
+        print(f"    {DIM}(image download failed: {e}){RESET}",
+              file=sys.stderr)
+        return None
 
 
 # ----- I/O and string helpers -----
