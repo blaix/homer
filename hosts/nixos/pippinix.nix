@@ -52,7 +52,14 @@
     memoryPercent = 50;
   };
 
-  # WireGuard VPN server
+  # WireGuard VPN server.
+  #
+  # Off-LAN reachability depends on infra NOT in this repo:
+  #   - home.blaix.com is a CNAME to the eero's dyndns hostname (tracks our
+  #     dynamic home IP).
+  #   - The eero forwards UDP 51820 to this host.
+  # Peer client tunnels use Endpoint = home.blaix.com:51820 (set in each
+  # device's WireGuard app, not declared here).
   networking.wireguard.interfaces.wg0 = {
     ips = [ "10.100.0.1/24" ];
     listenPort = 51820;
