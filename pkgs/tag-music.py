@@ -105,6 +105,9 @@ def main():
     parser.add_argument("--art", action="store_true",
                         help="download missing album cover art from the "
                              "Cover Art Archive into each album folder")
+    parser.add_argument("--cleanup", action="store_true",
+                        help="list AppleDouble junk files (._*) that sit "
+                             "beside a real file and offer to delete them")
     args = parser.parse_args()
 
     maybe_disable_color()
@@ -115,7 +118,9 @@ def main():
         sys.exit(f"not a directory: {root}")
 
     try:
-        if args.art:
+        if args.cleanup:
+            run_cleanup(root, dry_run=args.dry_run)
+        elif args.art:
             run_art(root, dry_run=args.dry_run)
         elif args.fix:
             run_fix(root, dry_run=args.dry_run)
@@ -972,6 +977,57 @@ def ext_for_content_type(content_type):
     if "webp" in ct:
         return ".webp"
     return ".jpg"
+
+
+# ----- --cleanup mode -----
+
+def run_cleanup(root, dry_run):
+    """Delete AppleDouble junk (._foo) that sits beside its real file.
+
+    macOS writes a ._<name> sidecar next to <name> on non-HFS volumes.
+    We only offer to delete a ._* file when its real counterpart exists
+    in the same folder, so a (rare) legitimately-named ._ file with no
+    sibling is left alone. The deletion is a single all-or-nothing
+    prompt; when stdout isn't a terminal (piped to less, etc.) we can't
+    safely prompt, so we just list and assume "no".
+    """
+    print(f"{BOLD}scanning for AppleDouble junk...{RESET}")
+    junk = []
+    for p in sorted(root.rglob("._*")):
+        if not p.is_file():
+            continue
+        if (p.parent / p.name[2:]).exists():
+            junk.append(p)
+
+    if not junk:
+        print(f"  {GREEN}none found.{RESET}")
+        return
+
+    print(f"  {len(junk)} junk file(s) with a matching real file:")
+    for p in junk:
+        print(f"    {p}")
+
+    if dry_run:
+        print(f"  {DIM}(dry-run, nothing deleted){RESET}")
+        return
+
+    if not sys.stdout.isatty():
+        print(f"  {DIM}(not a terminal, assuming no — nothing deleted){RESET}")
+        return
+
+    answer = input(f"  delete all {len(junk)}? [y/N]: ").strip().lower()
+    if answer not in ("y", "yes"):
+        print("  nothing deleted.")
+        return
+
+    deleted = 0
+    for p in junk:
+        try:
+            p.unlink()
+            deleted += 1
+        except OSError as e:
+            print(f"  {RED}[!] {p}: {e}{RESET}", file=sys.stderr)
+    print(f"  {GREEN}deleted {deleted}.{RESET}")
 
 
 # ----- MusicBrainz -----
