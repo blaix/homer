@@ -149,11 +149,10 @@
     "d /mnt/media/tv     0755 justin justin -"
   ];
 
-  # SMB share reachable from Macs as smb://pippinix.local (read-only).
+  # SMB share reachable from Macs as smb://pippinix.local (read-write).
   #
   # First-time machine setup (not declarative):
-  #   - sudo smbpasswd -a justin to set the Samba password (SMB is read-only)
-  #   - Add content to /mnt/media over ssh (rsync/scp) as justin, not via SMB.
+  #   - sudo smbpasswd -a justin to set the Samba password.
   #   - In Jellyfin's web UI, add libraries:
   #       Movies -> /mnt/media/movies   (do NOT include /mnt/media/inbox)
   #       Shows  -> /mnt/media/tv
@@ -174,15 +173,31 @@
         # No anonymous access; we want auth so Finder caches creds in Keychain.
         "guest account" = "nobody";
         "map to guest" = "never";
+
+        # macOS interop: store Mac metadata in ext4 xattrs instead of "._"
+        # AppleDouble sidecar files, and auto-delete Finder/Spotlight junk.
+        "vfs objects" = "catia fruit streams_xattr";
+        "fruit:metadata" = "stream";
+        "fruit:posix_rename" = "yes";
+        "fruit:veto_appledouble" = "no";
+        "fruit:wipe_intentionally_left_blank_rfork" = "yes";
+        "fruit:delete_empty_adfiles" = "yes";
+        "fruit:nfs_aces" = "no";
+        "veto files" = "/.DS_Store/.Spotlight-V100/.Trashes/.TemporaryItems/.fseventsd/.apdisk/.AppleDB/.AppleDesktop/Network Trash Folder/Temporary Items/";
+        "delete veto files" = "yes";
       };
-      # Single read-only share over the whole drive (music/, tv/, movies/,
-      # inbox/). Writes go over ssh via rsync/scp, not SMB.
+      # Read-write share over the whole drive (music/, tv/, movies/, inbox/).
+      # Files are forced to justin and world-readable so navidrome/jellyfin,
+      # which read the drive as "other", can see newly added content.
       media = {
         "path" = "/mnt/media";
         "browseable" = "yes";
-        "read only" = "yes";
+        "read only" = "no";
         "guest ok" = "no";
         "valid users" = "justin";
+        "force user" = "justin";
+        "create mask" = "0644";
+        "directory mask" = "0755";
       };
     };
   };

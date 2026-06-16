@@ -124,6 +124,10 @@
       "com.apple.controlcenter" = {
         Bluetooth = 18; # show in menu bar
       };
+      # Don't litter network shares with .DS_Store files.
+      "com.apple.desktopservices" = {
+        DSDontWriteNetworkStores = true;
+      };
       "com.microsoft.VSCode" = {
         # Enable key-repeat on hold in vim mode
         # https://vimforvscode.com/enable-key-repeat-vim
