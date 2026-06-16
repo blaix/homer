@@ -112,38 +112,56 @@
     enable = true;
     openFirewall = false;
     settings = {
-      MusicFolder = "/mnt/music";
+      MusicFolder = "/mnt/media/music";
       Address = "0.0.0.0";
       Port = 4533;
     };
   };
 
-  # Music library on dedicated USB drive (ext4, labeled "music").
-  fileSystems."/mnt/music" = {
-    device = "/dev/disk/by-label/music";
+  # Music + media libraries on the dedicated USB drive (ext4, labeled "media").
+  fileSystems."/mnt/media" = {
+    device = "/dev/disk/by-label/media";
     fsType = "ext4";
     # nofail = server still boots if the drive is unplugged.
     options = [ "nofail" "x-systemd.device-timeout=10s" ];
   };
 
-  # Media libraries on the root filesystem (TODO: move to dedicated USB drive)
+  # navidrome and jellyfin read their libraries from this mount, so start them
+  # only after it is mounted. Otherwise they capture a pre-mount namespace and
+  # see an empty /mnt/media.
+  systemd.services.navidrome = {
+    after = [ "mnt-media.mount" ];
+    requires = [ "mnt-media.mount" ];
+  };
+  systemd.services.jellyfin = {
+    after = [ "mnt-media.mount" ];
+    requires = [ "mnt-media.mount" ];
+  };
+
+  # The whole USB drive is owned by justin and world-readable: navidrome and
+  # jellyfin read their libraries as "other", and neither can write here.
+  # Content is added over ssh (rsync/scp) as justin, not by the services.
   systemd.tmpfiles.rules = [
-    "d /mnt/music        0755 justin justin -"
-    "d /mnt/media        2775 jellyfin jellyfin -"
-    "d /mnt/media/inbox  2775 jellyfin jellyfin -"
-    "d /mnt/media/movies 2775 jellyfin jellyfin -"
-    "d /mnt/media/tv     2775 jellyfin jellyfin -"
+    "d /mnt/media        0755 justin justin -"
+    "d /mnt/media/music  0755 justin justin -"
+    "d /mnt/media/inbox  0755 justin justin -"
+    "d /mnt/media/movies 0755 justin justin -"
+    "d /mnt/media/tv     0755 justin justin -"
   ];
 
-  # SMB shares reachable from Macs as smb://pippinix.local.
+  # SMB share reachable from Macs as smb://pippinix.local (read-only).
   #
   # First-time machine setup (not declarative):
-  #   - sudo smbpasswd -a justin to set the Samba password
+  #   - sudo smbpasswd -a justin to set the Samba password (SMB is read-only)
+  #   - Add content to /mnt/media over ssh (rsync/scp) as justin, not via SMB.
   #   - In Jellyfin's web UI, add libraries:
   #       Movies -> /mnt/media/movies   (do NOT include /mnt/media/inbox)
   #       Shows  -> /mnt/media/tv
+  #     Jellyfin only ever reads the drive (files are owned by justin and
+  #     world-readable; jellyfin has no write access). Leave "save artwork /
+  #     NFO / subtitles into media folders" OFF so it never tries to write.
   #   - In Navidrome's web UI, complete first-run admin setup.
-  #     The /mnt/music folder is scanned automatically.
+  #     The /mnt/media/music folder is scanned automatically.
   services.samba = {
     enable = true;
     openFirewall = true;
@@ -157,24 +175,14 @@
         "guest account" = "nobody";
         "map to guest" = "never";
       };
-      music = {
-        "path" = "/mnt/music";
-        "browseable" = "yes";
-        "read only" = "no";
-        "guest ok" = "no";
-        "valid users" = "justin";
-        "create mask" = "0644";
-        "directory mask" = "0755";
-      };
+      # Single read-only share over the whole drive (music/, tv/, movies/,
+      # inbox/). Writes go over ssh via rsync/scp, not SMB.
       media = {
         "path" = "/mnt/media";
         "browseable" = "yes";
-        "read only" = "no";
+        "read only" = "yes";
         "guest ok" = "no";
         "valid users" = "justin";
-        "force group" = "jellyfin";
-        "create mask" = "0664";
-        "directory mask" = "2775";
       };
     };
   };
@@ -206,10 +214,7 @@
   users.groups.justin = {};
   users.users.justin = {
     isNormalUser = true;
-    # `jellyfin` group lets justin write into /mnt/media/* (see tmpfiles
-    # rules above) without sudo, so TV/movies can be scp'd/rsync'd in from
-    # another machine.
-    extraGroups = [ "wheel" "jellyfin" ];
+    extraGroups = [ "wheel" ];
     group = "justin";
     openssh.authorizedKeys.keys = import ../../users/justin/ssh-keys.nix;
   };
