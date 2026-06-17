@@ -24,7 +24,9 @@ Default — fill in missing artist/albumartist/album/title/tracknumber:
     spelling (e.g. "Capn Jazz" vs "Cap'n Jazz" across files), (b)
     release-date clusters: tracks of one album that carry disagreeing
     date tags (which makes players like Navidrome split a single album
-    into several), and (c) within-file mismatches where artist and
+    into several; the prompt offers the album's MusicBrainz release date
+    and the latest of the listed dates alongside the variants), and (c)
+    within-file mismatches where artist and
     albumartist disagree but are similar (single combined prompt sets
     both). Clusters are handled per field — artist, albumartist
     (global), album (scoped per artist) and date (scoped per album).
@@ -619,10 +621,82 @@ def resolve_date_clusters(clusters, dry_run, counts):
         ctx = cluster["context_artist"]
         if cluster.get("context_album"):
             ctx = f"{ctx} — {cluster['context_album']}"
-        chosen = prompt_cluster("date", cluster, ctx)
+        chosen = prompt_date_cluster(cluster, ctx)
         if chosen is None:
             continue
         apply_cluster_choice("date", cluster, chosen, dry_run, counts)
+
+
+def prompt_date_cluster(cluster, context):
+    """Resolve a release-date cluster.
+
+    Beyond the disagreeing date variants found across the album's tracks,
+    this offers two extra picks: the album's original release date looked
+    up on MusicBrainz, and the latest of the listed dates. The MB date is
+    the default when one is found (it's the authoritative answer), else we
+    default to the latest.
+    """
+    variants = cluster["variants"]
+    total = sum(len(entries) for _, entries in variants)
+
+    print()
+    title_ctx = f" [{context}]" if context else ""
+    print(f"  {BOLD}date cluster{RESET}{title_ctx} "
+          f"({len(variants)} variants, {total} files)")
+
+    latest = latest_date([raw for raw, _ in variants])
+
+    mb_date = None
+    if cluster.get("context_artist") and cluster.get("context_album"):
+        mb_date = mb_release_date(cluster["context_album"],
+                                  cluster["context_artist"])
+
+    for i, (raw, entries) in enumerate(variants, 1):
+        marker = f" {DIM}(latest){RESET}" if raw == latest else ""
+        print(f"    [{i}] {YELLOW}{raw}{RESET} ({len(entries)} files){marker}")
+
+    # The MB date may coincide with a variant already on the list (same
+    # string), in which case point at that variant instead of duplicating.
+    mb_matches_idx = None
+    if mb_date:
+        for i, (raw, _) in enumerate(variants):
+            if raw == mb_date:
+                mb_matches_idx = i
+                break
+    if mb_date and mb_matches_idx is None:
+        print(f"    [m] musicbrainz : {CYAN}{mb_date}{RESET}")
+        default = "m"
+    elif mb_date:
+        print(f"    {DIM}(musicbrainz matches "
+              f"variant [{mb_matches_idx + 1}]){RESET}")
+        default = str(mb_matches_idx + 1)
+    else:
+        print(f"    {DIM}(musicbrainz: no date found){RESET}")
+        default = "l"
+    print(f"    [l] latest      : {latest}")
+    print("    [t] type custom")
+    print("    [s] skip")
+
+    while True:
+        choice = (input(f"    choose [default: {default}]: ")
+                  .strip().lower() or default)
+        if choice == "s":
+            return None
+        if choice == "l":
+            return latest
+        if choice == "m" and mb_date and mb_matches_idx is None:
+            return mb_date
+        if choice == "t":
+            val = input("    enter date: ").strip()
+            if val:
+                return val
+            print("    (empty input)")
+            continue
+        if choice.isdigit():
+            idx = int(choice) - 1
+            if 0 <= idx < len(variants):
+                return variants[idx][0]
+        print(f"    unrecognized: {choice!r}")
 
 
 def prompt_cluster(field, cluster, context_artist):
@@ -1385,6 +1459,34 @@ def mb_canonical_track_count(album, artist):
     return min(counts) if counts else None
 
 
+@lru_cache(maxsize=None)
+def mb_release_date(album, artist):
+    """The album's original release date per MusicBrainz, or None.
+
+    Used by --fix to break release-date ties: among the matching
+    releases we take the earliest date, which is the album's original
+    release rather than a later reissue. The raw MB string (which may be
+    a bare year, year-month, or full date) is returned as-is.
+    """
+    q = f'release:"{escape(album)}" AND artist:({lucene_terms(artist)})'
+    data = mb_get("release", {"query": q, "fmt": "json", "limit": "10"})
+    if not data:
+        return None
+    dates = []
+    for item in data.get("releases", []) or []:
+        if item.get("score", 0) < MB_MIN_SCORE:
+            continue
+        if not similar(item.get("title", ""), album):
+            continue
+        ac = item.get("artist-credit", []) or []
+        if not ac or not similar(ac[0].get("name", ""), artist):
+            continue
+        d = item.get("date")
+        if d:
+            dates.append(d)
+    return min(dates, key=date_sort_key) if dates else None
+
+
 # ----- Cover Art Archive -----
 
 def caa_fetch_front(kind, mbid):
@@ -1574,6 +1676,24 @@ def parse_tracknum(s):
         return None
     m = re.match(r"^(\d+)", str(s))
     return int(m.group(1)) if m else None
+
+
+def date_sort_key(d):
+    """Sortable (year, month, day) for a release date string.
+
+    Handles bare years, year-month, and full dates by pulling out the
+    leading numbers and padding the missing parts with zero, so a bare
+    "1999" sorts just before "1999-09-21".
+    """
+    parts = [int(n) for n in re.findall(r"\d+", str(d))[:3]]
+    while len(parts) < 3:
+        parts.append(0)
+    return tuple(parts)
+
+
+def latest_date(dates):
+    """The latest of a set of release-date strings (chronologically)."""
+    return max(dates, key=date_sort_key)
 
 
 def find_gaps(sorted_nums):
