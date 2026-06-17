@@ -1110,7 +1110,8 @@ def run_gain(root, dry_run):
     if not shutil.which("rsgain"):
         sys.exit(f"{RED}rsgain not found on PATH.{RESET}")
 
-    cmd = ["rsgain", "easy", "-S", str(root)]
+    # -m MAX: scan albums in parallel, one thread per available core.
+    cmd = ["rsgain", "easy", "-m", "MAX", "-S", str(root)]
     print(f"{BOLD}running:{RESET} {' '.join(cmd)}")
 
     if dry_run:
