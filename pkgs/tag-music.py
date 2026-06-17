@@ -53,6 +53,19 @@ Default — fill in missing artist/albumartist/album/title/tracknumber:
     already have ReplayGain tags are left alone, making re-runs cheap.
     Non-interactive; rsgain's output streams through. With --dry-run
     the command is printed and nothing is executed.
+
+--missing — flag albums that look incomplete:
+    Read-only pass. For each album folder, combines two signals:
+    interior gaps in the local track-number sequence (1,2,4,5 → 3
+    missing) and a MusicBrainz canonical-count check that catches
+    missing trailing tracks (have 1–8, MB says 12 → 9–12 missing).
+    The canonical count is the **shortest** matching MB release, so
+    Japanese / deluxe / bonus-track editions can't make a complete
+    standard album look short. Multi-disc folders (detected via
+    duplicate tracknumbers) skip interior-gap detection and only
+    compare file count against the canonical total. Albums with no
+    album/artist tags or no tracknumbers are skipped — the default
+    pass exists to fill those in.
 """
 import argparse
 import os
@@ -129,6 +142,10 @@ def main():
                         help="run rsgain easy over the library to write "
                              "ReplayGain tags (skips albums that already "
                              "have them)")
+    parser.add_argument("--missing", action="store_true",
+                        help="list albums that look like they have "
+                             "missing tracks (read-only; uses MusicBrainz "
+                             "to skip bonus-track editions)")
     args = parser.parse_args()
 
     maybe_disable_color()
@@ -147,6 +164,8 @@ def main():
             run_art(root, dry_run=args.dry_run)
         elif args.fix:
             run_fix(root, dry_run=args.dry_run)
+        elif args.missing:
+            run_missing(root)
         else:
             run(root, dry_run=args.dry_run)
     except KeyboardInterrupt:
@@ -1107,6 +1126,131 @@ def run_gain(root, dry_run):
                  f"{result.returncode}{RESET}")
 
 
+# ----- --missing mode -----
+
+def run_missing(root):
+    """Flag albums whose track set looks incomplete.
+
+    Interior gaps in local track-number sequences are reported on
+    their own (high confidence — they're holes in your own files).
+    For the trailing case (have 1–8 of a 12-track album) we lean on
+    MusicBrainz: the smallest matching release wins as the canonical
+    count so bonus-track editions on Japanese / deluxe pressings
+    can't make a complete standard album look short.
+    """
+    print(f"{BOLD}scanning album folders...{RESET}")
+    albums = {}
+    for path in iter_audio(root):
+        artist_dir, album_dir = get_artist_album_dirs(path, root)
+        folder = album_dir or artist_dir
+        if folder is None:
+            continue
+        albums.setdefault(folder, []).append(path)
+    print(f"  {len(albums)} album folders")
+
+    flagged = 0
+    for folder, paths in sorted(albums.items()):
+        finding = inspect_album(paths)
+        if finding is None:
+            continue
+        flagged += 1
+        report_missing(folder, finding)
+
+    print()
+    print(f"{BOLD}done.{RESET} "
+          f"{YELLOW}flagged={flagged}{RESET} "
+          f"checked={len(albums)}")
+
+
+def inspect_album(paths):
+    """Detect missing tracks across a folder's audio files.
+
+    Returns a finding dict or None if nothing looks off (or there
+    isn't enough tag info to judge).
+    """
+    entries = []
+    album_name = None
+    artist_name = None
+    for path in paths:
+        try:
+            tags = read_tags(path)
+        except Exception:
+            continue
+        entries.append(tags)
+        if not album_name:
+            album_name = tags.get("album")
+        if not artist_name:
+            artist_name = tags.get("albumartist") or tags.get("artist")
+
+    if not entries or not album_name or not artist_name:
+        return None
+
+    track_nums = []
+    for tags in entries:
+        n = parse_tracknum(tags.get("tracknumber"))
+        if n:
+            track_nums.append(n)
+    if not track_nums:
+        return None
+
+    # Duplicate tracknumbers mean per-disc numbering, so gap detection
+    # on the raw numbers would be a false-positive minefield.
+    multi_disc = len(track_nums) != len(set(track_nums))
+    interior_gaps = []
+    if not multi_disc:
+        interior_gaps = find_gaps(sorted(set(track_nums)))
+
+    canonical = mb_canonical_track_count(album_name, artist_name)
+
+    trailing = []
+    shortfall = None
+    if canonical:
+        if multi_disc:
+            if len(entries) < canonical:
+                shortfall = canonical - len(entries)
+        else:
+            max_existing = max(track_nums)
+            if max_existing < canonical:
+                trailing = list(range(max_existing + 1, canonical + 1))
+        # Bonus-edition filter: drop interior gaps past the canonical
+        # count — that's the bonus region of an extended pressing.
+        interior_gaps = [g for g in interior_gaps if g <= canonical]
+
+    if not interior_gaps and not trailing and not shortfall:
+        return None
+
+    return {
+        "album": album_name,
+        "artist": artist_name,
+        "local_count": len(entries),
+        "canonical": canonical,
+        "interior_gaps": interior_gaps,
+        "trailing": trailing,
+        "shortfall": shortfall,
+    }
+
+
+def report_missing(folder, finding):
+    print()
+    print(f"{BOLD}{folder}{RESET}")
+    print(f"  {DIM}{finding['artist']} — {finding['album']}{RESET}")
+    if finding["canonical"]:
+        count_str = f"{finding['local_count']}/{finding['canonical']}"
+    else:
+        count_str = f"{finding['local_count']}/?"
+    parts = [f"have {count_str}"]
+    if finding["interior_gaps"]:
+        gaps = ", ".join(str(n) for n in finding["interior_gaps"])
+        parts.append(f"gaps: {gaps}")
+    if finding["trailing"]:
+        t = finding["trailing"]
+        rng = f"{t[0]}–{t[-1]}" if len(t) > 1 else str(t[0])
+        parts.append(f"trailing: {rng}")
+    if finding["shortfall"]:
+        parts.append(f"short by {finding['shortfall']} (multi-disc)")
+    print(f"  {YELLOW}{'  '.join(parts)}{RESET}")
+
+
 # ----- MusicBrainz -----
 
 def mb_get(endpoint, params):
@@ -1209,6 +1353,35 @@ def mb_find_release(album, artist):
             "title": item.get("title"),
         }
     return None
+
+
+@lru_cache(maxsize=None)
+def mb_canonical_track_count(album, artist):
+    """Smallest matching MB release's track count, summed across discs.
+
+    Used by --missing as the canonical album length. Picking the
+    minimum across pressings is the bonus-track defense: deluxe /
+    Japanese / anniversary editions add tracks, so the standard
+    release is the shortest.
+    """
+    q = f'release:"{escape(album)}" AND artist:({lucene_terms(artist)})'
+    data = mb_get("release", {"query": q, "fmt": "json", "limit": "10"})
+    if not data:
+        return None
+    counts = []
+    for item in data.get("releases", []) or []:
+        if item.get("score", 0) < MB_MIN_SCORE:
+            continue
+        if not similar(item.get("title", ""), album):
+            continue
+        ac = item.get("artist-credit", []) or []
+        if not ac or not similar(ac[0].get("name", ""), artist):
+            continue
+        media = item.get("media", []) or []
+        total = sum((m.get("track-count") or 0) for m in media)
+        if total > 0:
+            counts.append(total)
+    return min(counts) if counts else None
 
 
 # ----- Cover Art Archive -----
@@ -1392,6 +1565,22 @@ def parse_stem(stem, va=False):
             title = m.group(2).strip()
 
     return track, artist, title
+
+
+def parse_tracknum(s):
+    """Leading integer of a track tag like '5', '05', '5/12', or None."""
+    if not s:
+        return None
+    m = re.match(r"^(\d+)", str(s))
+    return int(m.group(1)) if m else None
+
+
+def find_gaps(sorted_nums):
+    """Interior gaps in a sorted unique sequence ([1,2,4,5] -> [3])."""
+    if not sorted_nums:
+        return []
+    full = set(range(sorted_nums[0], sorted_nums[-1] + 1))
+    return sorted(full - set(sorted_nums))
 
 
 def is_compilation_albumartist(s):
