@@ -5,11 +5,15 @@ Three modes:
 Default — fill in missing artist/albumartist/album/title/tracknumber:
     Walks a music root assumed to look like:
         root/Artist Name/Album Name/[NN - ]Track Title.ext
-    Only missing tags get written; existing tags are left alone. The
-    first time an artist, albumartist, or album folder is encountered,
-    MusicBrainz is queried and you're prompted to choose between folder
-    name, canonical MB name, or custom value. That choice is reused for
-    the rest of the folder. Missing titles get a per-file MB lookup
+    Only missing tags get written; existing tags are left alone.
+    Albumartist is resolved first (folder name vs. MusicBrainz prompt,
+    cached per folder). For normal albums, missing artist defaults to
+    albumartist without a separate prompt. For compilations
+    (albumartist contains "various", "compilation", "soundtrack", or
+    equals "VA"), per-track artist is parsed from "NN - Artist - Title"
+    filenames when present and otherwise left blank rather than being
+    mass-tagged with the folder name. Album folders prompt the same
+    way as artist folders. Missing titles get a per-file MB lookup
     (prompting only when MB differs significantly from the filename).
     Missing track numbers are filled in silently from MB or filename —
     but only when we're already fixing artist or album on that file.
@@ -85,8 +89,10 @@ SIMILAR_THRESHOLD = 0.85
 
 DISC_TRACK_RE = re.compile(r"^(\d+)[-_.](\d+)[-_.\s]+(.+?)$")
 TRACK_PREFIX_RE = re.compile(r"^(\d+)[-_.\s]+(.+?)$")
+VA_ARTIST_TITLE_RE = re.compile(r"^(.+?)\s+[-–—]\s+(.+)$")
 NORM_RE = re.compile(r"[^\w]+")
 COSMETIC_RE = re.compile(r"[^\w\s]+")  # strip punctuation, keep letters/whitespace
+COMPILATION_KEYWORDS = ("various", "compilation", "soundtrack")
 
 BOLD = "\033[1m"
 DIM = "\033[2m"
@@ -196,18 +202,11 @@ def process_file(path, root, artist_cache, albumartist_cache, album_cache,
 
     changes = {}
     effective_artist = current.get("artist")
+    effective_albumartist = current.get("albumartist")
     effective_album = current.get("album")
 
-    if "artist" in missing:
-        if artist_dir is None:
-            print(f"  {DIM}skip: cannot derive artist from path{RESET}")
-            counts["skipped"] += 1
-            return
-        if artist_dir not in artist_cache:
-            artist_cache[artist_dir] = resolve_artist(artist_dir.name)
-        effective_artist = artist_cache[artist_dir]
-        changes["artist"] = effective_artist
-
+    # Albumartist first — it tells us whether this is a compilation,
+    # which changes how we resolve the per-track artist.
     if "albumartist" in missing:
         if artist_dir is None:
             print(f"  {DIM}skip: cannot derive albumartist from path{RESET}")
@@ -216,7 +215,25 @@ def process_file(path, root, artist_cache, albumartist_cache, album_cache,
         if artist_dir not in albumartist_cache:
             albumartist_cache[artist_dir] = resolve_artist(
                 artist_dir.name, label="albumartist")
-        changes["albumartist"] = albumartist_cache[artist_dir]
+        effective_albumartist = albumartist_cache[artist_dir]
+        changes["albumartist"] = effective_albumartist
+
+    is_va = is_compilation_albumartist(effective_albumartist)
+
+    if "artist" in missing and not is_va:
+        if effective_albumartist:
+            # Single-artist album: artist == albumartist almost always.
+            effective_artist = effective_albumartist
+            changes["artist"] = effective_artist
+        else:
+            if artist_dir is None:
+                print(f"  {DIM}skip: cannot derive artist from path{RESET}")
+                counts["skipped"] += 1
+                return
+            if artist_dir not in artist_cache:
+                artist_cache[artist_dir] = resolve_artist(artist_dir.name)
+            effective_artist = artist_cache[artist_dir]
+            changes["artist"] = effective_artist
 
     if "album" in missing:
         if album_dir is None:
@@ -224,17 +241,29 @@ def process_file(path, root, artist_cache, albumartist_cache, album_cache,
             counts["skipped"] += 1
             return
         if album_dir not in album_cache:
+            lookup_artist = effective_albumartist or effective_artist
             album_cache[album_dir] = resolve_album(album_dir.name,
-                                                   effective_artist)
+                                                   lookup_artist)
         effective_album = album_cache[album_dir]
         changes["album"] = effective_album
 
     fixing_artist_or_album = "artist" in missing or "album" in missing
+    need_va_artist = is_va and "artist" in missing
     need_title = "title" in missing
     need_tracknum = "tracknumber" in missing and fixing_artist_or_album
 
-    if need_title or need_tracknum:
-        track_from_file, title_from_file = parse_stem(path.stem)
+    if need_title or need_tracknum or need_va_artist:
+        track_from_file, artist_from_file, title_from_file = parse_stem(
+            path.stem, va=is_va)
+
+        if need_va_artist:
+            if artist_from_file:
+                effective_artist = artist_from_file
+                changes["artist"] = effective_artist
+            else:
+                print(f"  {DIM}compilation: no 'Artist - Title' in "
+                      f"filename, leaving artist blank{RESET}")
+
         mb_rec = None
         if effective_artist and effective_album and title_from_file:
             mb_rec = mb_search_recording(effective_artist,
@@ -1340,15 +1369,45 @@ def get_artist_album_dirs(path, root):
     return (None, None)
 
 
-def parse_stem(stem):
+def parse_stem(stem, va=False):
     stem = stem.strip()
+    track = None
+    rest = stem
     m = DISC_TRACK_RE.match(stem)
     if m:
-        return str(int(m.group(2))), m.group(3).strip()
-    m = TRACK_PREFIX_RE.match(stem)
-    if m:
-        return str(int(m.group(1))), m.group(2).strip()
-    return None, stem
+        track = str(int(m.group(2)))
+        rest = m.group(3).strip()
+    else:
+        m = TRACK_PREFIX_RE.match(stem)
+        if m:
+            track = str(int(m.group(1)))
+            rest = m.group(2).strip()
+
+    artist = None
+    title = rest
+    if va:
+        m = VA_ARTIST_TITLE_RE.match(rest)
+        if m:
+            artist = m.group(1).strip()
+            title = m.group(2).strip()
+
+    return track, artist, title
+
+
+def is_compilation_albumartist(s):
+    """True if albumartist looks like a compilation marker.
+
+    Matches "Various Artists", "VA", "V.A.", "V/A", "Compilation",
+    "Original Soundtrack", etc. Uses normalized substring against the
+    longer keywords, plus an exact match for "va" to avoid false
+    positives like "Vacation".
+    """
+    if not s:
+        return False
+    norm = NORM_RE.sub("", s).lower()
+    if norm == "va":
+        return True
+    return any(k in norm for k in COMPILATION_KEYWORDS)
 
 
 def lucene_terms(s):
