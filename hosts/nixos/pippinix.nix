@@ -126,6 +126,14 @@
     options = [ "nofail" "x-systemd.device-timeout=10s" ];
   };
 
+  # General-purpose documents on a second USB drive (ext4, labeled "documents").
+  # Exported as an SMB share, reachable on the LAN and from wg peers.
+  fileSystems."/mnt/documents" = {
+    device = "/dev/disk/by-label/documents";
+    fsType = "ext4";
+    options = [ "nofail" "noatime" "x-systemd.device-timeout=10s" ];
+  };
+
   # navidrome and jellyfin read their libraries from this mount, so start them
   # only after it is mounted. Otherwise they capture a pre-mount namespace and
   # see an empty /mnt/media.
@@ -147,6 +155,7 @@
     "d /mnt/media/inbox  0755 justin justin -"
     "d /mnt/media/movies 0755 justin justin -"
     "d /mnt/media/tv     0755 justin justin -"
+    "d /mnt/documents    0755 justin justin -"
   ];
 
   # SMB share reachable from Macs as smb://pippinix.local (read-write).
@@ -191,6 +200,17 @@
       # which read the drive as "other", can see newly added content.
       media = {
         "path" = "/mnt/media";
+        "browseable" = "yes";
+        "read only" = "no";
+        "guest ok" = "no";
+        "valid users" = "justin";
+        "force user" = "justin";
+        "create mask" = "0644";
+        "directory mask" = "0755";
+      };
+      # General-purpose documents share on the "documents" USB drive.
+      documents = {
+        "path" = "/mnt/documents";
         "browseable" = "yes";
         "read only" = "no";
         "guest ok" = "no";
