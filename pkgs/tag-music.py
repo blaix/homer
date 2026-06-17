@@ -40,10 +40,21 @@ Default — fill in missing artist/albumartist/album/title/tracknumber:
     Non-interactive: it takes the best match or reports no match. Artist
     images aren't handled here — Navidrome fetches those itself via its
     external agents.
+
+--gain — write ReplayGain tags across the library:
+    Shells out to `rsgain easy` over the music root. rsgain walks the
+    tree itself and treats each leaf folder as an album, so the same
+    root/Artist/Album/Track.ext layout the other modes expect just
+    works. `-S` (skip-existing) is passed so albums whose tracks
+    already have ReplayGain tags are left alone, making re-runs cheap.
+    Non-interactive; rsgain's output streams through. With --dry-run
+    the command is printed and nothing is executed.
 """
 import argparse
 import os
 import re
+import shutil
+import subprocess
 import sys
 import time
 from difflib import SequenceMatcher
@@ -108,6 +119,10 @@ def main():
     parser.add_argument("--cleanup", action="store_true",
                         help="list AppleDouble junk files (._*) that sit "
                              "beside a real file and offer to delete them")
+    parser.add_argument("--gain", action="store_true",
+                        help="run rsgain easy over the library to write "
+                             "ReplayGain tags (skips albums that already "
+                             "have them)")
     args = parser.parse_args()
 
     maybe_disable_color()
@@ -120,6 +135,8 @@ def main():
     try:
         if args.cleanup:
             run_cleanup(root, dry_run=args.dry_run)
+        elif args.gain:
+            run_gain(root, dry_run=args.dry_run)
         elif args.art:
             run_art(root, dry_run=args.dry_run)
         elif args.fix:
@@ -1028,6 +1045,37 @@ def run_cleanup(root, dry_run):
         except OSError as e:
             print(f"  {RED}[!] {p}: {e}{RESET}", file=sys.stderr)
     print(f"  {GREEN}deleted {deleted}.{RESET}")
+
+
+# ----- --gain mode -----
+
+def run_gain(root, dry_run):
+    """Apply ReplayGain tags across the library via rsgain easy.
+
+    rsgain's `easy` subcommand walks the tree itself and treats each
+    leaf folder as an album, which lines up with the
+    root/Artist/Album/Track.ext layout the other modes expect. `-S`
+    (skip-existing) makes the operation idempotent: albums whose tracks
+    already carry ReplayGain tags are passed over, so re-runs are
+    quick. Output streams through unmodified.
+    """
+    if not shutil.which("rsgain"):
+        sys.exit(f"{RED}rsgain not found on PATH.{RESET}")
+
+    cmd = ["rsgain", "easy", "-S", str(root)]
+    print(f"{BOLD}running:{RESET} {' '.join(cmd)}")
+
+    if dry_run:
+        print(f"  {DIM}(dry-run, not executed){RESET}")
+        return
+
+    try:
+        result = subprocess.run(cmd, check=False)
+    except OSError as e:
+        sys.exit(f"{RED}failed to run rsgain: {e}{RESET}")
+    if result.returncode != 0:
+        sys.exit(f"{RED}rsgain exited with status "
+                 f"{result.returncode}{RESET}")
 
 
 # ----- MusicBrainz -----
