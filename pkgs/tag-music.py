@@ -25,10 +25,19 @@ Default — fill in missing artist/albumartist/album/title/tracknumber:
     release-date clusters: tracks of one album that carry disagreeing
     date tags (which makes players like Navidrome split a single album
     into several; the prompt offers the album's MusicBrainz release date
-    and the latest of the listed dates alongside the variants), and (c)
+    and the latest of the listed dates alongside the variants), (c)
     within-file mismatches where artist and
     albumartist disagree but are similar (single combined prompt sets
-    both). Clusters are handled per field — artist, albumartist
+    both), and (d) per-album genre gaps and outliers: albums where some
+    tracks have no genre, or where the tracks' genres disagree. Each such
+    album is resolved against its MusicBrainz genres (the default, when a
+    confident release match is found) or the album's own majority genre
+    (the fallback), written as a single comma-joined value that
+    Navidrome's default separators split back into multiple genres.
+    Uniform, fully-tagged albums are left alone, and compilations only
+    have missing genres filled (their existing per-track genres, which
+    legitimately vary, are not overwritten). Clusters are handled per
+    field — artist, albumartist
     (global), album (scoped per artist) and date (scoped per album).
     Finishes with a list of filesystem warnings (folder names that
     disagree with chosen tags, sibling folders that normalize to the
@@ -92,8 +101,9 @@ COVER_STEMS = {"cover", "folder", "front", "album", "albumart"}
 TAG_FIELDS = ("artist", "albumartist", "album", "title", "tracknumber")
 # Fields read off every file. The default missing-tag pass only fills
 # TAG_FIELDS, but --fix also needs the release date to spot albums that
-# have been split across inconsistent date tags.
-READ_FIELDS = TAG_FIELDS + ("date",)
+# have been split across inconsistent date tags, and the genre to fill
+# gaps and unify outliers per album.
+READ_FIELDS = TAG_FIELDS + ("date", "genre")
 MB_BASE = "https://musicbrainz.org/ws/2"
 CAA_BASE = "https://coverartarchive.org"
 USER_AGENT = "homer-tag-music/2.0 ( https://github.com/blaix/homer )"
@@ -435,6 +445,8 @@ def run_fix(root, dry_run):
     print()
     print(f"{BOLD}within-file mismatches: {len(mismatches)}{RESET}")
     resolve_mismatches(mismatches, dry_run, counts)
+
+    resolve_genres_per_album(library, root, dry_run, counts)
 
     warnings = collect_fs_warnings(root, library)
     if warnings:
@@ -838,6 +850,131 @@ def prompt_mismatch(entry):
             return mb_name
         if choice == "t":
             val = input("    enter value: ").strip()
+            if val:
+                return val
+            print("    (empty input)")
+            continue
+        print(f"    unrecognized: {choice!r}")
+
+
+def resolve_genres_per_album(library, root, dry_run, counts):
+    """Fill missing genres and unify outliers, one album folder at a time.
+
+    Genre is near-uniform per album, so the album folder is the unit. An
+    album is flagged when some of its tracks have no genre, or when the
+    tracks carry disagreeing genre values. Uniform, fully-tagged albums
+    are skipped so existing curation is left alone. For each flagged
+    album the chosen genre defaults to the album's MusicBrainz genres
+    (when a confident release match is found) and falls back to the
+    album's own majority genre, written as one comma-joined value.
+
+    Compilations (Various Artists / soundtracks) legitimately span
+    genres, so they only get missing genres filled — existing per-track
+    genres are never overwritten.
+    """
+    by_folder = {}
+    for entry in library:
+        artist_dir, album_dir = get_artist_album_dirs(entry["path"], root)
+        folder = album_dir or artist_dir
+        if folder is None:
+            continue
+        by_folder.setdefault(folder, []).append(entry)
+
+    todo = []
+    for folder, entries in sorted(by_folder.items()):
+        present = {e["tags"].get("genre") for e in entries if e["tags"].get("genre")}
+        n_missing = sum(1 for e in entries if not e["tags"].get("genre"))
+        if n_missing == 0 and len(present) <= 1:
+            continue
+        todo.append((folder, entries))
+
+    if not todo:
+        return
+
+    print()
+    print(f"{BOLD}resolving album genres ({len(todo)}){RESET}")
+    for folder, entries in todo:
+        chosen = prompt_genre(folder, entries)
+        if chosen is None:
+            continue
+        is_va = is_compilation_albumartist(
+            album_artist_from_entries(entries)[1])
+        for e in entries:
+            cur = e["tags"].get("genre")
+            if cur == chosen:
+                continue
+            # On compilations only fill blanks; never clobber an existing
+            # per-track genre, since variety there is expected.
+            if is_va and cur:
+                continue
+            write_one(e, {"genre": chosen}, dry_run, counts)
+
+
+def album_artist_from_entries(entries):
+    """Most common (album, albumartist-or-artist) across an album's entries."""
+    albums = {}
+    artists = {}
+    for e in entries:
+        al = e["tags"].get("album")
+        if al:
+            albums[al] = albums.get(al, 0) + 1
+        ar = e["tags"].get("albumartist") or e["tags"].get("artist")
+        if ar:
+            artists[ar] = artists.get(ar, 0) + 1
+    album = max(albums, key=albums.get) if albums else None
+    artist = max(artists, key=artists.get) if artists else None
+    return album, artist
+
+
+def prompt_genre(folder, entries):
+    """Resolve one album's genre. Returns the chosen string or None (skip)."""
+    tally = {}
+    for e in entries:
+        g = e["tags"].get("genre")
+        if g:
+            tally[g] = tally.get(g, 0) + 1
+    consensus = max(tally, key=tally.get) if tally else None
+    n_missing = sum(1 for e in entries if not e["tags"].get("genre"))
+
+    album, artist = album_artist_from_entries(entries)
+    mb_list = mb_genres(album, artist) if (album and artist) else []
+    mb = ", ".join(mb_list) if mb_list else None
+
+    print()
+    print(f"  {BOLD}{folder}{RESET}")
+    print(f"  {DIM}{artist or '?'} — {album or '?'} "
+          f"({len(entries)} tracks, {n_missing} missing genre){RESET}")
+    for g, c in sorted(tally.items(), key=lambda x: -x[1]):
+        print(f"    {YELLOW}{g}{RESET} ({c})")
+
+    # MB is the default when present, else the album's own majority.
+    if mb:
+        print(f"    [m] musicbrainz : {CYAN}{mb}{RESET}")
+    else:
+        print(f"    {DIM}(musicbrainz: no genres found){RESET}")
+    if consensus:
+        print(f"    [c] consensus   : {consensus}")
+    print("    [t] type custom")
+    print("    [s] skip")
+
+    if mb:
+        default = "m"
+    elif consensus:
+        default = "c"
+    else:
+        default = "s"
+
+    while True:
+        choice = (input(f"    choose [default: {default}]: ")
+                  .strip().lower() or default)[:1]
+        if choice == "s":
+            return None
+        if choice == "m" and mb:
+            return mb
+        if choice == "c" and consensus:
+            return consensus
+        if choice == "t":
+            val = input("    enter genre(s), comma-separated: ").strip()
             if val:
                 return val
             print("    (empty input)")
@@ -1428,6 +1565,30 @@ def mb_find_release(album, artist):
             "title": item.get("title"),
         }
     return None
+
+
+@lru_cache(maxsize=None)
+def mb_genres(album, artist):
+    """The album's top genres per MusicBrainz, Title-Cased, or [].
+
+    Resolves the album's release-group (via the same gated search --art
+    uses) and reads its folksonomy genres, which carry community vote
+    counts. The genres are returned highest-vote-first, capped at three
+    so the joined value stays useful for the umbrella `contains` rules
+    rather than a sprawling tag list. MB genres are lowercase, so they're
+    Title-Cased to match the rest of the library.
+    """
+    rel = mb_find_release(album, artist)
+    if not rel or not rel.get("release_group"):
+        return []
+    data = mb_get(f"release-group/{rel['release_group']}",
+                  {"inc": "genres", "fmt": "json"})
+    if not data:
+        return []
+    genres = [g for g in (data.get("genres") or [])
+              if g.get("name") and g.get("count", 0) > 0]
+    genres.sort(key=lambda g: -g.get("count", 0))
+    return [g["name"].title() for g in genres[:3]]
 
 
 @lru_cache(maxsize=None)
