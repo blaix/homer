@@ -87,16 +87,23 @@
   };
 
   # Firewall - allow SSH, local dev servers, Jellyfin (web + LAN auto-discovery),
-  # Navidrome (4533), and WireGuard, trust VPN interface
+  # Navidrome (4533), Komga (25600), and WireGuard, trust VPN interface
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 3000 8000 8096 4533 ];
+    allowedTCPPorts = [ 22 3000 8000 8096 4533 25600 ];
     allowedUDPPorts = [ 51820 7359 ];
     trustedInterfaces = [ "wg0" ];
   };
 
   # Enable mosh connections (opens UDP ports)
   programs.mosh.enable = true;
+
+  # cbr2cbz: convert RAR-based comic archives (incl. RAR5, which Komga's reader
+  # can't open) into .cbz. Run it on files in /mnt/media/inbox before moving
+  # them into the Komga library at /mnt/media/comics. See pkgs/cbr2cbz.nix.
+  environment.systemPackages = [
+    (pkgs.callPackage ../../pkgs/cbr2cbz.nix {})
+  ];
 
   # Jellyfin TV/movies server. Reachable on the LAN (8096) and from wg peers
   # (10.100.0.1:8096). UDP 7359 is opened above so LAN clients like the Roku
@@ -116,6 +123,16 @@
       Address = "0.0.0.0";
       Port = 4533;
     };
+  };
+
+  # Komga comics server. Reachable on the LAN (25600) and from wg peers
+  # (10.100.0.1:25600). Like jellyfin/navidrome it only reads the drive: it
+  # runs as the "komga" user and the library at /mnt/media/comics is
+  # world-readable. Content is added over ssh (rsync/scp) as justin.
+  services.komga = {
+    enable = true;
+    openFirewall = false;
+    settings.server.port = 25600;
   };
 
   # Music + media libraries on the dedicated USB drive (ext4, labeled "media").
@@ -145,6 +162,10 @@
     after = [ "mnt-media.mount" ];
     requires = [ "mnt-media.mount" ];
   };
+  systemd.services.komga = {
+    after = [ "mnt-media.mount" ];
+    requires = [ "mnt-media.mount" ];
+  };
 
   # The whole USB drive is owned by justin and world-readable: navidrome and
   # jellyfin read their libraries as "other", and neither can write here.
@@ -155,6 +176,7 @@
     "d /mnt/media/inbox  0755 justin justin -"
     "d /mnt/media/movies 0755 justin justin -"
     "d /mnt/media/tv     0755 justin justin -"
+    "d /mnt/media/comics 0755 justin justin -"
     "d /mnt/documents    0755 justin justin -"
   ];
 
@@ -170,6 +192,10 @@
   #     NFO / subtitles into media folders" OFF so it never tries to write.
   #   - In Navidrome's web UI, complete first-run admin setup.
   #     The /mnt/media/music folder is scanned automatically.
+  #   - In Komga's web UI (port 25600), create the admin account, then add a
+  #     library pointing at /mnt/media/comics. Komga only reads the drive
+  #     (files owned by justin, world-readable); leave any "write metadata back
+  #     to files" / cover-persistence options OFF so it never tries to write.
   services.samba = {
     enable = true;
     openFirewall = true;
