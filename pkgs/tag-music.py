@@ -32,9 +32,18 @@ Default — fill in missing artist/albumartist/album/title/tracknumber:
     date tags (which makes players like Navidrome split a single album
     into several; the prompt offers the album's MusicBrainz release date
     and the latest of the listed dates alongside the variants), (c)
-    within-file mismatches where artist and
+    musicbrainz album-id clusters: tracks of one album that carry
+    disagreeing MusicBrainz Album Ids — or where some tracks carry an id
+    and others none — the same kind of split as a date cluster but on the
+    id Navidrome's album grouping keys on first, so a folder tagged
+    per-recording against several releases (or with a few tracks the
+    default pass couldn't back-fill) shows up as multiple album copies
+    (the prompt defaults to MusicBrainz's release match when there is one,
+    else the id on the most tracks, and writes the chosen id to every
+    track in the album, untagged ones included),
+    (d) within-file mismatches where artist and
     albumartist disagree but are similar (single combined prompt sets
-    both), and (d) per-album genre gaps and outliers: albums where some
+    both), and (e) per-album genre gaps and outliers: albums where some
     tracks have no genre, or where the tracks' genres disagree. Each such
     album is resolved against its MusicBrainz genres (the default, when a
     confident release match is found) or the album's own majority genre
@@ -44,7 +53,8 @@ Default — fill in missing artist/albumartist/album/title/tracknumber:
     have missing genres filled (their existing per-track genres, which
     legitimately vary, are not overwritten). Clusters are handled per
     field — artist, albumartist
-    (global), album (scoped per artist) and date (scoped per album).
+    (global), album (scoped per artist), and date and musicbrainz_albumid
+    (each scoped per album).
     Finishes with a list of filesystem warnings (folder names that
     disagree with chosen tags, sibling folders that normalize to the
     same name) for you to fix by hand.
@@ -476,17 +486,20 @@ def run_fix(root, dry_run):
     albumartist_clusters = find_clusters(library, "albumartist")
     album_clusters = find_album_clusters_per_artist(library)
     date_clusters = find_date_clusters_per_album(library)
+    albumid_clusters = find_albumid_clusters_per_album(library)
 
     print()
     print(f"  artist clusters     : {len(artist_clusters)}")
     print(f"  albumartist clusters: {len(albumartist_clusters)}")
     print(f"  album clusters      : {len(album_clusters)}")
     print(f"  date clusters       : {len(date_clusters)}")
+    print(f"  album-id clusters   : {len(albumid_clusters)}")
 
     resolve_clusters("artist", artist_clusters, dry_run, counts)
     resolve_clusters("albumartist", albumartist_clusters, dry_run, counts)
     resolve_album_clusters(album_clusters, dry_run, counts)
     resolve_date_clusters(date_clusters, dry_run, counts)
+    resolve_albumid_clusters(albumid_clusters, dry_run, counts)
 
     # After cluster cleanup; mismatches are computed off the updated state.
     mismatches = find_within_file_mismatches(library)
@@ -636,6 +649,71 @@ def find_date_clusters_per_album(library):
     return clusters
 
 
+def find_albumid_clusters_per_album(library):
+    """MusicBrainz album-id clusters scoped to one album at a time.
+
+    Tracks of the same album (same albumartist, falling back to artist,
+    plus album name — both normalized) should all carry the same
+    MusicBrainz Album Id. When they don't, Navidrome's default album
+    grouping — whose persistent id keys on musicbrainz_albumid before
+    falling back to albumartist/album — treats each distinct id as a
+    separate release and splits one folder into several albums in the UI
+    (the classic "why do I have four copies of Extraordinary Machine"
+    case, where a per-recording tagger matched tracks to different
+    releases of the same album). Files are bucketed by the (artist,
+    album) pair, then the distinct musicbrainz_albumid values within each
+    bucket are surfaced. A bucket with two or more distinct ids is a
+    cluster — structurally the same split as a release-date cluster, just
+    keyed on the id instead of the date. Files with no album-id tag at
+    all are ignored here; back-filling absent ids is the default pass's
+    job, not --fix's.
+    """
+    by_album = {}
+    for entry in library:
+        a = entry["tags"].get("albumartist") or entry["tags"].get("artist")
+        album = entry["tags"].get("album")
+        if not a or not album:
+            continue
+        a_norm = NORM_RE.sub("", a.lower())
+        al_norm = NORM_RE.sub("", album.lower())
+        if not a_norm or not al_norm:
+            continue
+        by_album.setdefault((a_norm, al_norm), []).append(entry)
+
+    clusters = []
+    for entries in by_album.values():
+        by_id = {}
+        blanks = []
+        for e in entries:
+            mbid = e["tags"].get("musicbrainz_albumid")
+            if not mbid:
+                blanks.append(e)
+                continue
+            by_id.setdefault(mbid, []).append(e)
+        # Nothing to choose from when no track carries an id at all —
+        # back-filling a wholly-untagged album is the default pass's job.
+        if not by_id:
+            continue
+        # Flag the album when its ids disagree (two or more distinct ids)
+        # or when some tracks carry an id and others are blank. Both split
+        # the folder into separate albums in Navidrome — the blank case is
+        # the common one the default pass leaves behind when a recording
+        # lookup can't confidently match a track, so the chosen id is
+        # applied to the untagged tracks too (see apply_cluster_choice).
+        if len(by_id) < 2 and not blanks:
+            continue
+        sorted_variants = sorted(by_id.items(), key=lambda x: -len(x[1]))
+        sample = sorted_variants[0][1][0]
+        clusters.append({
+            "variants": sorted_variants,
+            "blanks": blanks,
+            "context_artist": (sample["tags"].get("albumartist")
+                               or sample["tags"].get("artist")),
+            "context_album": sample["tags"].get("album"),
+        })
+    return clusters
+
+
 def find_within_file_mismatches(library):
     out = []
     for entry in library:
@@ -759,6 +837,106 @@ def prompt_date_cluster(cluster, context):
         print(f"    unrecognized: {choice!r}")
 
 
+def resolve_albumid_clusters(clusters, dry_run, counts):
+    if not clusters:
+        return
+    print()
+    print(f"{BOLD}resolving musicbrainz album-id clusters "
+          f"({len(clusters)}){RESET}")
+    for cluster in clusters:
+        ctx = cluster["context_artist"]
+        if cluster.get("context_album"):
+            ctx = f"{ctx} — {cluster['context_album']}"
+        chosen = prompt_albumid_cluster(cluster, ctx)
+        if chosen is None:
+            continue
+        apply_cluster_choice("musicbrainz_albumid", cluster, chosen,
+                             dry_run, counts)
+
+
+def prompt_albumid_cluster(cluster, context):
+    """Resolve a MusicBrainz album-id cluster.
+
+    The disagreeing ids found across the album's tracks are listed with
+    their file counts, the dominant one ("majority") marked. We look the
+    album up on MusicBrainz and, whenever it returns a release match, that
+    id is the default — it's the authoritative answer, whether or not any
+    track already carries it. If MB matches an id we already hold, that
+    variant is marked and defaulted to; if MB points at an id present on
+    no track, it's offered as [m] and is still the default. Only when MB
+    has no match at all does the default fall back to the majority id
+    already on the most tracks. The chosen id is written to every track in
+    the album, including any with no album-id tag at all (those untagged
+    tracks are what split the folder into a duplicate album in the first
+    place).
+    """
+    variants = cluster["variants"]
+    total = sum(len(entries) for _, entries in variants)
+    n_blank = len(cluster.get("blanks", []))
+
+    print()
+    title_ctx = f" [{context}]" if context else ""
+    blank_note = f", {n_blank} untagged" if n_blank else ""
+    print(f"  {BOLD}musicbrainz album-id cluster{RESET}{title_ctx} "
+          f"({len(variants)} variants, {total} files{blank_note})")
+
+    majority = variants[0][0]
+
+    mb_id = None
+    if cluster.get("context_artist") and cluster.get("context_album"):
+        rel = mb_find_release(cluster["context_album"],
+                              cluster["context_artist"])
+        if rel:
+            mb_id = rel.get("release")
+
+    mb_matches_idx = None
+    if mb_id:
+        for i, (raw, _) in enumerate(variants):
+            if raw == mb_id:
+                mb_matches_idx = i
+                break
+
+    for i, (raw, entries) in enumerate(variants, 1):
+        marks = []
+        if raw == majority:
+            marks.append("majority")
+        if mb_id and raw == mb_id:
+            marks.append("musicbrainz")
+        marker = f" {DIM}({', '.join(marks)}){RESET}" if marks else ""
+        print(f"    [{i}] {YELLOW}{raw}{RESET} ({len(entries)} files){marker}")
+
+    if mb_id and mb_matches_idx is None:
+        print(f"    [m] musicbrainz : {CYAN}{mb_id}{RESET} "
+              f"{DIM}(on no track){RESET}")
+        default = "m"
+    elif mb_id:
+        default = str(mb_matches_idx + 1)
+    else:
+        print(f"    {DIM}(musicbrainz: no release match){RESET}")
+        default = "1"
+    print("    [t] type custom")
+    print("    [s] skip")
+
+    while True:
+        choice = (input(f"    choose [default: {default}]: ")
+                  .strip().lower() or default)
+        if choice == "s":
+            return None
+        if choice == "m" and mb_id and mb_matches_idx is None:
+            return mb_id
+        if choice == "t":
+            val = input("    enter musicbrainz album id: ").strip()
+            if val:
+                return val
+            print("    (empty input)")
+            continue
+        if choice.isdigit():
+            idx = int(choice) - 1
+            if 0 <= idx < len(variants):
+                return variants[idx][0]
+        print(f"    unrecognized: {choice!r}")
+
+
 def prompt_cluster(field, cluster, context_artist):
     variants = cluster["variants"]
     total = sum(len(entries) for _, entries in variants)
@@ -828,6 +1006,11 @@ def apply_cluster_choice(field, cluster, chosen, dry_run, counts):
             continue
         for entry in entries:
             write_one(entry, {field: chosen}, dry_run, counts)
+    # Tracks that carried no value at all (only album-id clusters record
+    # these) get the chosen value written too, so an album split by a few
+    # untagged tracks is fully unified rather than left half-fixed.
+    for entry in cluster.get("blanks", []):
+        write_one(entry, {field: chosen}, dry_run, counts)
 
 
 def resolve_mismatches(mismatches, dry_run, counts):
