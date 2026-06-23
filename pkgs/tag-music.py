@@ -17,6 +17,12 @@ Default — fill in missing artist/albumartist/album/title/tracknumber:
     (prompting only when MB differs significantly from the filename).
     Missing track numbers are filled in silently from MB or filename —
     but only when we're already fixing artist or album on that file.
+    MusicBrainz IDs (recording, release, and artist) are filled in
+    silently from the same recording lookup on a confident match, and a
+    track missing any of them is enough on its own to trigger that
+    lookup — so an already-tagged library can be back-filled with the IDs
+    Navidrome and the ListenBrainz playlist plugin match tracks on.
+    Existing IDs are never overwritten.
 
 --fix — find and resolve inconsistencies in tags that already exist:
     Scans the whole library and surfaces (a) cross-file variant
@@ -92,6 +98,21 @@ from pathlib import Path
 import mutagen
 import requests
 
+# mutagen's EasyMP4 doesn't map the MusicBrainz freeform atoms by default,
+# so register the three IDs we write. EasyID3 (mp3) and VorbisComment
+# (flac/ogg/opus) already handle these keys, so this is only needed so
+# m4a/aac files don't error on write.
+try:
+    from mutagen.easymp4 import EasyMP4Tags
+    for _key, _atom in (
+        ("musicbrainz_trackid", "MusicBrainz Track Id"),
+        ("musicbrainz_albumid", "MusicBrainz Album Id"),
+        ("musicbrainz_artistid", "MusicBrainz Artist Id"),
+    ):
+        EasyMP4Tags.RegisterFreeformKey(_key, _atom)
+except Exception:
+    pass
+
 
 AUDIO_EXTENSIONS = {".mp3", ".flac", ".m4a", ".ogg", ".opus", ".wav", ".aac"}
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
@@ -99,11 +120,18 @@ IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 # --art leaves those folders alone. Matches Navidrome's default lookup.
 COVER_STEMS = {"cover", "folder", "front", "album", "albumart"}
 TAG_FIELDS = ("artist", "albumartist", "album", "title", "tracknumber")
-# Fields read off every file. The default missing-tag pass only fills
-# TAG_FIELDS, but --fix also needs the release date to spot albums that
-# have been split across inconsistent date tags, and the genre to fill
-# gaps and unify outliers per album.
-READ_FIELDS = TAG_FIELDS + ("date", "genre")
+# MusicBrainz IDs the default pass back-fills. musicbrainz_trackid is the
+# *recording* ID (the historical tag name) — the one ListenBrainz
+# playlists reference and Navidrome matches on; the other two are the
+# release and (track) artist IDs. A track missing any of these triggers a
+# recording lookup.
+MBID_FIELDS = ("musicbrainz_trackid", "musicbrainz_albumid",
+               "musicbrainz_artistid")
+# Fields read off every file. The default missing-tag pass fills
+# TAG_FIELDS and MBID_FIELDS, but --fix also needs the release date to
+# spot albums that have been split across inconsistent date tags, and the
+# genre to fill gaps and unify outliers per album.
+READ_FIELDS = TAG_FIELDS + ("date", "genre") + MBID_FIELDS
 MB_BASE = "https://musicbrainz.org/ws/2"
 CAA_BASE = "https://coverartarchive.org"
 USER_AGENT = "homer-tag-music/2.0 ( https://github.com/blaix/homer )"
@@ -220,9 +248,13 @@ def process_file(path, root, artist_cache, albumartist_cache, album_cache,
                  dry_run, counts):
     current = read_tags(path)
     missing = {f for f in TAG_FIELDS if not current.get(f)}
+    need_mbid = any(not current.get(f) for f in MBID_FIELDS)
 
-    # Track number alone never triggers processing — by the user's spec.
-    if not (missing & {"artist", "albumartist", "album", "title"}):
+    # Track number alone never triggers processing — by the user's spec —
+    # but a missing MusicBrainz ID does, so an already-tagged library can
+    # be back-filled with the IDs the ListenBrainz plugin matches on.
+    triggers_text = bool(missing & {"artist", "albumartist", "album", "title"})
+    if not triggers_text and not need_mbid:
         counts["complete"] += 1
         return
 
@@ -283,7 +315,7 @@ def process_file(path, root, artist_cache, albumartist_cache, album_cache,
     need_title = "title" in missing
     need_tracknum = "tracknumber" in missing and fixing_artist_or_album
 
-    if need_title or need_tracknum or need_va_artist:
+    if need_title or need_tracknum or need_va_artist or need_mbid:
         track_from_file, artist_from_file, title_from_file = parse_stem(
             path.stem, va=is_va)
 
@@ -295,11 +327,18 @@ def process_file(path, root, artist_cache, albumartist_cache, album_cache,
                 print(f"  {DIM}compilation: no 'Artist - Title' in "
                       f"filename, leaving artist blank{RESET}")
 
+        # Prefer the title already on the file (or just chosen above) over
+        # the filename parse — it's the most reliable key for the search,
+        # and back-filling MBIDs runs on files that are already titled.
+        effective_title = (current.get("title")
+                           or changes.get("title")
+                           or title_from_file)
+
         mb_rec = None
-        if effective_artist and effective_album and title_from_file:
+        if effective_artist and effective_album and effective_title:
             mb_rec = mb_search_recording(effective_artist,
                                          effective_album,
-                                         title_from_file)
+                                         effective_title)
 
         if need_title:
             chosen = resolve_title(title_from_file,
@@ -314,6 +353,15 @@ def process_file(path, root, artist_cache, albumartist_cache, album_cache,
             elif track_from_file:
                 changes["tracknumber"] = track_from_file
 
+        if need_mbid and mb_rec:
+            # Fill only the IDs that are absent; never overwrite an
+            # existing one (it may be a more precise Picard tagging).
+            for field, key in (("musicbrainz_trackid", "mbid"),
+                               ("musicbrainz_albumid", "release_mbid"),
+                               ("musicbrainz_artistid", "artist_mbid")):
+                if not current.get(field) and mb_rec.get(key):
+                    changes[field] = mb_rec[key]
+
     if not changes:
         print(f"  {DIM}(nothing to write){RESET}")
         counts["skipped"] += 1
@@ -321,7 +369,7 @@ def process_file(path, root, artist_cache, albumartist_cache, album_cache,
 
     print("  writing:")
     for k, v in changes.items():
-        print(f"    {k:12} {v}")
+        print(f"    {k:20} {v}")
 
     if dry_run:
         print(f"  {DIM}(dry-run, not written){RESET}")
@@ -1532,18 +1580,23 @@ def mb_search_recording(artist, album, title):
         ac = rec.get("artist-credit", []) or []
         if not ac or not similar(ac[0].get("name", ""), artist):
             continue
+        artist_mbid = (ac[0].get("artist") or {}).get("id")
         for rel in rec.get("releases", []) or []:
             if not similar(rel.get("title", ""), album):
                 continue
+            base = {
+                "title": rec_title,
+                "mbid": rec.get("id"),
+                "release_mbid": rel.get("id"),
+                "artist_mbid": artist_mbid,
+            }
             for medium in rel.get("media", []) or []:
                 for track in medium.get("track", []) or []:
                     if similar(track.get("title", ""), title):
                         n = track.get("number")
-                        return {
-                            "title": rec_title,
-                            "tracknumber": str(n) if n else None,
-                        }
-            return {"title": rec_title, "tracknumber": None}
+                        return {**base,
+                                "tracknumber": str(n) if n else None}
+            return {**base, "tracknumber": None}
     return None
 
 
