@@ -366,11 +366,27 @@ def process_file(path, root, artist_cache, albumartist_cache, album_cache,
         if need_mbid and mb_rec:
             # Fill only the IDs that are absent; never overwrite an
             # existing one (it may be a more precise Picard tagging).
-            for field, key in (("musicbrainz_trackid", "mbid"),
-                               ("musicbrainz_albumid", "release_mbid"),
-                               ("musicbrainz_artistid", "artist_mbid")):
-                if not current.get(field) and mb_rec.get(key):
-                    changes[field] = mb_rec[key]
+            #
+            # The album id comes from a release search (mb_find_release),
+            # NOT from whichever release happens to hang off the recording
+            # match. A recording appears on many releases (US/UK/deluxe/
+            # comp) returned in no particular order, so picking the first
+            # similar one is arbitrary — and it disagrees with what --fix's
+            # own mb_find_release lookup considers authoritative, so --fix
+            # would re-flag the album and propose a different id. Routing
+            # both passes through the same lookup makes them converge. The
+            # recording match still supplies the recording and artist ids.
+            release_mbid = None
+            if not current.get("musicbrainz_albumid"):
+                lookup_artist = effective_albumartist or effective_artist
+                rel = mb_find_release(effective_album, lookup_artist)
+                release_mbid = rel.get("release") if rel else None
+            for field, value in (
+                    ("musicbrainz_trackid", mb_rec.get("mbid")),
+                    ("musicbrainz_albumid", release_mbid),
+                    ("musicbrainz_artistid", mb_rec.get("artist_mbid"))):
+                if not current.get(field) and value:
+                    changes[field] = value
 
     if not changes:
         print(f"  {DIM}(nothing to write){RESET}")
@@ -1770,7 +1786,6 @@ def mb_search_recording(artist, album, title):
             base = {
                 "title": rec_title,
                 "mbid": rec.get("id"),
-                "release_mbid": rel.get("id"),
                 "artist_mbid": artist_mbid,
             }
             for medium in rel.get("media", []) or []:
@@ -1783,8 +1798,14 @@ def mb_search_recording(artist, album, title):
     return None
 
 
+@lru_cache(maxsize=None)
 def mb_find_release(album, artist):
-    """Best-matching release MBID (plus its release-group MBID) for cover art."""
+    """Best-matching release MBID (plus its release-group MBID).
+
+    Cached because both the default pass (back-filling musicbrainz_albumid)
+    and --fix resolve the album id through here, often for the same album
+    across many files — one release search per (album, artist) is enough.
+    Callers only read the returned dict, so sharing it is safe."""
     q = f'release:"{escape(album)}" AND artist:({lucene_terms(artist)})'
     data = mb_get("release", {"query": q, "fmt": "json", "limit": "5"})
     if not data:
