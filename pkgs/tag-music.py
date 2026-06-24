@@ -129,6 +129,9 @@ IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 # Filename stems (case-insensitive) that count as an existing cover, so
 # --art leaves those folders alone. Matches Navidrome's default lookup.
 COVER_STEMS = {"cover", "folder", "front", "album", "albumart"}
+# Extensions --cleanup deletes outright: download-bundle clutter Navidrome
+# doesn't need — .nfo info files and .m3u/.m3u8 playlists.
+CLEANUP_EXTENSIONS = {".nfo", ".m3u", ".m3u8"}
 TAG_FIELDS = ("artist", "albumartist", "album", "title", "tracknumber")
 # MusicBrainz IDs the default pass back-fills. musicbrainz_trackid is the
 # *recording* ID (the historical tag name) — the one ListenBrainz
@@ -186,8 +189,9 @@ def main():
                         help="download missing album cover art from the "
                              "Cover Art Archive into each album folder")
     parser.add_argument("--cleanup", action="store_true",
-                        help="list AppleDouble junk files (._*) that sit "
-                             "beside a real file and offer to delete them")
+                        help="delete library clutter: AppleDouble sidecars "
+                             "(._* beside a real file), .nfo info files, and "
+                             ".m3u/.m3u8 playlists (prompts before deleting)")
     parser.add_argument("--gain", action="store_true",
                         help="run rsgain easy over the library to write "
                              "ReplayGain tags (skips albums that already "
@@ -1505,28 +1509,34 @@ def ext_for_content_type(content_type):
 # ----- --cleanup mode -----
 
 def run_cleanup(root, dry_run):
-    """Delete AppleDouble junk (._foo) that sits beside its real file.
+    """Delete clutter from the library: AppleDouble sidecars, plus .nfo
+    info files and .m3u/.m3u8 playlists.
 
-    macOS writes a ._<name> sidecar next to <name> on non-HFS volumes.
-    We only offer to delete a ._* file when its real counterpart exists
-    in the same folder, so a (rare) legitimately-named ._ file with no
-    sibling is left alone. The deletion is a single all-or-nothing
-    prompt; when stdout isn't a terminal (piped to less, etc.) we can't
-    safely prompt, so we just list and assume "no".
+    macOS writes a ._<name> sidecar next to <name> on non-HFS volumes; we
+    only delete a ._* file when its real counterpart exists in the same
+    folder, so a (rare) legitimately-named ._ file with no sibling is left
+    alone. .nfo and .m3u/.m3u8 files are download-bundle leftovers Navidrome
+    doesn't need and are removed wherever they appear. The deletion is a
+    single all-or-nothing prompt; when stdout isn't a terminal (piped to
+    less, etc.) we can't safely prompt, so we just list and assume "no".
     """
-    print(f"{BOLD}scanning for AppleDouble junk...{RESET}")
-    junk = []
-    for p in sorted(root.rglob("._*")):
-        if not p.is_file():
-            continue
-        if (p.parent / p.name[2:]).exists():
-            junk.append(p)
+    print(f"{BOLD}scanning for clutter...{RESET}")
+    junk = set()
+    # AppleDouble sidecars: only when the real file they shadow exists.
+    for p in root.rglob("._*"):
+        if p.is_file() and (p.parent / p.name[2:]).exists():
+            junk.add(p)
+    # Info files and playlists: download leftovers, removed anywhere.
+    for p in root.rglob("*"):
+        if p.is_file() and p.suffix.lower() in CLEANUP_EXTENSIONS:
+            junk.add(p)
+    junk = sorted(junk)
 
     if not junk:
         print(f"  {GREEN}none found.{RESET}")
         return
 
-    print(f"  {len(junk)} junk file(s) with a matching real file:")
+    print(f"  {len(junk)} clutter file(s):")
     for p in junk:
         print(f"    {p}")
 
