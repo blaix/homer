@@ -76,6 +76,7 @@
       "firefox"
       "ghostty"
       "google-chrome"
+      "iina"
       "michaelvillar-timer"
       "netnewswire"
       "obsidian"
@@ -83,7 +84,6 @@
       "postman"
       "slack"
       "qbittorrent"
-      "soulseek"
       "steam"
       "vivaldi"
     ];
