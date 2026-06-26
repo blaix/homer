@@ -72,14 +72,17 @@ Default — fill in missing artist/albumartist/album/title/tracknumber:
     images aren't handled here — Navidrome fetches those itself via its
     external agents.
 
---gain — write ReplayGain tags across the library:
-    Shells out to `rsgain easy` over the music root. rsgain walks the
-    tree itself and treats each leaf folder as an album, so the same
-    root/Artist/Album/Track.ext layout the other modes expect just
-    works. `-S` (skip-existing) is passed so albums whose tracks
-    already have ReplayGain tags are left alone, making re-runs cheap.
-    Non-interactive; rsgain's output streams through. With --dry-run
-    the command is printed and nothing is executed.
+--gain — lift quiet tracks up to a loudness floor (boost-only):
+    Tracks already at or above the floor (default -20 LUFS) keep their
+    own master loudness and get no tag, so hot-mastered genres (punk,
+    hard rock) are never turned down. Only tracks below the floor get a
+    positive ReplayGain *track* gain that raises them to the floor, with
+    positive-only clip protection so the boost can't clip. Set the floor
+    with --floor. Existing ReplayGain tags are preserved (re-runnable as
+    new tracks arrive); pass --wipe to delete all existing tags first and
+    re-derive from scratch. Album folders are processed in parallel
+    (--jobs). With --dry-run the library is scanned read-only and the
+    tracks that would be boosted are listed, but nothing is written.
 
 --missing — flag albums that look incomplete:
     Read-only pass. For each album folder, combines two signals:
@@ -95,6 +98,7 @@ Default — fill in missing artist/albumartist/album/title/tracknumber:
     pass exists to fill those in.
 """
 import argparse
+import concurrent.futures
 import os
 import re
 import shutil
@@ -193,9 +197,19 @@ def main():
                              "(._* beside a real file), .nfo info files, and "
                              ".m3u/.m3u8 playlists (prompts before deleting)")
     parser.add_argument("--gain", action="store_true",
-                        help="run rsgain easy over the library to write "
-                             "ReplayGain tags (skips albums that already "
-                             "have them)")
+                        help="boost quiet tracks up to a loudness floor "
+                             "(leaves louder tracks untouched; never turns "
+                             "anything down)")
+    parser.add_argument("--floor", type=float, default=-20.0,
+                        help="loudness floor in LUFS for --gain; tracks "
+                             "below it are boosted up to it (default: -20)")
+    parser.add_argument("--wipe", action="store_true",
+                        help="with --gain, delete all existing ReplayGain "
+                             "tags first and re-derive from scratch (default "
+                             "preserves tags a file already has)")
+    parser.add_argument("--jobs", type=int, default=None,
+                        help="parallel album-folder workers for --gain "
+                             "(default: CPU count)")
     parser.add_argument("--missing", action="store_true",
                         help="list albums that look like they have "
                              "missing tracks (read-only; uses MusicBrainz "
@@ -213,7 +227,8 @@ def main():
         if args.cleanup:
             run_cleanup(root, dry_run=args.dry_run)
         elif args.gain:
-            run_gain(root, dry_run=args.dry_run)
+            run_gain(root, dry_run=args.dry_run,
+                     floor=args.floor, wipe=args.wipe, jobs=args.jobs)
         elif args.art:
             run_art(root, dry_run=args.dry_run)
         elif args.fix:
@@ -1565,34 +1580,121 @@ def run_cleanup(root, dry_run):
 
 # ----- --gain mode -----
 
-def run_gain(root, dry_run):
-    """Apply ReplayGain tags across the library via rsgain easy.
+# rsgain's `easy` recommended settings (share/rsgain/presets/default.ini):
+# positive-only clip protection, 0 dB max sample peak, standard ReplayGain
+# tags for Opus. We mirror them in custom mode so the boost-only pass
+# matches easy's per-format quality. Custom mode is single-threaded and its
+# -O output is keyed by basename, so we drive it one folder at a time and
+# parallelize across folders ourselves.
+GAIN_BASE = ["rsgain", "custom", "-q", "-c", "p", "-m", "0"]
 
-    rsgain's `easy` subcommand walks the tree itself and treats each
-    leaf folder as an album, which lines up with the
-    root/Artist/Album/Track.ext layout the other modes expect. `-S`
-    (skip-existing) makes the operation idempotent: albums whose tracks
-    already carry ReplayGain tags are passed over, so re-runs are
-    quick. Output streams through unmodified.
+
+def run_gain(root, dry_run, floor=-20.0, wipe=False, jobs=None):
+    """Boost-only ReplayGain: lift quiet tracks up to a loudness floor.
+
+    Tracks at or above `floor` LUFS keep their original master loudness
+    (no tag written), so loud, hot-mastered genres aren't turned down.
+    Only sub-floor tracks get a positive track-gain tag raising them to
+    the floor, with positive-only clip protection so the boost can't clip.
+
+    rsgain only normalizes toward a target in both directions, so the
+    selection happens here: each album folder is scanned read-only to
+    measure loudness, and just the sub-floor files are handed back to
+    rsgain for tag writing. Scanning per folder keeps rsgain's basename-
+    only -O output unambiguous; folders run concurrently via a thread pool
+    (each worker shells out to rsgain, so the GIL isn't a bottleneck).
+
+    Existing tags are preserved by default (rsgain's -S skips them) so the
+    pass is cheap to re-run as new tracks are added. `wipe=True` deletes
+    all existing tags first and re-derives from scratch -- needed once to
+    clear the old flat-normalization tags from earlier runs.
     """
     if not shutil.which("rsgain"):
         sys.exit(f"{RED}rsgain not found on PATH.{RESET}")
 
-    # -m MAX: scan albums in parallel, one thread per available core.
-    cmd = ["rsgain", "easy", "-m", "MAX", "-S", str(root)]
-    print(f"{BOLD}running:{RESET} {' '.join(cmd)}")
-
-    if dry_run:
-        print(f"  {DIM}(dry-run, not executed){RESET}")
+    folders = {}
+    for p in iter_audio(root):
+        folders.setdefault(p.parent, []).append(p)
+    if not folders:
+        print(f"{DIM}no audio files found under {root}{RESET}")
         return
 
+    floor_s = str(floor)
+    # No -S when wiping: tags are gone (real run) or we want every file
+    # classified for an accurate preview (dry-run).
+    skip = [] if wipe else ["-S"]
+    workers = max(1, jobs or (os.cpu_count() or 4))
+
+    state = []
+    if wipe:
+        state.append("wiping existing tags")
+    if dry_run:
+        state.append("dry-run")
+    suffix = f" ({', '.join(state)})" if state else ""
+    print(f"{BOLD}boost-only ReplayGain{RESET} floor {floor_s} LUFS"
+          f"{suffix}; {len(folders)} folders, {workers} workers")
+
+    def process(folder):
+        files = sorted(folders[folder])
+        paths = [str(f) for f in files]
+        if wipe and not dry_run:
+            _run_rsgain(GAIN_BASE + ["-s", "d"] + paths)
+        out = _run_rsgain(
+            GAIN_BASE + skip + ["-s", "s", "-l", floor_s, "-O"] + paths,
+            capture=True)
+        quiet = _parse_quiet(out, folder)
+        if quiet and not dry_run:
+            _run_rsgain(GAIN_BASE + skip + ["-s", "i", "-l", floor_s]
+                        + [str(q) for q in quiet])
+        return {"total": len(files), "quiet": quiet}
+
+    boosted = 0
+    left_alone = 0
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
+        for res in ex.map(process, sorted(folders)):
+            boosted += len(res["quiet"])
+            left_alone += res["total"] - len(res["quiet"])
+            for q in res["quiet"]:
+                print(f"  {GREEN}boost{RESET} {q.relative_to(root)}")
+
+    verb = "would boost" if dry_run else "boosted"
+    print(f"{BOLD}{verb} {boosted}{RESET} track(s); "
+          f"{left_alone} left unchanged")
+
+
+def _run_rsgain(cmd, capture=False):
     try:
-        result = subprocess.run(cmd, check=False)
+        result = subprocess.run(
+            cmd, check=False,
+            stdout=subprocess.PIPE if capture else None,
+            text=True)
     except OSError as e:
         sys.exit(f"{RED}failed to run rsgain: {e}{RESET}")
     if result.returncode != 0:
         sys.exit(f"{RED}rsgain exited with status "
                  f"{result.returncode}{RESET}")
+    return result.stdout if capture else ""
+
+
+def _parse_quiet(output, folder):
+    """Folder files whose scanned gain is positive (i.e. below the floor).
+
+    rsgain's -O output is tab-delimited with a header row; the Filename
+    column is a basename and the Gain (dB) column is the clip-adjusted
+    gain needed to reach the target. Positive gain => below floor => boost.
+    """
+    quiet = []
+    for line in output.splitlines():
+        cols = line.split("\t")
+        if len(cols) < 3:
+            continue
+        try:
+            gain = float(cols[2])
+        except ValueError:
+            continue  # header row or an error line
+        if gain > 0:
+            quiet.append(folder / cols[0])
+    return quiet
 
 
 # ----- --missing mode -----
