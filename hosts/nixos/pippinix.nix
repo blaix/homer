@@ -98,11 +98,11 @@
   # Enable mosh connections (opens UDP ports)
   programs.mosh.enable = true;
 
-  # cbr2cbz: convert RAR-based comic archives (incl. RAR5, which Komga's reader
-  # can't open) into .cbz. Run it on files in /mnt/media/inbox before moving
-  # them into the Komga library at /mnt/media/comics. See pkgs/cbr2cbz.nix.
   environment.systemPackages = [
+    # cbr2cbz: convert RAR-based comic archives (which Komga struggles with) into .cbz.
     (pkgs.callPackage ../../pkgs/cbr2cbz.nix {})
+    # sort-media: rename/move movie & tv files into a Jellyfin-friendly layout
+    (pkgs.callPackage ../../pkgs/sort-media.nix {})
   ];
 
   # Jellyfin TV/movies server. Reachable on the LAN (8096) and from wg peers
@@ -122,6 +122,22 @@
       MusicFolder = "/mnt/media/music";
       Address = "0.0.0.0";
       Port = 4533;
+      Plugins = {
+        Enabled = true;
+        Folder =
+          let
+            listenbrainz-daily-playlist = pkgs.fetchurl {
+              url = "https://github.com/kgarner7/navidrome-listenbrainz-daily-playlist/releases/download/v5.0.2/listenbrainz-daily-playlist.ndp";
+              hash = "sha256-P1lB18Gjqjg6p2atn+PqQRcM0U1jSCtGWqkZDNWQ3Pk=";
+            };
+          in
+          pkgs.linkFarm "navidrome-plugins" [
+            {
+              name = "listenbrainz-daily-playlist.ndp";
+              path = listenbrainz-daily-playlist;
+            }
+          ];
+      };
     };
   };
 
