@@ -48,6 +48,7 @@ in
     diff-so-fancy
     entr
     fd
+    ffmpeg # for yt-dlp
     fzf
     gcc
     gh
@@ -65,6 +66,7 @@ in
     nmap
     # failing to build on unstable
     #nodePackages.degit
+    python3
     ripgrep
     rlwrap
     (callPackage ../pkgs/tag-music.nix {})
@@ -72,6 +74,7 @@ in
     tree
     unzip
     wireguard-tools
+    yt-dlp
     #(callPackage taskfiles {})
   ];
 
