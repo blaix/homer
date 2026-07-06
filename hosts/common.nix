@@ -69,6 +69,7 @@ in
     python3
     ripgrep
     rlwrap
+    (callPackage ../pkgs/rwhat.nix {})
     (callPackage ../pkgs/tag-music.nix {})
     tmux
     tree
