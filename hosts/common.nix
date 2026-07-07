@@ -74,6 +74,7 @@ in
     tmux
     tree
     unzip
+    wget
     wireguard-tools
     yt-dlp
     #(callPackage taskfiles {})
