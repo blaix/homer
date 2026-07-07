@@ -86,11 +86,11 @@
     ];
   };
 
-  # Firewall - allow SSH, local dev servers, Jellyfin (web + LAN auto-discovery),
-  # Navidrome (4533), Komga (25600), and WireGuard, trust VPN interface
+  # Firewall - allow SSH, local dev servers, media servers (Jellyfin,
+  # Navidrome, etc), and WireGuard, trust VPN interface.
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 3000 8000 8096 4533 25600 ];
+    allowedTCPPorts = [ 22 3000 8000 8080 8096 4533 25600 ];
     allowedUDPPorts = [ 51820 7359 ];
     trustedInterfaces = [ "wg0" ];
   };
@@ -149,6 +149,24 @@
     enable = true;
     openFirewall = false;
     settings.server.port = 25600;
+  };
+
+  # Private podcast server
+  services.caddy = {
+    enable = true;
+    virtualHosts.":8080" = {
+      extraConfig = ''
+        root * /mnt/media/podcasts
+        file_server browse
+      '';
+    };
+  };
+
+  # Don't start Caddy until the media drive is mounted (same reason as the
+  # jellyfin/navidrome/komga ordering above).
+  systemd.services.caddy = {
+    after = [ "mnt-media.mount" ];
+    requires = [ "mnt-media.mount" ];
   };
 
   # Music + media libraries on the dedicated USB drive (ext4, labeled "media").
