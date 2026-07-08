@@ -72,17 +72,16 @@ Default — fill in missing artist/albumartist/album/title/tracknumber:
     images aren't handled here — Navidrome fetches those itself via its
     external agents.
 
---gain — lift quiet tracks up to a loudness floor (boost-only):
-    Tracks already at or above the floor (default -20 LUFS) keep their
-    own master loudness and get no tag, so hot-mastered genres (punk,
-    hard rock) are never turned down. Only tracks below the floor get a
-    positive ReplayGain *track* gain that raises them to the floor, with
-    positive-only clip protection so the boost can't clip. Set the floor
-    with --floor. Existing ReplayGain tags are preserved (re-runnable as
-    new tracks arrive); pass --wipe to delete all existing tags first and
-    re-derive from scratch. Album folders are processed in parallel
-    (--jobs). With --dry-run the library is scanned read-only and the
-    tracks that would be boosted are listed, but nothing is written.
+--gain — normalize every track to a target loudness (ReplayGain):
+    Writes a ReplayGain *track* gain to every file so tracks play at a
+    uniform loudness (default target -14 LUFS). Loud tracks get a negative
+    gain (turned down), quiet tracks a positive one, capped by
+    positive-only clip protection. Set the target with --target. Existing
+    tags are preserved and already-tagged files skipped, so re-runs are
+    cheap; pass --wipe to delete all tags first and re-derive (needed once
+    when changing the target). Album folders run in parallel (--jobs).
+    --dry-run lists the per-track gains without writing (add --wipe to
+    preview every file, since --dry-run alone skips already-tagged ones).
 
 --missing — flag albums that look incomplete:
     Read-only pass. For each album folder, combines two signals:
@@ -197,12 +196,11 @@ def main():
                              "(._* beside a real file), .nfo info files, and "
                              ".m3u/.m3u8 playlists (prompts before deleting)")
     parser.add_argument("--gain", action="store_true",
-                        help="boost quiet tracks up to a loudness floor "
-                             "(leaves louder tracks untouched; never turns "
-                             "anything down)")
-    parser.add_argument("--floor", type=float, default=-20.0,
-                        help="loudness floor in LUFS for --gain; tracks "
-                             "below it are boosted up to it (default: -20)")
+                        help="normalize every track to a target loudness "
+                             "(turns loud tracks down and quiet tracks up)")
+    parser.add_argument("--target", type=float, default=-14.0,
+                        help="target loudness in LUFS for --gain; every "
+                             "track is normalized to it (default: -14)")
     parser.add_argument("--wipe", action="store_true",
                         help="with --gain, delete all existing ReplayGain "
                              "tags first and re-derive from scratch (default "
@@ -228,7 +226,7 @@ def main():
             run_cleanup(root, dry_run=args.dry_run)
         elif args.gain:
             run_gain(root, dry_run=args.dry_run,
-                     floor=args.floor, wipe=args.wipe, jobs=args.jobs)
+                     target=args.target, wipe=args.wipe, jobs=args.jobs)
         elif args.art:
             run_art(root, dry_run=args.dry_run)
         elif args.fix:
@@ -1582,32 +1580,28 @@ def run_cleanup(root, dry_run):
 
 # rsgain's `easy` recommended settings (share/rsgain/presets/default.ini):
 # positive-only clip protection, 0 dB max sample peak, standard ReplayGain
-# tags for Opus. We mirror them in custom mode so the boost-only pass
+# tags for Opus. We mirror them in custom mode so the normalize pass
 # matches easy's per-format quality. Custom mode is single-threaded and its
 # -O output is keyed by basename, so we drive it one folder at a time and
 # parallelize across folders ourselves.
 GAIN_BASE = ["rsgain", "custom", "-q", "-c", "p", "-m", "0"]
 
 
-def run_gain(root, dry_run, floor=-20.0, wipe=False, jobs=None):
-    """Boost-only ReplayGain: lift quiet tracks up to a loudness floor.
+def run_gain(root, dry_run, target=-14.0, wipe=False, jobs=None):
+    """Normalize every track to `target` LUFS with ReplayGain.
 
-    Tracks at or above `floor` LUFS keep their original master loudness
-    (no tag written), so loud, hot-mastered genres aren't turned down.
-    Only sub-floor tracks get a positive track-gain tag raising them to
-    the floor, with positive-only clip protection so the boost can't clip.
-
-    rsgain only normalizes toward a target in both directions, so the
-    selection happens here: each album folder is scanned read-only to
-    measure loudness, and just the sub-floor files are handed back to
-    rsgain for tag writing. Scanning per folder keeps rsgain's basename-
-    only -O output unambiguous; folders run concurrently via a thread pool
-    (each worker shells out to rsgain, so the GIL isn't a bottleneck).
+    rsgain measures and writes a track-gain tag in one pass per album
+    folder: loud tracks get a negative gain, quiet ones a positive gain
+    capped by positive-only clip protection. Per-folder invocation keeps
+    rsgain's basename-only -O output unambiguous; folders run concurrently
+    via a thread pool (each worker shells out to rsgain, so the GIL isn't
+    a bottleneck). The -O table is parsed only to report how many tracks
+    went up vs down.
 
     Existing tags are preserved by default (rsgain's -S skips them) so the
     pass is cheap to re-run as new tracks are added. `wipe=True` deletes
-    all existing tags first and re-derives from scratch -- needed once to
-    clear the old flat-normalization tags from earlier runs.
+    all existing tags first and re-derives from scratch -- needed once
+    when changing the target, since -S would otherwise skip stale tags.
     """
     if not shutil.which("rsgain"):
         sys.exit(f"{RED}rsgain not found on PATH.{RESET}")
@@ -1619,10 +1613,12 @@ def run_gain(root, dry_run, floor=-20.0, wipe=False, jobs=None):
         print(f"{DIM}no audio files found under {root}{RESET}")
         return
 
-    floor_s = str(floor)
+    target_s = str(target)
     # No -S when wiping: tags are gone (real run) or we want every file
-    # classified for an accurate preview (dry-run).
+    # classified for an accurate preview (dry-run --wipe).
     skip = [] if wipe else ["-S"]
+    # Dry-run scans without writing tags; a real run writes them.
+    tag_mode = "s" if dry_run else "i"
     workers = max(1, jobs or (os.cpu_count() or 4))
 
     state = []
@@ -1631,7 +1627,7 @@ def run_gain(root, dry_run, floor=-20.0, wipe=False, jobs=None):
     if dry_run:
         state.append("dry-run")
     suffix = f" ({', '.join(state)})" if state else ""
-    print(f"{BOLD}boost-only ReplayGain{RESET} floor {floor_s} LUFS"
+    print(f"{BOLD}normalize ReplayGain{RESET} target {target_s} LUFS"
           f"{suffix}; {len(folders)} folders, {workers} workers")
 
     def process(folder):
@@ -1640,26 +1636,26 @@ def run_gain(root, dry_run, floor=-20.0, wipe=False, jobs=None):
         if wipe and not dry_run:
             _run_rsgain(GAIN_BASE + ["-s", "d"] + paths)
         out = _run_rsgain(
-            GAIN_BASE + skip + ["-s", "s", "-l", floor_s, "-O"] + paths,
+            GAIN_BASE + skip + ["-s", tag_mode, "-l", target_s, "-O"] + paths,
             capture=True)
-        quiet = _parse_quiet(out, folder)
-        if quiet and not dry_run:
-            _run_rsgain(GAIN_BASE + skip + ["-s", "i", "-l", floor_s]
-                        + [str(q) for q in quiet])
-        return {"total": len(files), "quiet": quiet}
+        return _parse_gains(out, folder)
 
-    boosted = 0
-    left_alone = 0
+    up = 0
+    down = 0
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
-        for res in ex.map(process, sorted(folders)):
-            boosted += len(res["quiet"])
-            left_alone += res["total"] - len(res["quiet"])
-            for q in res["quiet"]:
-                print(f"  {GREEN}boost{RESET} {q.relative_to(root)}")
+        for gains in ex.map(process, sorted(folders)):
+            for path, gain in gains:
+                if gain > 0:
+                    up += 1
+                    label = f"{GREEN}up  {gain:+.1f} dB{RESET}"
+                else:
+                    down += 1
+                    label = f"{YELLOW}down{gain:+.1f} dB{RESET}"
+                print(f"  {label}  {path.relative_to(root)}")
 
-    verb = "would boost" if dry_run else "boosted"
-    print(f"{BOLD}{verb} {boosted}{RESET} track(s); "
-          f"{left_alone} left unchanged")
+    verb = "would tag" if dry_run else "tagged"
+    print(f"{BOLD}{verb} {up + down}{RESET} track(s); "
+          f"{up} boosted, {down} turned down")
 
 
 def _run_rsgain(cmd, capture=False):
@@ -1676,14 +1672,15 @@ def _run_rsgain(cmd, capture=False):
     return result.stdout if capture else ""
 
 
-def _parse_quiet(output, folder):
-    """Folder files whose scanned gain is positive (i.e. below the floor).
+def _parse_gains(output, folder):
+    """(path, gain_dB) for each file in rsgain's -O table.
 
-    rsgain's -O output is tab-delimited with a header row; the Filename
-    column is a basename and the Gain (dB) column is the clip-adjusted
-    gain needed to reach the target. Positive gain => below floor => boost.
+    The output is tab-delimited with a header row; column 0 is the
+    basename and column 2 the clip-adjusted track gain (negative = turned
+    down, positive = boosted). Rows that don't parse (header, error lines)
+    are skipped.
     """
-    quiet = []
+    gains = []
     for line in output.splitlines():
         cols = line.split("\t")
         if len(cols) < 3:
@@ -1692,9 +1689,8 @@ def _parse_quiet(output, folder):
             gain = float(cols[2])
         except ValueError:
             continue  # header row or an error line
-        if gain > 0:
-            quiet.append(folder / cols[0])
-    return quiet
+        gains.append((folder / cols[0], gain))
+    return gains
 
 
 # ----- --missing mode -----
