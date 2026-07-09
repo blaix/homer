@@ -111,6 +111,7 @@
         blaixapps = mkNixosSystem { hostname = "blaixapps"; system = "x86_64-linux"; }; # multi-app server
         blaixapps-base = mkNixosSystem { hostname = "blaixapps-base"; system = "x86_64-linux"; }; # base-level nixos server install
         pippinix = mkNixosSystem { hostname = "pippinix"; }; # nixos on mac mini (apple silicon)
+        shire = mkNixosSystem { hostname = "shire"; system = "x86_64-linux"; }; # home server on gmktec mini pc
       };
     };
 }
