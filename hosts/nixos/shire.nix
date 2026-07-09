@@ -27,18 +27,49 @@
     memoryPercent = 50;
   };
 
-  # NOTE: WireGuard server is intentionally NOT here yet. It's added during the
-  # Phase 7 cutover, after copying pippinix's /etc/wireguard/wg0-key onto this
-  # host, so the server keeps its identity and no client needs reconfiguring.
-  # At that point re-add the wg0 interface block, UDP 51820, and
-  # trustedInterfaces = [ "wg0" ]. See MIGRATION.md.
+  # WireGuard VPN server. (migrated from pippinix)
+  #
+  # Off-LAN reachability depends on infra NOT in this repo:
+  #   - home.blaix.com is a CNAME to the eero's dyndns hostname (tracks our
+  #     dynamic home IP).
+  #   - The eero forwards UDP 51820 to shire's LAN IP. That IP MUST be pinned
+  #     with a DHCP reservation on the eero (do this in the eero app);
+  # Peer client tunnels use Endpoint = home.blaix.com:51820 (set in each
+  # device's WireGuard app, not declared here).
+  networking.wireguard.interfaces.wg0 = {
+    ips = [ "10.100.0.1/24" ];
+    listenPort = 51820;
+    generatePrivateKeyFile = true;
+    privateKeyFile = "/etc/wireguard/wg0-key";
 
-  # Firewall - SSH, local dev servers, and media servers (Jellyfin, Navidrome,
-  # Komga, podcast Caddy). UDP 7359 is Jellyfin client auto-discovery.
+    peers = [
+      { # arwen
+        publicKey = "DnDZDE3WEygq58ak+ViZyRyp1sadqRKSmtoL25ztxiY=";
+        allowedIPs = [ "10.100.0.2/32" ];
+      }
+      { # bilbo
+        publicKey = "doShLIrZi005B0qsO8aLY4gF06gHSiv4Hw3YmnIe3Co=";
+        allowedIPs = [ "10.100.0.3/32" ];
+      }
+      { # ipad
+        publicKey = "j+PtMQZe4IBzTOjSCFeknomeeEZXAYd4rhfrX+GQJRQ=";
+        allowedIPs = [ "10.100.0.4/32" ];
+      }
+      { # iphone
+        publicKey = "MAqyNsojFlFxD0lbRzcT9d8/ZbeD7TyxWmOUR6EtNUk=";
+        allowedIPs = [ "10.100.0.5/32" ];
+      }
+    ];
+  };
+
+  # Firewall - SSH, local dev servers, media servers (Jellyfin, Navidrome,
+  # Komga, podcast Caddy), and WireGuard; trust the VPN interface. UDP 7359 is
+  # Jellyfin client auto-discovery.
   networking.firewall = {
     enable = true;
     allowedTCPPorts = [ 22 3000 8000 8080 8096 4533 25600 ];
-    allowedUDPPorts = [ 7359 ];
+    allowedUDPPorts = [ 51820 7359 ];
+    trustedInterfaces = [ "wg0" ];
   };
 
   # Enable mosh connections (opens UDP ports)
