@@ -20,7 +20,7 @@
   networking.networkmanager.enable = true;
   time.timeZone = "America/New_York";
 
-  # Copied from the original /etc/configruation.nix
+  # Copied from the original /etc/configuration.nix
   # Set according to the nixos-apple-silicon instructions at:
   # https://github.com/nix-community/nixos-apple-silicon/blob/2fbdf62451bcd9fc83ca99c56a6e379df8c47c8d/docs/uefi-standalone.md#nixos-configuration
   boot.loader.systemd-boot.enable = true;
@@ -52,124 +52,21 @@
     memoryPercent = 50;
   };
 
-  # WireGuard VPN server.
-  #
-  # Off-LAN reachability depends on infra NOT in this repo:
-  #   - home.blaix.com is a CNAME to the eero's dyndns hostname (tracks our
-  #     dynamic home IP).
-  #   - The eero forwards UDP 51820 to this host.
-  # Peer client tunnels use Endpoint = home.blaix.com:51820 (set in each
-  # device's WireGuard app, not declared here).
-  networking.wireguard.interfaces.wg0 = {
-    ips = [ "10.100.0.1/24" ];
-    listenPort = 51820;
-    generatePrivateKeyFile = true;
-    privateKeyFile = "/etc/wireguard/wg0-key";
+  # ---------------------------------------------------------------------------
+  # Soft-decommissioned this as my home server on 2026-07-09. Moved to shire.
+  # ---------------------------------------------------------------------------
 
-    peers = [
-      { # arwen
-        publicKey = "DnDZDE3WEygq58ak+ViZyRyp1sadqRKSmtoL25ztxiY=";
-        allowedIPs = [ "10.100.0.2/32" ];
-      }
-      { # bilbo
-        publicKey = "doShLIrZi005B0qsO8aLY4gF06gHSiv4Hw3YmnIe3Co=";
-        allowedIPs = [ "10.100.0.3/32" ];
-      }
-      { # ipad
-        publicKey = "j+PtMQZe4IBzTOjSCFeknomeeEZXAYd4rhfrX+GQJRQ=";
-        allowedIPs = [ "10.100.0.4/32" ];
-      }
-      { # iphone
-        publicKey = "MAqyNsojFlFxD0lbRzcT9d8/ZbeD7TyxWmOUR6EtNUk=";
-        allowedIPs = [ "10.100.0.5/32" ];
-      }
-    ];
-  };
-
-  # Firewall - allow SSH, local dev servers, media servers (Jellyfin,
-  # Navidrome, etc), and WireGuard, trust VPN interface.
+  # Firewall - SSH only. (Samba opens 445 via its own openFirewall below.)
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 3000 8000 8080 8096 4533 25600 ];
-    allowedUDPPorts = [ 51820 7359 ];
-    trustedInterfaces = [ "wg0" ];
+    allowedTCPPorts = [ 22 ];
+    allowedUDPPorts = [ ];
   };
 
   # Enable mosh connections (opens UDP ports)
   programs.mosh.enable = true;
 
-  environment.systemPackages = [
-    # cbr2cbz: convert RAR-based comic archives (which Komga struggles with) into .cbz.
-    (pkgs.callPackage ../../pkgs/cbr2cbz.nix {})
-    # sort-media: rename/move movie & tv files into a Jellyfin-friendly layout
-    (pkgs.callPackage ../../pkgs/sort-media.nix {})
-  ];
-
-  # Jellyfin TV/movies server. Reachable on the LAN (8096) and from wg peers
-  # (10.100.0.1:8096). UDP 7359 is opened above so LAN clients like the Roku
-  # Jellyfin app can auto-discover the server.
-  services.jellyfin = {
-    enable = true;
-    openFirewall = false;
-  };
-
-  # Navidrome music server. Reachable on the LAN
-  # (4533) and from wg peers (10.100.0.1:4533).
-  services.navidrome = {
-    enable = true;
-    openFirewall = false;
-    settings = {
-      MusicFolder = "/mnt/media/music";
-      Address = "0.0.0.0";
-      Port = 4533;
-      Plugins = {
-        Enabled = true;
-        Folder =
-          let
-            listenbrainz-daily-playlist = pkgs.fetchurl {
-              url = "https://github.com/kgarner7/navidrome-listenbrainz-daily-playlist/releases/download/v5.0.2/listenbrainz-daily-playlist.ndp";
-              hash = "sha256-P1lB18Gjqjg6p2atn+PqQRcM0U1jSCtGWqkZDNWQ3Pk=";
-            };
-          in
-          pkgs.linkFarm "navidrome-plugins" [
-            {
-              name = "listenbrainz-daily-playlist.ndp";
-              path = listenbrainz-daily-playlist;
-            }
-          ];
-      };
-    };
-  };
-
-  # Komga comics server. Reachable on the LAN (25600) and from wg peers
-  # (10.100.0.1:25600). Like jellyfin/navidrome it only reads the drive: it
-  # runs as the "komga" user and the library at /mnt/media/comics is
-  # world-readable. Content is added over ssh (rsync/scp) as justin.
-  services.komga = {
-    enable = true;
-    openFirewall = false;
-    settings.server.port = 25600;
-  };
-
-  # Private podcast server
-  services.caddy = {
-    enable = true;
-    virtualHosts.":8080" = {
-      extraConfig = ''
-        root * /mnt/media/podcasts
-        file_server browse
-      '';
-    };
-  };
-
-  # Don't start Caddy until the media drive is mounted (same reason as the
-  # jellyfin/navidrome/komga ordering above).
-  systemd.services.caddy = {
-    after = [ "mnt-media.mount" ];
-    requires = [ "mnt-media.mount" ];
-  };
-
-  # Music + media libraries on the dedicated USB drive (ext4, labeled "media").
+  # Old media drive (ext4, label "media"). 
   fileSystems."/mnt/media" = {
     device = "/dev/disk/by-label/media";
     fsType = "ext4";
@@ -178,58 +75,21 @@
   };
 
   # General-purpose documents on a second USB drive (ext4, labeled "documents").
-  # Exported as an SMB share, reachable on the LAN and from wg peers.
+  # Exported as an SMB share, reachable on the LAN. (Migration to shire deferred.)
   fileSystems."/mnt/documents" = {
     device = "/dev/disk/by-label/documents";
     fsType = "ext4";
     options = [ "nofail" "noatime" "x-systemd.device-timeout=10s" ];
   };
 
-  # navidrome and jellyfin read their libraries from this mount, so start them
-  # only after it is mounted. Otherwise they capture a pre-mount namespace and
-  # see an empty /mnt/media.
-  systemd.services.navidrome = {
-    after = [ "mnt-media.mount" ];
-    requires = [ "mnt-media.mount" ];
-  };
-  systemd.services.jellyfin = {
-    after = [ "mnt-media.mount" ];
-    requires = [ "mnt-media.mount" ];
-  };
-  systemd.services.komga = {
-    after = [ "mnt-media.mount" ];
-    requires = [ "mnt-media.mount" ];
-  };
-
-  # The whole USB drive is owned by justin and world-readable: navidrome and
-  # jellyfin read their libraries as "other", and neither can write here.
-  # Content is added over ssh (rsync/scp) as justin, not by the services.
+  # Drive dirs owned by justin, world-readable.
   systemd.tmpfiles.rules = [
-    "d /mnt/media        0755 justin justin -"
-    "d /mnt/media/music  0755 justin justin -"
-    "d /mnt/media/inbox  0755 justin justin -"
-    "d /mnt/media/movies 0755 justin justin -"
-    "d /mnt/media/tv     0755 justin justin -"
-    "d /mnt/media/comics 0755 justin justin -"
-    "d /mnt/documents    0755 justin justin -"
+    "d /mnt/media     0755 justin justin -"
+    "d /mnt/documents 0755 justin justin -"
   ];
 
   # SMB share reachable from Macs as smb://pippinix.local (read-write).
-  #
-  # First-time machine setup (not declarative):
-  #   - sudo smbpasswd -a justin to set the Samba password.
-  #   - In Jellyfin's web UI, add libraries:
-  #       Movies -> /mnt/media/movies   (do NOT include /mnt/media/inbox)
-  #       Shows  -> /mnt/media/tv
-  #     Jellyfin only ever reads the drive (files are owned by justin and
-  #     world-readable; jellyfin has no write access). Leave "save artwork /
-  #     NFO / subtitles into media folders" OFF so it never tries to write.
-  #   - In Navidrome's web UI, complete first-run admin setup.
-  #     The /mnt/media/music folder is scanned automatically.
-  #   - In Komga's web UI (port 25600), create the admin account, then add a
-  #     library pointing at /mnt/media/comics. Komga only reads the drive
-  #     (files owned by justin, world-readable); leave any "write metadata back
-  #     to files" / cover-persistence options OFF so it never tries to write.
+  # First-time machine setup (not declarative): sudo smbpasswd -a justin.
   services.samba = {
     enable = true;
     openFirewall = true;
@@ -254,19 +114,6 @@
         "fruit:nfs_aces" = "no";
         "veto files" = "/.DS_Store/.Spotlight-V100/.Trashes/.TemporaryItems/.fseventsd/.apdisk/.AppleDB/.AppleDesktop/Network Trash Folder/Temporary Items/";
         "delete veto files" = "yes";
-      };
-      # Read-write share over the whole drive (music/, tv/, movies/, inbox/).
-      # Files are forced to justin and world-readable so navidrome/jellyfin,
-      # which read the drive as "other", can see newly added content.
-      media = {
-        "path" = "/mnt/media";
-        "browseable" = "yes";
-        "read only" = "no";
-        "guest ok" = "no";
-        "valid users" = "justin";
-        "force user" = "justin";
-        "create mask" = "0644";
-        "directory mask" = "0755";
       };
       # General-purpose documents share on the "documents" USB drive.
       documents = {
