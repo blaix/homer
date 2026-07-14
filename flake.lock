@@ -83,11 +83,11 @@
         "ws4sql": "ws4sql"
       },
       "locked": {
-        "lastModified": 1784037612,
-        "narHash": "sha256-5SQ0A3CCl+DaLcuEfho2YAxdGzNlPsz79B5PXPmZ95k=",
+        "lastModified": 1784059726,
+        "narHash": "sha256-RhfHFzFEN3NkRtBUXf4Knuobk3Gf8hLu6dE/rYUzSVc=",
         "ref": "refs/heads/main",
-        "rev": "1e299b64dda9180ce38abe40f1bd52defc266fed",
-        "revCount": 280,
+        "rev": "01b679a005be061fde27ff54e998eee0cf51dd08",
+        "revCount": 282,
         "type": "git",
         "url": "ssh://git@github.com/blaix/doitanyway.new.git"
       },
