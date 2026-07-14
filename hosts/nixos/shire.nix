@@ -67,7 +67,7 @@
   # Jellyfin client auto-discovery.
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 3000 8000 8080 8096 4533 25600 ];
+    allowedTCPPorts = [ 22 3000 8000 8080 8096 8100 4533 25600 ];
     allowedUDPPorts = [ 51820 7359 ];
     trustedInterfaces = [ "wg0" ];
   };
@@ -127,7 +127,7 @@
   # Private podcast server.
   services.caddy = {
     enable = true;
-    virtualHosts.":8080" = {
+    virtualHosts.":8100" = {
       extraConfig = ''
         root * /mnt/media/podcasts
         file_server browse
