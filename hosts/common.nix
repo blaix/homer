@@ -51,8 +51,9 @@ in
     ffmpeg # for yt-dlp
     fzf
     gcc
-    gh
+    gh # github cli
     git
+    glab # gitlab cli
     gnumake
     gnupg
     gren

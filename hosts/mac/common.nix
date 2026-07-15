@@ -69,6 +69,7 @@
       "alfred"
       "aws-vpn-client"
       "amethyst"
+      "gcloud-cli" # google cloud (work)
       "claude"
       "discord"
       "drawio"
