@@ -127,8 +127,6 @@ require("lualine").setup({
 
 local autocmd = vim.api.nvim_create_autocmd
 
-vim.lsp.set_log_level("debug")
-
 -- Override the underlying floating preview function to ensure borders.
 -- There has to be a better way to do this... but so far nothing I tried works.
 local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
