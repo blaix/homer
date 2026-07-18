@@ -111,11 +111,6 @@
       neogit
       vim-markdown-toc # https://github.com/mzlogin/vim-markdown-toc
 
-      # vimwiki: I use this for GTD, projects, and notes
-      # https://github.com/vimwiki/vimwiki
-      vimwiki
-      pkgs.vimwiki-markdown
-
       # themes
       catppuccin-nvim
       dracula-nvim
