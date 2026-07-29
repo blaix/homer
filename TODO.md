@@ -1,9 +1,9 @@
 - [X] Switch to a Flakes setup
 - [X] Use Mae's gren-treesitter (officially added to the nvim-treesitter plugin)
 - [X] Remove duplication under the various hosts/ files. Especially with my user setup.
-- [.] Set up pippinix as a router for cameras
-    - [ ] Switch to wifi for incoming
-    - [ ] Switch nic to output for switch / router setup
+- [.] Set up shire as a router for cameras (Frigate + Home Assistant)
+    - [x] Camera subnet on enp3s0 (eno1 stays on the LAN; dual wired NICs, no wifi needed)
+    - [ ] Cable the Reolink PoE switch + cameras, then pin their IPs (Kea reservations)
 - [ ] See TODO comments in code.
 
 Maybe:
