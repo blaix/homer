@@ -28,11 +28,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784011142,
-        "narHash": "sha256-dW639Zi7R46zzHhHxlvolQwiNFwi4qkWwjV9Yx2laaw=",
+        "lastModified": 1785285785,
+        "narHash": "sha256-r1cMlvXjRVKe+uQ/GKwy4TpionpmbNgksFP2758D/MM=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "41146e01a683653d69b8176c5784a66315263835",
+        "rev": "da78262708d858861afbe1f68ea65fedda4054c4",
         "type": "github"
       },
       "original": {
@@ -83,11 +83,11 @@
         "ws4sql": "ws4sql"
       },
       "locked": {
-        "lastModified": 1784059726,
-        "narHash": "sha256-RhfHFzFEN3NkRtBUXf4Knuobk3Gf8hLu6dE/rYUzSVc=",
+        "lastModified": 1785345948,
+        "narHash": "sha256-k7hZKZBvtHAQ/R0m1l1yoSVV3zacij2ZG6x55kJSZ5Y=",
         "ref": "refs/heads/main",
-        "rev": "01b679a005be061fde27ff54e998eee0cf51dd08",
-        "revCount": 282,
+        "rev": "94a4474e0f42955d928ae8cb7d06b35a146564eb",
+        "revCount": 283,
         "type": "git",
         "url": "ssh://git@github.com/blaix/doitanyway.new.git"
       },
