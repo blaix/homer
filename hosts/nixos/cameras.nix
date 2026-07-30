@@ -144,10 +144,20 @@
     };
   };
 
-  # RTSP password kept out of the Nix store. Optional file (leading '-'), created
-  # by hand on shire once the cameras are provisioned:
+  # Camera RTSP password handling. Frigate does a hard ${...} substitution at
+  # startup and CRASH-LOOPS if FRIGATE_RTSP_PASSWORD is unset (KeyError), so we
+  # always provide a placeholder default via Environment= - that lets Frigate
+  # boot before any camera/credential exists (cameras just show offline). The
+  # optional EnvironmentFile (leading '-') overrides the placeholder once the
+  # real password is dropped in; systemd applies EnvironmentFile after
+  # Environment=, so the file wins when present, and the real password never
+  # lands in the world-readable Nix store. Create it when cameras are provisioned:
   #   sudo install -Dm600 /dev/stdin /etc/frigate/rtsp.env <<<'FRIGATE_RTSP_PASSWORD=...'
-  systemd.services.frigate.serviceConfig.EnvironmentFile = "-/etc/frigate/rtsp.env";
+  # then: sudo systemctl restart frigate
+  systemd.services.frigate = {
+    environment.FRIGATE_RTSP_PASSWORD = "placeholder";
+    serviceConfig.EnvironmentFile = "-/etc/frigate/rtsp.env";
+  };
 
   # Serve the Frigate UI on a high port instead of the module's default 80, to
   # match the "one server per high port" convention. The module sets no explicit
