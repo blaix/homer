@@ -51,7 +51,13 @@ Default — fill in missing artist/albumartist/album/title/tracknumber:
     Navidrome's default separators split back into multiple genres.
     Uniform, fully-tagged albums are left alone, and compilations only
     have missing genres filled (their existing per-track genres, which
-    legitimately vary, are not overwritten). Clusters are handled per
+    legitimately vary, are not overwritten). And (f) stray compilation
+    flags: albums marked "part of a compilation" (mp4 `cpil`, id3 TCMP,
+    vorbis COMPILATION) whose flagged tracks nonetheless all share one
+    real albumartist — the mark that files a single-artist album under
+    Compilations/ in iTunes-style trees — are offered, per album, to
+    have the flag removed. Genuine Various Artists albums are left
+    alone. Clusters are handled per
     field — artist, albumartist
     (global), album (scoped per artist), and date and musicbrainz_albumid
     (each scoped per album).
@@ -123,6 +129,23 @@ try:
         ("musicbrainz_artistid", "MusicBrainz Artist Id"),
     ):
         EasyMP4Tags.RegisterFreeformKey(_key, _atom)
+
+    # EasyMP4 also has no mapping for the iTunes compilation flag (the
+    # `cpil` boolean atom), which --fix reads to spot single-artist
+    # albums mis-marked as compilations. Expose it as "compilation" with
+    # "1"/"0" values, matching EasyID3 (TCMP) and vorbis comments.
+    def _mp4_compilation_get(tags, key):
+        return ["1" if tags["cpil"] else "0"]
+
+    def _mp4_compilation_set(tags, key, value):
+        vals = value if isinstance(value, list) else [value]
+        tags["cpil"] = str(vals[0]).strip().lower() in ("1", "true", "yes")
+
+    def _mp4_compilation_del(tags, key):
+        del tags["cpil"]
+
+    EasyMP4Tags.RegisterKey("compilation", _mp4_compilation_get,
+                            _mp4_compilation_set, _mp4_compilation_del)
 except Exception:
     pass
 
@@ -145,9 +168,10 @@ MBID_FIELDS = ("musicbrainz_trackid", "musicbrainz_albumid",
                "musicbrainz_artistid")
 # Fields read off every file. The default missing-tag pass fills
 # TAG_FIELDS and MBID_FIELDS, but --fix also needs the release date to
-# spot albums that have been split across inconsistent date tags, and the
-# genre to fill gaps and unify outliers per album.
-READ_FIELDS = TAG_FIELDS + ("date", "genre") + MBID_FIELDS
+# spot albums that have been split across inconsistent date tags, the
+# genre to fill gaps and unify outliers per album, and the compilation
+# flag to spot single-artist albums mis-marked as compilations.
+READ_FIELDS = TAG_FIELDS + ("date", "genre", "compilation") + MBID_FIELDS
 MB_BASE = "https://musicbrainz.org/ws/2"
 CAA_BASE = "https://coverartarchive.org"
 USER_AGENT = "homer-tag-music/2.0 ( https://github.com/blaix/homer )"
@@ -541,6 +565,7 @@ def run_fix(root, dry_run):
     resolve_mismatches(mismatches, dry_run, counts)
 
     resolve_genres_per_album(library, root, dry_run, counts)
+    resolve_compilation_flags(library, root, dry_run, counts)
 
     warnings = collect_fs_warnings(root, library)
     if warnings:
@@ -1246,6 +1271,59 @@ def prompt_genre(folder, entries):
         print(f"    unrecognized: {choice!r}")
 
 
+def resolve_compilation_flags(library, root, dry_run, counts):
+    """Offer to drop compilation flags from single-artist albums.
+
+    The iTunes Store sets the "part of a compilation" flag (mp4 `cpil`,
+    id3 TCMP, vorbis COMPILATION) on soundtracks and single-artist
+    rarity collections, which is what files them under Compilations/ in
+    iTunes-style trees even though every track shares one albumartist.
+    Navidrome groups by albumartist and ignores the flag there, but
+    other tag-aware tools honor it and re-file the album. Each album
+    whose flagged tracks all agree on one non-Various albumartist is
+    offered per album; genuine Various Artists compilations (and albums
+    whose flagged tracks disagree on albumartist — an artist-cluster
+    problem, not a flag problem) are left alone.
+    """
+    by_folder = {}
+    for entry in library:
+        if not is_truthy_flag(entry["tags"].get("compilation")):
+            continue
+        aa = entry["tags"].get("albumartist")
+        if not aa or is_compilation_albumartist(aa):
+            continue
+        artist_dir, album_dir = get_artist_album_dirs(entry["path"], root)
+        folder = album_dir or artist_dir
+        if folder is None:
+            continue
+        by_folder.setdefault(folder, []).append(entry)
+
+    todo = []
+    for folder, entries in sorted(by_folder.items()):
+        albumartists = {e["tags"]["albumartist"] for e in entries}
+        if len(albumartists) == 1:
+            todo.append((folder, entries, albumartists.pop()))
+
+    if not todo:
+        return
+
+    print()
+    print(f"{BOLD}resolving compilation flags ({len(todo)}){RESET}")
+    for folder, entries, albumartist in todo:
+        album, _ = album_artist_from_entries(entries)
+        print()
+        print(f"  {BOLD}{folder}{RESET}")
+        print(f"  {DIM}{albumartist} — {album or '?'}{RESET}")
+        print(f"    {YELLOW}marked as a compilation, but all "
+              f"{len(entries)} flagged file(s) share one albumartist{RESET}")
+        answer = (input("    remove the compilation flag? [Y/n]: ")
+                  .strip().lower() or "y")
+        if answer not in ("y", "yes"):
+            continue
+        for e in entries:
+            remove_one(e, "compilation", dry_run, counts)
+
+
 def write_one(entry, updates, dry_run, counts):
     path = entry["path"]
     summary = ", ".join(f"{k}={v}" for k, v in updates.items())
@@ -1260,6 +1338,23 @@ def write_one(entry, updates, dry_run, counts):
         for k, v in updates.items():
             entry["tags"][k] = v
         print(f"    {GREEN}written{RESET} {path} → {summary}")
+        counts["written"] += 1
+    except Exception as e:
+        print(f"    {RED}[!] {path}: {e}{RESET}", file=sys.stderr)
+        counts["errors"] += 1
+
+
+def remove_one(entry, field, dry_run, counts):
+    path = entry["path"]
+    if dry_run:
+        print(f"    {DIM}(dry-run){RESET} {path} → remove {field}")
+        entry["tags"].pop(field, None)
+        counts["written"] += 1
+        return
+    try:
+        delete_tag(path, field)
+        entry["tags"].pop(field, None)
+        print(f"    {GREEN}removed{RESET} {field} from {path}")
         counts["written"] += 1
     except Exception as e:
         print(f"    {RED}[!] {path}: {e}{RESET}", file=sys.stderr)
@@ -2152,6 +2247,17 @@ def write_tags(path, changes):
     f.save()
 
 
+def delete_tag(path, field):
+    f = mutagen.File(path, easy=True)
+    if f is None or f.tags is None:
+        return
+    try:
+        del f.tags[field]
+    except KeyError:
+        return
+    f.save()
+
+
 def get_artist_album_dirs(path, root):
     """Return (artist_dir, album_dir) relative to the music root.
 
@@ -2244,6 +2350,12 @@ def is_compilation_albumartist(s):
     if norm == "va":
         return True
     return any(k in norm for k in COMPILATION_KEYWORDS)
+
+
+def is_truthy_flag(v):
+    """True for the spellings a set compilation flag takes across formats
+    ("1" from mp4/id3, "true"/"yes" seen in vorbis comments)."""
+    return str(v).strip().lower() in ("1", "true", "yes")
 
 
 def lucene_terms(s):
