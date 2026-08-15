@@ -4,6 +4,7 @@
 - [.] Set up shire as a router for cameras (Frigate + Home Assistant)
     - [x] Camera subnet on enp3s0 (eno1 stays on the LAN; dual wired NICs, no wifi needed)
     - [ ] Cable the Reolink PoE switch + cameras, then pin their IPs (Kea reservations)
+- [ ] Migrate blaixapps hand-managed secrets to sops-nix (shire is already done)
 - [ ] See TODO comments in code.
 
 Maybe:
