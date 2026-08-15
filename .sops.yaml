@@ -8,7 +8,8 @@
 keys:
   # update the shared secret entry below if adding new entries here
   - &template  REPLACE_WITH_HOSTS_AGE_PUBLIC_KEY
-  - &justin    REPLACE_WITH_PERSONAL_AGE_PUBLIC_KEY
+  - &justin    age1swfw2mncv9wkmszg7pe5fanwexha625ex29ztzjxp02sxwzw6ucq4g3jvy
+  - &shire     age13akzycmgvle66snk9tggaud0nede66zx8nr4w8nadu88l2wzcfds43tl3n
   - &pippinix  REPLACE_WITH_PIPPINIX_AGE_PUBLIC_KEY
   - &blaixapps REPLACE_WITH_BLAIXAPPS_AGE_PUBLIC_KEY
 
@@ -24,6 +25,12 @@ creation_rules:
       - age:
           - *justin
           - *blaixapps
+
+  - path_regex: secrets/shire\.yaml$
+    key_groups:
+      - age:
+          - *justin
+          - *shire
 
   # Secrets that must be readable by every host.
   - path_regex: secrets/shared\.yaml$

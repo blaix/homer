@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
   # ---------------------------------------------------------------------------
   #   Home camera stack: Frigate NVR + Home Assistant + Mosquitto, on an
@@ -12,6 +12,14 @@
   #   later as small config flips - see the "Deferred" notes at the bottom.
   #
   #   First-time machine setup (not declarative):
+  #     - Frigate UI (http://shire.local:8971): auth is ON by default. On the
+  #       first successful boot Frigate creates an `admin` user and logs a
+  #       one-time random password - find it with:
+  #         journalctl -u frigate | grep -i password
+  #       Log in as admin with that, then set your own password in the UI under
+  #       Settings -> Users. It persists in /var/lib/frigate/frigate.db (survives
+  #       restarts and is never re-logged). The UI is reachable by any device on
+  #       the LAN, not just over WireGuard, which is why auth is kept on.
   #     - Home Assistant: open http://shire.local:8123 and create the admin
   #       account (onboarding). Then add two integrations from the HA UI:
   #         * MQTT     -> broker 127.0.0.1, port 1883
@@ -20,8 +28,8 @@
   #     - HA companion app: install on the phone; on home WiFi it finds shire
   #       (http://shire.local:8123). Remotely, connect WireGuard and use
   #       http://10.100.0.1:8123.
-  #     - Camera RTSP password: once the cameras are configured, write it to
-  #       /etc/frigate/rtsp.env (see EnvironmentFile note below).
+  #     - Camera RTSP password: managed via sops (secrets/shire.yaml). Set the
+  #       same password on each camera's admin account when provisioning them.
   #     - Camera IPs: discover each camera's MAC and add a Kea reservation - see
   #       the markdown doc's "Assign a camera a fixed IP" section.
   # ---------------------------------------------------------------------------
@@ -98,8 +106,8 @@
   #
   # NOTE ON RTSP CREDENTIALS: the \${FRIGATE_RTSP_PASSWORD} below is escaped so
   # Nix leaves the literal env-var reference in config.yml; Frigate substitutes
-  # it at runtime from the EnvironmentFile set further down. This keeps the
-  # camera password out of the world-readable Nix store.
+  # it at runtime from the sops-rendered EnvironmentFile set further down. This
+  # keeps the camera password out of the world-readable Nix store.
   services.frigate = {
     enable = true;
     hostname = "shire.local";
@@ -144,20 +152,18 @@
     };
   };
 
-  # Camera RTSP password handling. Frigate does a hard ${...} substitution at
-  # startup and CRASH-LOOPS if FRIGATE_RTSP_PASSWORD is unset (KeyError), so we
-  # always provide a placeholder default via Environment= - that lets Frigate
-  # boot before any camera/credential exists (cameras just show offline). The
-  # optional EnvironmentFile (leading '-') overrides the placeholder once the
-  # real password is dropped in; systemd applies EnvironmentFile after
-  # Environment=, so the file wins when present, and the real password never
-  # lands in the world-readable Nix store. Create it when cameras are provisioned:
-  #   sudo install -Dm600 /dev/stdin /etc/frigate/rtsp.env <<<'FRIGATE_RTSP_PASSWORD=...'
-  # then: sudo systemctl restart frigate
-  systemd.services.frigate = {
-    environment.FRIGATE_RTSP_PASSWORD = "placeholder";
-    serviceConfig.EnvironmentFile = "-/etc/frigate/rtsp.env";
-  };
+  # Camera RTSP password comes from sops (secrets/shire.yaml, key
+  # frigate-rtsp-password; backed up in 1Password as "shire frigate camera rtsp").
+  # Frigate does a hard ${...} substitution on config.yml at startup, so we hand it
+  # the value as FRIGATE_RTSP_PASSWORD via a sops-rendered EnvironmentFile. Set the
+  # same password on each camera's admin account when provisioning them. The value
+  # never lands in the world-readable Nix store. (Build-time checkConfig has no sops,
+  # so it uses the preCheckConfig placeholder above.)
+  sops.secrets."frigate-rtsp-password" = {};
+  sops.templates."frigate-rtsp.env".content =
+    "FRIGATE_RTSP_PASSWORD=${config.sops.placeholder."frigate-rtsp-password"}";
+  systemd.services.frigate.serviceConfig.EnvironmentFile =
+    config.sops.templates."frigate-rtsp.env".path;
 
   # Serve the Frigate UI on a high port instead of the module's default 80, to
   # match the "one server per high port" convention. The module sets no explicit
@@ -201,7 +207,5 @@
   #   * Recording: record.enabled = true
   #       Need to determine storage strategy.
   #       ~150 GB/day for 2 cameras 24/7 - must not sit on the NVMe root.
-  #   * RTSP secret: optionally move /etc/frigate/rtsp.env into sops-nix once
-  #       that's bootstrapped for shire.
   # ---------------------------------------------------------------------------
 }

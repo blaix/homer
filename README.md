@@ -18,6 +18,107 @@ It's set up for myself but should be adaptable if you want to use this setup for
 * Update your system to the latest changes: `just switch [hostname]`
 * Deploy server with `just blaixapps-deploy`
 
+## Secrets and passwords
+
+Most of this repo is declarative, but some credentials can't live in git (it's a
+public repo, and the built config lands in the world-readable `/nix/store`). They're
+handled two ways:
+
+* **sops-nix** — encrypted secrets committed to the repo, decrypted per-host at
+  activation using the host's SSH key. See [`SECRETS.md`](/SECRETS.md). Wired into all
+  NixOS hosts; the bootstrap (personal age key from 1Password, registering a host as a
+  recipient) is the one manual part.
+* **Out-of-band** — a file created by hand on the machine (`chmod 600`), or an account
+  created through a service's own web UI. These are **not declarative**: they must be
+  redone on a from-scratch rebuild. Where a value is noted as being in **1Password**,
+  that's where I keep it.
+
+This section inventories every manual credential step, by host. It's the checklist for
+standing a machine back up from nothing.
+
+### Every NixOS host
+
+* `passwd justin` — set the user login password (as root, on first boot). _Not needed on
+  hosts that set `hashedPasswordFile` from sops (e.g. shire)._
+* sops-nix bootstrap, **only if the host needs secrets**: place my personal age key
+  from 1Password at `~/.config/sops/age/keys.txt`, then register the host as a recipient
+  in `.sops.yaml`. Full steps in [`SECRETS.md`](/SECRETS.md).
+
+### Every Mac
+
+* Import my GPG key from 1Password.
+
+### Torrent/Jellyfin Macs
+
+* qBittorrent Web UI **admin password** (in 1Password). Plus the qBittorrent Web UI and
+  Proton bind-address setup in
+  [`hosts/mac/proton-portforward.nix`](/hosts/mac/proton-portforward.nix).
+
+### shire (home media + cameras)
+
+_Managed by sops (`secrets/shire.yaml`), **no manual step** on a rebuild — listed here
+only so you know where they live:_
+
+* **Login password** — `users.users.justin.hashedPasswordFile` (replaces `passwd justin`).
+* **WireGuard server key** — `wg0-private-key`, backed up in 1Password as
+  `shire wireguard wg0 private key`.
+* **Frigate camera RTSP password** — `frigate-rtsp-password`, in 1Password as
+  `shire frigate camera rtsp`; rendered into Frigate's environment via a sops template.
+  The only related action is setting **that same password** on each camera's `admin`
+  account when you provision them.
+
+_Still manual (app accounts created through each service's own web UI / DB):_
+
+* `sudo smbpasswd -a justin` — Samba share password.
+* **Jellyfin** (`:8096`): create the admin account in the web UI; add the movie/show
+  libraries.
+* **Navidrome** (`:4533`): complete first-run admin setup in the web UI.
+* **Komga** (`:25600`): create the admin account in the web UI; add the comics library.
+* **its-mytabs** (`:47777`): create the admin account in the web UI.
+* **Home Assistant** (`:8123`): complete onboarding (create admin account), then add the
+  **MQTT** (`127.0.0.1:1883`) and **Frigate** (`http://127.0.0.1:5000`) integrations from
+  the HA UI.
+* **Frigate** (`:8971`): auth is on by default. On first successful boot Frigate logs a
+  one-time random `admin` password — find it with
+  `journalctl -u frigate | grep -i password`. Log in, then set your own password under
+  Settings → Users (it persists in `/var/lib/frigate/frigate.db`).
+
+_WireGuard peer devices connect to `home.blaix.com:51820` using configs kept in
+1Password / each device's WireGuard app (the server key itself is sops-managed, above)._
+
+### pippinix (decommissioned home server)
+
+* `sudo smbpasswd -a justin` — Samba share password.
+
+### blaixapps (remote server)
+
+These files must exist on the server and are not managed by nix _(TODO: migrate to
+[sops](/SECRETS.md))_:
+
+* **`/etc/grafana-admin-password`** — Grafana `admin` user password:
+  ```bash
+  echo 'your-secure-password' | sudo tee /etc/grafana-admin-password
+  sudo chown grafana:grafana /etc/grafana-admin-password
+  sudo chmod 0600 /etc/grafana-admin-password
+  ```
+* **`/etc/grafana-secret-key`** — key Grafana uses to sign cookies / encrypt data:
+  ```bash
+  nix run nixpkgs#openssl -- rand -hex 32 | sudo tee /etc/grafana-secret-key
+  sudo chown grafana:grafana /etc/grafana-secret-key
+  sudo chmod 0600 /etc/grafana-secret-key
+  ```
+* **`/etc/htpasswd`** — nginx basic-auth file fronting several of my personal apps:
+  ```bash
+  nix-shell -p apacheHttpd
+  sudo htpasswd -c /etc/htpasswd <username>
+  ```
+
+### Planned (not yet built)
+
+* **pippinix restic backups**: a restic repo password + Backblaze B2 env, both via sops
+  (`secrets/pippinix.yaml`), plus `sudo smbpasswd -a` for the `arwen`/`bilbo` SMB users.
+  See [`TODO-storage-backup-plan.md`](/TODO-storage-backup-plan.md).
+
 ## Initial setup
 
 ### Mac
@@ -170,25 +271,6 @@ Apps hosted on this server maintain their own flake for building the project, bu
 
 #### Server Secrets
 
-These files must exist on the server and are not managed by nix:
-(TODO: migrate to the new [sops setup](/SECRETS.md))
-
-- **`/etc/grafana-admin-password`** — Password for the Grafana `admin` user.
-  ```bash
-  echo 'your-secure-password' | sudo tee /etc/grafana-admin-password
-  sudo chown grafana:grafana /etc/grafana-admin-password
-  sudo chmod 0600 /etc/grafana-admin-password
-  ```
-
-- **`/etc/grafana-secret-key`** — Secret key used by Grafana to sign cookies and encrypt data.
-  ```bash
-  nix run nixpkgs#openssl -- rand -hex 32 | sudo tee /etc/grafana-secret-key
-  sudo chown grafana:grafana /etc/grafana-secret-key
-  sudo chmod 0600 /etc/grafana-secret-key
-  ```
-
-- **`/etc/htpasswd`** — nginx basic auth file used by several of my personal apps.
-  ```bash
-  nix-shell -p apacheHttpd
-  sudo htpasswd -c /etc/htpasswd <username>
-  ```
+See the blaixapps entry under [Secrets and passwords](#secrets-and-passwords) for the
+`/etc/grafana-admin-password`, `/etc/grafana-secret-key`, and `/etc/htpasswd` files this
+server needs.
