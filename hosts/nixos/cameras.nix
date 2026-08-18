@@ -104,10 +104,12 @@
   # high port. It only auto-enables hardware.coral.usb when an edgetpu detector is
   # configured - we configure none, so no Coral is required for this milestone.
   #
-  # NOTE ON RTSP CREDENTIALS: the \${FRIGATE_RTSP_PASSWORD} below is escaped so
-  # Nix leaves the literal env-var reference in config.yml; Frigate substitutes
-  # it at runtime from the sops-rendered EnvironmentFile set further down. This
-  # keeps the camera password out of the world-readable Nix store.
+  # NOTE ON RTSP CREDENTIALS: Frigate substitutes env vars with Python .format(),
+  # so the reference is {FRIGATE_RTSP_PASSWORD} - BRACES ONLY, no leading '$'. (A
+  # '$' is left literal by .format(), producing a wrong "$<password>".) Nix leaves
+  # {FRIGATE_RTSP_PASSWORD} untouched (no '$', so no Nix interpolation). Frigate
+  # fills it at runtime from the sops-rendered EnvironmentFile set further down,
+  # keeping the camera password out of the world-readable Nix store.
   services.frigate = {
     enable = true;
     hostname = "shire.local";
@@ -123,14 +125,14 @@
       # go2rtc restream (copy-through) of the main stream, for smooth live view
       # in the Frigate UI and in Home Assistant.
       go2rtc.streams = {
-        barn_stall_1 = [ "rtsp://admin:\${FRIGATE_RTSP_PASSWORD}@192.168.20.10:554/cam/realmonitor?channel=1&subtype=0" ];
-        barn_stall_2 = [ "rtsp://admin:\${FRIGATE_RTSP_PASSWORD}@192.168.20.11:554/cam/realmonitor?channel=1&subtype=0" ];
+        barn_stall_1 = [ "rtsp://admin:{FRIGATE_RTSP_PASSWORD}@192.168.20.10:554/cam/realmonitor?channel=1&subtype=0" ];
+        barn_stall_2 = [ "rtsp://admin:{FRIGATE_RTSP_PASSWORD}@192.168.20.11:554/cam/realmonitor?channel=1&subtype=0" ];
       };
       cameras = {
         barn_stall_1 = {
           ffmpeg.inputs = [
             {
-              path = "rtsp://admin:\${FRIGATE_RTSP_PASSWORD}@192.168.20.10:554/cam/realmonitor?channel=1&subtype=1";
+              path = "rtsp://admin:{FRIGATE_RTSP_PASSWORD}@192.168.20.10:554/cam/realmonitor?channel=1&subtype=1";
               roles = [ "detect" ];
             }
           ];
@@ -140,7 +142,7 @@
         barn_stall_2 = {
           ffmpeg.inputs = [
             {
-              path = "rtsp://admin:\${FRIGATE_RTSP_PASSWORD}@192.168.20.11:554/cam/realmonitor?channel=1&subtype=1";
+              path = "rtsp://admin:{FRIGATE_RTSP_PASSWORD}@192.168.20.11:554/cam/realmonitor?channel=1&subtype=1";
               roles = [ "detect" ];
             }
           ];
@@ -172,6 +174,27 @@
   services.nginx.virtualHosts."shire.local".listen = [
     { addr = "0.0.0.0"; port = 8971; } # Frigate's conventional authenticated port
   ];
+
+  # --- go2rtc restreamer (smooth live view) -----------------------------------
+  # The NixOS frigate module proxies WebRTC/MSE live view to go2rtc on
+  # 127.0.0.1:1984 and orders frigate `after go2rtc.service` - but it does NOT
+  # run go2rtc, so we must, or live view falls back to a ~0.1fps jsmpeg slideshow.
+  # Streams are named after the cameras so Frigate finds them (it queries
+  # /api/streams?src=<camera>). NOTE: go2rtc uses ${VAR} env syntax (with the '$',
+  # unlike Frigate's {VAR}); the password comes from the same sops-rendered
+  # EnvironmentFile. The \${...} below is escaped so Nix emits a literal
+  # ${FRIGATE_RTSP_PASSWORD} for go2rtc to substitute at runtime.
+  services.go2rtc = {
+    enable = true;
+    settings = {
+      api.listen = "127.0.0.1:1984";
+      streams = {
+        barn_stall_1 = "rtsp://admin:\${FRIGATE_RTSP_PASSWORD}@192.168.20.10:554/cam/realmonitor?channel=1&subtype=0";
+        barn_stall_2 = "rtsp://admin:\${FRIGATE_RTSP_PASSWORD}@192.168.20.11:554/cam/realmonitor?channel=1&subtype=0";
+      };
+    };
+  };
+  systemd.services.go2rtc.serviceConfig.EnvironmentFile = config.sops.templates."frigate-rtsp.env".path;
 
   # --- Home Assistant (stable, from pinned nixos-25.11) -----------------------
   services.home-assistant = {
