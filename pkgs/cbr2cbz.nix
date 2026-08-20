@@ -79,7 +79,12 @@ pkgs.writeShellApplication {
     skipped=0
 
     for src in "''${cbrs[@]}"; do
-      out="''${src%.[cC][bB][rR]}.cbz"
+      # Absolute paths so the `cd "$tmp"` in step 3 can't relocate the
+      # partial/output (a bare-filename invocation would otherwise make these
+      # relative and the zip would land inside the scratch dir).
+      src_dir="$(cd "$(dirname "$src")" && pwd)"
+      src_base="$(basename "$src")"
+      out="$src_dir/''${src_base%.[cC][bB][rR]}.cbz"
       echo "==> $src"
 
       if [ -e "$out" ] && [ "$force" -ne 1 ]; then
@@ -97,8 +102,7 @@ pkgs.writeShellApplication {
 
       # Keep scratch on the same filesystem as the source (avoids filling a
       # RAM-backed /tmp and lets the final move be a fast rename).
-      dir="$(dirname "$src")"
-      tmp="$(mktemp -d "$dir/.cbr2cbz.XXXXXX")"
+      tmp="$(mktemp -d "$src_dir/.cbr2cbz.XXXXXX")"
       partial="$out.partial"
 
       # 2. Extract.
