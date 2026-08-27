@@ -109,25 +109,13 @@
   services.navidrome = {
     enable = true;
     openFirewall = false;
+    plugins = [ pkgs.navidromePlugins.listenbrainz-daily-playlist ];
     settings = {
       MusicFolder = "/mnt/media/music";
       Address = "0.0.0.0";
       Port = 4533;
       Plugins = {
         Enabled = true;
-        Folder =
-          let
-            listenbrainz-daily-playlist = pkgs.fetchurl {
-              url = "https://github.com/kgarner7/navidrome-listenbrainz-daily-playlist/releases/download/v5.0.2/listenbrainz-daily-playlist.ndp";
-              hash = "sha256-P1lB18Gjqjg6p2atn+PqQRcM0U1jSCtGWqkZDNWQ3Pk=";
-            };
-          in
-          pkgs.linkFarm "navidrome-plugins" [
-            {
-              name = "listenbrainz-daily-playlist.ndp";
-              path = listenbrainz-daily-playlist;
-            }
-          ];
       };
     };
   };

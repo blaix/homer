@@ -9,9 +9,9 @@
     #apple-silicon.url = "github:nix-community/nixos-apple-silicon";
 
     # versioned
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
-    nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
-    home-manager.url = "github:nix-community/home-manager/release-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
+    nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
+    home-manager.url = "github:nix-community/home-manager/release-26.05";
 
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";

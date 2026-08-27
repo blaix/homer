@@ -99,6 +99,8 @@
   # Note: config is in nvim/* copied via xdgconfig below
   programs.neovim = {
     enable = true;
+    withRuby = true;
+    withPython3 = true;
     plugins = with pkgs.vimPlugins; [
       nvim-tree-lua
       nvim-lspconfig
