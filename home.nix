@@ -89,7 +89,6 @@
       ".DS_Store"
       ".claude*"
       ".direnv"
-      ".envrc"
     ];
     hooks = {
       pre-commit = ./git/hooks/pre-commit.sh;
