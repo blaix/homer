@@ -83,7 +83,7 @@
   # UDP 7359 is Jellyfin client auto-discovery.
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 3000 8000 8080 8096 8100 4533 25600 47777 ];
+    allowedTCPPorts = [ 22 3000 5150 8000 8080 8096 8100 4533 25600 47777 ];
     allowedUDPPorts = [ 51820 7359 ];
     trustedInterfaces = [ "wg0" ];
   };
