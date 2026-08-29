@@ -197,6 +197,8 @@
       localgren = "GREN_BIN=~/projects/gren/compiler/gren node ~/projects/gren/compiler/app";
       blaixgren = "GREN_BIN=~/projects/gren/compiler-blaix/gren node ~/projects/gren/compiler-blaix/cli.js";
       maingren = "nix shell nixpkgs#nodejs_20 github:gren-lang/nix/main --command gren";
+      # nix aliases
+      nd = "nix develop -c zsh";
     };
     initContent = ''
       # https://github.com/jeffreytse/zsh-vi-mode#nix
