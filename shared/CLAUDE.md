@@ -103,7 +103,6 @@ My Gren coding preferences:
 * Import Html as H
 * Import Html.Attributes as A
 * Forms should be actual forms using onSubmit, instead of an onClick on the submit button.
-* Prefer past-tense verbs for message names. E.g. `InputUpdated` instead of `UpdateInput`
 * Format tests so `<|` and `\_ ->` are on the same line. E.g. `test "my test" <| \_ ->`
 
 ## Nix
