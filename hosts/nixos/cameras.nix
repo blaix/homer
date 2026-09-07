@@ -1,4 +1,38 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
+
+let
+  # ---------------------------------------------------------------------------
+  #   Adding a camera:
+  #
+  #     1. Plug it into a PoE port
+  #     2. run:  provision-camera <ip>
+  #     2. Add a line here, then `just switch shire`.
+  #
+  #   Keep addresses below .100 - see the provisioning note on enp3s0 below.
+  # ---------------------------------------------------------------------------
+  cameras = {
+    barn_stall_1 = "192.168.20.10";
+    barn_stall_2 = "192.168.20.11";
+  };
+
+  # Amcrest/Dahua RTSP URL. subtype 0 = main stream (2960x1668 here), used for
+  # live view; subtype 1 = substream (704x480), used for Frigate's detect role.
+  #
+  # NOTE ON RTSP CREDENTIALS: Frigate substitutes env vars with Python .format(),
+  # so the reference is {FRIGATE_RTSP_PASSWORD} - BRACES ONLY, no leading '$'. (A
+  # '$' is left literal by .format(), producing a wrong "$<password>".) Nix leaves
+  # {FRIGATE_RTSP_PASSWORD} untouched (no '$', so no Nix interpolation). Frigate
+  # fills it at runtime from the sops-rendered EnvironmentFile set further down,
+  # keeping the camera password out of the world-readable Nix store.
+  rtspFrigate = ip: subtype:
+    "rtsp://admin:{FRIGATE_RTSP_PASSWORD}@${ip}:554/cam/realmonitor?channel=1&subtype=${toString subtype}";
+
+  # Same URL for the standalone go2rtc service, which uses ${VAR} env syntax
+  # (with the '$', unlike Frigate's {VAR}) and reads the same EnvironmentFile.
+  # The \${...} is escaped so Nix emits a literal ${FRIGATE_RTSP_PASSWORD}.
+  rtspGo2rtc = ip:
+    "rtsp://admin:\${FRIGATE_RTSP_PASSWORD}@${ip}:554/cam/realmonitor?channel=1&subtype=0";
+in
 {
   # ---------------------------------------------------------------------------
   #   Home camera stack: Frigate NVR + Home Assistant + Mosquitto, on an
@@ -28,20 +62,27 @@
   #     - HA companion app: install on the phone; on home WiFi it finds shire
   #       (http://shire.local:8123). Remotely, connect WireGuard and use
   #       http://10.100.0.1:8123.
-  #     - Camera RTSP password: managed via sops (secrets/shire.yaml). Set the
-  #       same password on each camera's admin account when provisioning them.
-  #     - Camera IPs: discover each camera's MAC and add a Kea reservation - see
-  #       the markdown doc's "Assign a camera a fixed IP" section.
+  #     - Cameras: run `provision-camera <ip>` on shire (see pkgs/provision-camera.nix),
+  #       then add a line to the `cameras` attrset at the top of this file. The
+  #       script sets the camera's admin password from sops and pins its static
+  #       IP over the HTTP CGI API - no camera web UI needed.
   # ---------------------------------------------------------------------------
 
   # --- Camera subnet on the second NIC (enp3s0 -> Reolink PoE switch) ---------
   #
   # eno1 stays on the LAN (NetworkManager/DHCP, 192.168.7.x). enp3s0 becomes the
   # gateway for a dedicated camera subnet. NetworkManager must leave it alone so
-  # the static address below sticks.
+  # the static addresses below stick.
   networking.networkmanager.unmanaged = [ "interface-name:enp3s0" ];
   networking.interfaces.enp3s0.ipv4.addresses = [
     { address = "192.168.20.1"; prefixLength = 24; }
+    # Provisioning address. A factory-reset Amcrest/Dahua camera tries DHCP,
+    # finds no server on this segment (we deliberately run none - see below),
+    # and falls back to a hardcoded 192.168.1.108. This second address is how
+    # shire reaches a brand-new camera to configure it; `provision-camera` uses
+    # it, and it is why cameras get addresses below .100 - so a camera being
+    # provisioned can never collide with one already in service.
+    { address = "192.168.1.2"; prefixLength = 24; }
   ];
 
   # Cameras have no internet path: shire never forwards their traffic. This is
@@ -50,35 +91,18 @@
   # explicit drop for saddr 192.168.20.0/24 in networking.firewall.extraForwardRules.
   boot.kernel.sysctl."net.ipv4.ip_forward" = 0;
 
-  # DHCP for the camera subnet. Cameras stay on DHCP (their factory default);
-  # each gets a fixed IP via a MAC reservation below. See the markdown doc for
-  # how to discover a camera's MAC and add its reservation.
-  services.kea.dhcp4 = {
-    enable = true;
-    settings = {
-      interfaces-config.interfaces = [ "enp3s0" ];
-      lease-database = {
-        type = "memfile";
-        persist = true;
-        name = "/var/lib/kea/dhcp4.leases";
-      };
-      subnet4 = [
-        {
-          id = 1;
-          subnet = "192.168.20.0/24";
-          pools = [ { pool = "192.168.20.100 - 192.168.20.200"; } ];
-          # No routers option on purpose: cameras get no default gateway, so
-          # they cannot even attempt to route out. Frigate reaches them
-          # on-subnet from 192.168.20.1 regardless.
-          reservations = [
-            # Fill in once each camera's MAC is known (see markdown doc):
-            # { hw-address = "aa:bb:cc:dd:ee:10"; ip-address = "192.168.20.10"; }
-            # { hw-address = "aa:bb:cc:dd:ee:11"; ip-address = "192.168.20.11"; }
-          ];
-        }
-      ];
-    };
-  };
+  # NO DHCP SERVER ON THIS SEGMENT, on purpose. Cameras get a static address
+  # written into their own NVRAM by `provision-camera`. A DHCP server here was
+  # tried and removed, for two reasons worth remembering:
+  #   * It bought nothing. Provisioning a new camera needs the 192.168.1.108
+  #     fallback path regardless, and once a camera is reachable there it is
+  #     simpler to just set its address than to discover its MAC, write a
+  #     reservation, redeploy, and reboot it.
+  #   * These cameras would not take a lease anyway. Kea ACKed every request and
+  #     the camera looped on DHCPREQUEST forever, never binding - they appear to
+  #     want a `routers` option, which this subnet deliberately does not offer.
+  # Running no DHCP server also makes the 192.168.1.108 fallback deterministic
+  # rather than a race, which is what makes provisioning repeatable.
 
   # --- Mosquitto (MQTT) -------------------------------------------------------
   #
@@ -103,13 +127,6 @@
   # so it's reachable at http://shire.local:8971 - keeping every server on its own
   # high port. It only auto-enables hardware.coral.usb when an edgetpu detector is
   # configured - we configure none, so no Coral is required for this milestone.
-  #
-  # NOTE ON RTSP CREDENTIALS: Frigate substitutes env vars with Python .format(),
-  # so the reference is {FRIGATE_RTSP_PASSWORD} - BRACES ONLY, no leading '$'. (A
-  # '$' is left literal by .format(), producing a wrong "$<password>".) Nix leaves
-  # {FRIGATE_RTSP_PASSWORD} untouched (no '$', so no Nix interpolation). Frigate
-  # fills it at runtime from the sops-rendered EnvironmentFile set further down,
-  # keeping the camera password out of the world-readable Nix store.
   services.frigate = {
     enable = true;
     hostname = "shire.local";
@@ -124,32 +141,17 @@
       };
       # go2rtc restream (copy-through) of the main stream, for smooth live view
       # in the Frigate UI and in Home Assistant.
-      go2rtc.streams = {
-        barn_stall_1 = [ "rtsp://admin:{FRIGATE_RTSP_PASSWORD}@192.168.20.10:554/cam/realmonitor?channel=1&subtype=0" ];
-        barn_stall_2 = [ "rtsp://admin:{FRIGATE_RTSP_PASSWORD}@192.168.20.11:554/cam/realmonitor?channel=1&subtype=0" ];
-      };
-      cameras = {
-        barn_stall_1 = {
-          ffmpeg.inputs = [
-            {
-              path = "rtsp://admin:{FRIGATE_RTSP_PASSWORD}@192.168.20.10:554/cam/realmonitor?channel=1&subtype=1";
-              roles = [ "detect" ];
-            }
-          ];
-          detect.enabled = false; # no object detection yet (no Coral required)
-          # Live view uses the go2rtc stream of the same name (barn_stall_1) automatically.
-        };
-        barn_stall_2 = {
-          ffmpeg.inputs = [
-            {
-              path = "rtsp://admin:{FRIGATE_RTSP_PASSWORD}@192.168.20.11:554/cam/realmonitor?channel=1&subtype=1";
-              roles = [ "detect" ];
-            }
-          ];
-          detect.enabled = false;
-          # Live view uses the go2rtc stream of the same name (barn_stall_2) automatically.
-        };
-      };
+      go2rtc.streams = lib.mapAttrs (_: ip: [ (rtspFrigate ip 0) ]) cameras;
+      # Live view uses the go2rtc stream of the same name automatically.
+      cameras = lib.mapAttrs (_: ip: {
+        ffmpeg.inputs = [
+          {
+            path = rtspFrigate ip 1;
+            roles = [ "detect" ];
+          }
+        ];
+        detect.enabled = false; # no object detection yet (no Coral required)
+      }) cameras;
       record.enabled = false; # no recording yet -> no storage concern
     };
   };
@@ -157,10 +159,10 @@
   # Camera RTSP password comes from sops (secrets/shire.yaml, key
   # frigate-rtsp-password; backed up in 1Password as "shire frigate camera rtsp").
   # Frigate does a hard ${...} substitution on config.yml at startup, so we hand it
-  # the value as FRIGATE_RTSP_PASSWORD via a sops-rendered EnvironmentFile. Set the
-  # same password on each camera's admin account when provisioning them. The value
-  # never lands in the world-readable Nix store. (Build-time checkConfig has no sops,
-  # so it uses the preCheckConfig placeholder above.)
+  # the value as FRIGATE_RTSP_PASSWORD via a sops-rendered EnvironmentFile. The same
+  # secret is what `provision-camera` writes onto each camera's admin account. The
+  # value never lands in the world-readable Nix store. (Build-time checkConfig has
+  # no sops, so it uses the preCheckConfig placeholder above.)
   sops.secrets."frigate-rtsp-password" = {};
   sops.templates."frigate-rtsp.env".content =
     "FRIGATE_RTSP_PASSWORD=${config.sops.placeholder."frigate-rtsp-password"}";
@@ -180,18 +182,12 @@
   # 127.0.0.1:1984 and orders frigate `after go2rtc.service` - but it does NOT
   # run go2rtc, so we must, or live view falls back to a ~0.1fps jsmpeg slideshow.
   # Streams are named after the cameras so Frigate finds them (it queries
-  # /api/streams?src=<camera>). NOTE: go2rtc uses ${VAR} env syntax (with the '$',
-  # unlike Frigate's {VAR}); the password comes from the same sops-rendered
-  # EnvironmentFile. The \${...} below is escaped so Nix emits a literal
-  # ${FRIGATE_RTSP_PASSWORD} for go2rtc to substitute at runtime.
+  # /api/streams?src=<camera>).
   services.go2rtc = {
     enable = true;
     settings = {
       api.listen = "127.0.0.1:1984";
-      streams = {
-        barn_stall_1 = "rtsp://admin:\${FRIGATE_RTSP_PASSWORD}@192.168.20.10:554/cam/realmonitor?channel=1&subtype=0";
-        barn_stall_2 = "rtsp://admin:\${FRIGATE_RTSP_PASSWORD}@192.168.20.11:554/cam/realmonitor?channel=1&subtype=0";
-      };
+      streams = lib.mapAttrs (_: ip: rtspGo2rtc ip) cameras;
     };
   };
   systemd.services.go2rtc.serviceConfig.EnvironmentFile = config.sops.templates."frigate-rtsp.env".path;
@@ -214,10 +210,10 @@
 
   # --- Firewall (merges with the list in shire.nix) ---------------------------
   # Frigate UI (8971) and Home Assistant (8123) on the LAN; wg0 is already trusted,
-  # so both are reachable over WireGuard without extra rules. Kea DHCP (UDP 67)
-  # is opened on the camera interface only.
+  # so both are reachable over WireGuard without extra rules. Nothing needs to be
+  # opened on the camera interface: shire only ever makes outbound connections to
+  # the cameras (RTSP and the HTTP CGI API), never accepts inbound from them.
   networking.firewall.allowedTCPPorts = [ 8971 8123 ];
-  networking.firewall.interfaces.enp3s0.allowedUDPPorts = [ 67 ];
 
   # ---------------------------------------------------------------------------
   #   Deferred (documented, not enabled now):

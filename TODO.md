@@ -3,7 +3,8 @@
 - [X] Remove duplication under the various hosts/ files. Especially with my user setup.
 - [.] Set up shire as a router for cameras (Frigate + Home Assistant)
     - [x] Camera subnet on enp3s0 (eno1 stays on the LAN; dual wired NICs, no wifi needed)
-    - [ ] Cable the Reolink PoE switch + cameras, then pin their IPs (Kea reservations)
+    - [x] Cable the Reolink PoE switch + both barn cameras; static IPs set by `provision-camera`
+    - [ ] Object detection (Coral USB TPU) and recording - see Deferred in hosts/nixos/cameras.nix
 - [ ] Migrate blaixapps hand-managed secrets to sops-nix (shire is already done)
 - [ ] See TODO comments in code.
 

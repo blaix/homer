@@ -108,6 +108,8 @@
     (pkgs.callPackage ../../pkgs/cbr2cbz.nix {})
     # sort-media: rename/move movie & tv files into a Jellyfin-friendly layout
     (pkgs.callPackage ../../pkgs/sort-media.nix {})
+    # provision-camera: set up a new PoE camera for Frigate (see cameras.nix)
+    (pkgs.callPackage ../../pkgs/provision-camera.nix {})
   ];
 
   # Jellyfin TV/movies server. Reachable on the LAN (8096). UDP 7359 is opened
