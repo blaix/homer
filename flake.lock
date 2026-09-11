@@ -265,6 +265,27 @@
         "type": "github"
       }
     },
+    "gren-format": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1789123441,
+        "narHash": "sha256-xreTCMtH2ce8MfcoKf48oOSxu3UrdbTTlkd1Pp69/wA=",
+        "owner": "blaix",
+        "repo": "gren-format",
+        "rev": "e86064895f5156679e42feb08ee082c547ceac36",
+        "type": "github"
+      },
+      "original": {
+        "owner": "blaix",
+        "ref": "flake-fix",
+        "repo": "gren-format",
+        "type": "github"
+      }
+    },
     "growth": {
       "inputs": {
         "nixpkgs": [
@@ -648,6 +669,7 @@
         "claude-code": "claude-code",
         "disko": "disko",
         "doitanyway": "doitanyway",
+        "gren-format": "gren-format",
         "growth": "growth",
         "home-manager": "home-manager",
         "komorebi": "komorebi",

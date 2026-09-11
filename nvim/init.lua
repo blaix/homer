@@ -195,6 +195,38 @@ autocmd("FileType", {
   end
 })
 
+-- Format on save with gren-format (https://github.com/gilramir/gren-format).
+-- gren-format only rewrites files in place, so feed it a copy of the buffer and
+-- read `--show` back in. That keeps unwritten buffers, undo history, and the
+-- cursor intact, which reloading the file after the write would not.
+autocmd("BufWritePre", {
+  pattern = "*.gren",
+  callback = function(args)
+    if vim.fn.executable("gren-format") == 0 then
+      return
+    end
+
+    local tmp = vim.fn.tempname() .. ".gren"
+    vim.fn.writefile(vim.api.nvim_buf_get_lines(args.buf, 0, -1, false), tmp)
+    local result = vim.system({ "gren-format", "--show", tmp }, { text = true }):wait()
+    vim.fn.delete(tmp)
+
+    -- Non-zero means it wouldn't parse (or formatting hit a bug), in which case
+    -- it prints nothing. Save what was typed and let the lsp report the error.
+    if result.code ~= 0 then
+      return
+    end
+
+    local lines = vim.split(result.stdout, "\n")
+    -- trailing newline from the formatter, not an empty last line
+    if lines[#lines] == "" then
+      table.remove(lines)
+    end
+
+    vim.api.nvim_buf_set_lines(args.buf, 0, -1, false, lines)
+  end
+})
+
 --
 -- html
 --

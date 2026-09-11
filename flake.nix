@@ -64,6 +64,12 @@
     claude-code.url = "github:sadjow/claude-code-nix";
     claude-code.inputs.nixpkgs.follows = "nixpkgs";
 
+    # gren-format: code formatter for gren
+    # using my fork until the flake fix is merged upstream:
+    # https://github.com/gilramir/gren-format
+    gren-format.url = "github:blaix/gren-format/flake-fix";
+    gren-format.inputs.nixpkgs.follows = "nixpkgs";
+
     # komorebi tiling window manager (for macs)
     # see hosts/mac/common for pkg install and settings
     komorebi.url = "github:LGUG2Z/komorebi-for-mac";

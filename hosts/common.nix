@@ -57,6 +57,7 @@ in
     gnumake
     gnupg
     gren
+    inputs.gren-format.packages.${stdenv.hostPlatform.system}.default
     (callPackage ../pkgs/gren-language-server.nix {})
     htop
     just
