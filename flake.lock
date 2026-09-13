@@ -272,16 +272,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1789123441,
+        "lastModified": 1789128458,
         "narHash": "sha256-xreTCMtH2ce8MfcoKf48oOSxu3UrdbTTlkd1Pp69/wA=",
-        "owner": "blaix",
+        "owner": "gilramir",
         "repo": "gren-format",
-        "rev": "e86064895f5156679e42feb08ee082c547ceac36",
+        "rev": "0c490b0bf13703234d0c7d3713383985f09d6740",
         "type": "github"
       },
       "original": {
-        "owner": "blaix",
-        "ref": "flake-fix",
+        "owner": "gilramir",
         "repo": "gren-format",
         "type": "github"
       }

@@ -65,9 +65,7 @@
     claude-code.inputs.nixpkgs.follows = "nixpkgs";
 
     # gren-format: code formatter for gren
-    # using my fork until the flake fix is merged upstream:
-    # https://github.com/gilramir/gren-format
-    gren-format.url = "github:blaix/gren-format/flake-fix";
+    gren-format.url = "github:gilramir/gren-format";
     gren-format.inputs.nixpkgs.follows = "nixpkgs";
 
     # komorebi tiling window manager (for macs)
