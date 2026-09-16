@@ -78,10 +78,9 @@ _Still manual (app accounts created through each service's own web UI / DB):_
 * **Home Assistant** (`:8123`): complete onboarding (create admin account), then add the
   **MQTT** (`127.0.0.1:1883`) and **Frigate** (`http://127.0.0.1:5000`) integrations from
   the HA UI.
-* **Frigate** (`:8971`): auth is on by default. On first successful boot Frigate logs a
-  one-time random `admin` password — find it with
-  `journalctl -u frigate | grep -i password`. Log in, then set your own password under
-  Settings → Users (it persists in `/var/lib/frigate/frigate.db`).
+* **Frigate** (`:8971`): nothing to set up — it has no login. The UI listens only on
+  shire's WireGuard address, so connect the VPN and open <http://10.100.0.1:8971>
+  (it is not reachable from the LAN, and `shire.local` won't resolve over the tunnel).
 
 _WireGuard peer devices connect to `home.blaix.com:51820` using configs kept in
 1Password / each device's WireGuard app (the server key itself is sops-managed, above)._

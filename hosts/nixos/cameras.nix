@@ -46,14 +46,9 @@ in
   #   later as small config flips - see the "Deferred" notes at the bottom.
   #
   #   First-time machine setup (not declarative):
-  #     - Frigate UI (http://shire.local:8971): auth is ON by default. On the
-  #       first successful boot Frigate creates an `admin` user and logs a
-  #       one-time random password - find it with:
-  #         journalctl -u frigate | grep -i password
-  #       Log in as admin with that, then set your own password in the UI under
-  #       Settings -> Users. It persists in /var/lib/frigate/frigate.db (survives
-  #       restarts and is never re-logged). The UI is reachable by any device on
-  #       the LAN, not just over WireGuard, which is why auth is kept on.
+  #     - Frigate UI: nothing to do. It has no login, because it is reachable
+  #       only over WireGuard - see the "VPN-only, no login" note further down.
+  #       Connect the VPN and open http://10.100.0.1:8971.
   #     - Home Assistant: open http://shire.local:8123 and create the admin
   #       account (onboarding). Then add two integrations from the HA UI:
   #         * MQTT     -> broker 127.0.0.1, port 1883
@@ -123,10 +118,11 @@ in
   # --- Frigate NVR (live only) ------------------------------------------------
   #
   # The module force-enables services.nginx to serve the UI vhost. We move its
-  # public listen off the default port 80 to 8971 (see the nginx override below),
-  # so it's reachable at http://shire.local:8971 - keeping every server on its own
-  # high port. It only auto-enables hardware.coral.usb when an edgetpu detector is
-  # configured - we configure none, so no Coral is required for this milestone.
+  # public listen off the default port 80 to the WireGuard address on port 8971
+  # (see the nginx override below), so it's reachable at http://10.100.0.1:8971 -
+  # keeping every server on its own high port. It only auto-enables
+  # hardware.coral.usb when an edgetpu detector is configured - we configure none,
+  # so no Coral is required for this milestone.
   services.frigate = {
     enable = true;
     hostname = "shire.local";
@@ -135,6 +131,20 @@ in
     # the env var a placeholder value for validation.
     preCheckConfig = "export FRIGATE_RTSP_PASSWORD=placeholder";
     settings = {
+      # VPN-ONLY, NO LOGIN. The UI is bound to the WireGuard address (nginx
+      # override below) and is not in the firewall's LAN port list, so the only
+      # way in is over the tunnel - which is already authenticated by WireGuard.
+      # A second password in front of that bought nothing, so auth is off and
+      # there is no login page.
+      #
+      # auth.enabled = false alone would leave every request in the "viewer"
+      # role (read-only: no Settings, no config editor, no user management),
+      # because Frigate's /auth endpoint falls back to proxy.default_role when
+      # no user is authenticated - and that defaults to "viewer". Setting it to
+      # "admin" is what makes the unauthenticated session a full admin one.
+      auth.enabled = false;
+      proxy.default_role = "admin";
+
       mqtt = {
         enabled = true;
         host = "127.0.0.1";
@@ -172,10 +182,26 @@ in
   # Serve the Frigate UI on a high port instead of the module's default 80, to
   # match the "one server per high port" convention. The module sets no explicit
   # public listen on this vhost, so this override doesn't fight it; Frigate's
-  # internal 127.0.0.1:5000 listener is injected separately and is untouched.
+  # internal 127.0.0.1:5000 listener is injected separately and is untouched
+  # (Home Assistant's Frigate integration talks to it there).
+  #
+  # Binding to 10.100.0.1 - shire's WireGuard address - rather than 0.0.0.0 is
+  # what makes the UI VPN-only: it is not listening on the LAN at all, so this
+  # holds even if the firewall is ever misconfigured. It also means mDNS won't
+  # help you (shire.local resolves to the LAN address), so the URL is the bare
+  # IP: http://10.100.0.1:8971. This vhost is the only server block on that
+  # address:port, so nginx serves it regardless of the Host header.
   services.nginx.virtualHosts."shire.local".listen = [
-    { addr = "0.0.0.0"; port = 8971; } # Frigate's conventional authenticated port
+    { addr = "10.100.0.1"; port = 8971; } # Frigate's conventional UI port
   ];
+
+  # nginx binds a specific address, so wg0 must exist before it starts or the
+  # bind fails. (nginx has Restart=always and would eventually recover, but only
+  # after up to 10s of downtime per attempt.)
+  systemd.services.nginx = {
+    after = [ "wireguard-wg0.service" ];
+    wants = [ "wireguard-wg0.service" ];
+  };
 
   # --- go2rtc restreamer (smooth live view) -----------------------------------
   # The NixOS frigate module proxies WebRTC/MSE live view to go2rtc on
@@ -209,11 +235,13 @@ in
   };
 
   # --- Firewall (merges with the list in shire.nix) ---------------------------
-  # Frigate UI (8971) and Home Assistant (8123) on the LAN; wg0 is already trusted,
-  # so both are reachable over WireGuard without extra rules. Nothing needs to be
-  # opened on the camera interface: shire only ever makes outbound connections to
-  # the cameras (RTSP and the HTTP CGI API), never accepts inbound from them.
-  networking.firewall.allowedTCPPorts = [ 8971 8123 ];
+  # Home Assistant (8123) on the LAN. The Frigate UI is deliberately NOT here:
+  # it listens only on the WireGuard address (see the nginx override above), and
+  # wg0 is a trusted interface in shire.nix, so it needs no port opened - which
+  # is exactly what keeps it off the LAN. Nothing needs to be opened on the
+  # camera interface either: shire only ever makes outbound connections to the
+  # cameras (RTSP and the HTTP CGI API), never accepts inbound from them.
+  networking.firewall.allowedTCPPorts = [ 8123 ];
 
   # ---------------------------------------------------------------------------
   #   Deferred (documented, not enabled now):
