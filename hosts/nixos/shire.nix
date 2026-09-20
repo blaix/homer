@@ -75,6 +75,10 @@
         publicKey = "MAqyNsojFlFxD0lbRzcT9d8/ZbeD7TyxWmOUR6EtNUk=";
         allowedIPs = [ "10.100.0.5/32" ];
       }
+      { # kari iphone
+        publicKey = "nDNWPdCxkAo5eJ9sC+4vrbubr+rxfV+3cu7HPoasFH8=";
+        allowedIPs = [ "10.100.0.6/32" ];
+      }
     ];
   };
 
