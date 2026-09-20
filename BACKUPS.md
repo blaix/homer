@@ -3,7 +3,7 @@
 ## TODO
 
 - [ ] mv anything that's not pure media (e.g. home movies) out of /mnt/media
-    - [ ] maybe /mnt/storage pointed at the 1TB usb drive plugged into shire
+    - [ ] maybe /mnt/storage pointed at the 500GB with the 1TB drive as a restic backup?
 - [ ] backblaze b2 remote backup
     - [ ] pre-encrypted by restic - store private key in 1Pass
     - [ ] /mnt/media
