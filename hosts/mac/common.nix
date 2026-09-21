@@ -41,6 +41,10 @@
   # nix packages specific to macs
   environment.systemPackages = [
 
+    # scriptable mac VMs for automated UI tests that don't steal focus on my main machine
+    # (the cirruslabs/cli/tart brew formula is broken with current homebrew)
+    pkgs.tart
+
     # Promising tiling window manager for mac.
     # Seems a little too early-stage for daily use.
     # If I do end up using it, some things I will need to do:
