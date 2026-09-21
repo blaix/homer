@@ -62,6 +62,7 @@
     };
     brews = [
       "git-gui" # Bring back gitk: https://www.bstefanski.com/blog/gitk-on-macos
+      "muter-mutation-testing/formulae/muter" # mutation testing for my swift apps
     ];
     # Find casks at https://formulae.brew.sh/cask/
     casks = [
