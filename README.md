@@ -70,6 +70,12 @@ only so you know where they live:_
 _Still manual (app accounts created through each service's own web UI / DB):_
 
 * `sudo smbpasswd -a justin` — Samba share password.
+* `sudo chown justin:justin /mnt/storage` — one-time, after formatting the storage
+  drive. A fresh ext4 root is owned by root, and the `nofail` mount is not ordered
+  before `systemd-tmpfiles-setup`, so the tmpfiles rule cannot be relied on to fix
+  it. ext4 keeps the ownership on the drive, so this only needs doing once per
+  reformat. Without it the SMB share is read-only in practice (`force user = justin`
+  has no write permission at the share root).
 * **Jellyfin** (`:8096`): create the admin account in the web UI; add the movie/show
   libraries.
 * **Navidrome** (`:4533`): complete first-run admin setup in the web UI.

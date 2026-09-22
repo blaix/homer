@@ -178,6 +178,15 @@
     options = [ "nofail" "noatime" "x-systemd.device-timeout=10s" ];
   };
 
+  # General file storage on the 1 TB USB
+  # drive (whole-disk ext4, label "storage")
+  fileSystems."/mnt/storage" = {
+    device = "/dev/disk/by-label/storage";
+    fsType = "ext4";
+    # nofail = server still boots if the drive is unplugged.
+    options = [ "nofail" "noatime" "x-systemd.device-timeout=10s" ];
+  };
+
   # Services read their libraries from this mount, so start them only after it
   # is mounted. Otherwise they capture a pre-mount namespace and see an empty
   # /mnt/media.
@@ -185,6 +194,11 @@
   systemd.services.jellyfin  = { after = [ "mnt-media.mount" ]; requires = [ "mnt-media.mount" ]; };
   systemd.services.komga     = { after = [ "mnt-media.mount" ]; requires = [ "mnt-media.mount" ]; };
   systemd.services.caddy     = { after = [ "mnt-media.mount" ]; requires = [ "mnt-media.mount" ]; };
+
+  # Samba only needs the ordering, not the dependency: "requires" here would
+  # tear down smbd (and with it the media share) whenever the storage drive is
+  # unplugged, which is exactly what nofail above exists to avoid.
+  systemd.services.samba-smbd = { after = [ "mnt-storage.mount" ]; };
 
   # The whole media drive is owned by justin and world-readable: the services
   # read as "other" and never write here. Content is added over ssh as justin.
@@ -196,6 +210,12 @@
     "d /mnt/media/tv       0755 justin justin -"
     "d /mnt/media/comics   0755 justin justin -"
     "d /mnt/media/podcasts 0755 justin justin -"
+    # Storage drive, same ownership scheme as the media drive above. Note this
+    # rule does NOT fix a freshly formatted drive: nofail mounts are not ordered
+    # before systemd-tmpfiles-setup, so the mount can land on top afterwards and
+    # re-expose the root-owned ext4 root. The one-time `chown justin:justin
+    # /mnt/storage` after mkfs is in the README checklist; ext4 persists it.
+    "d /mnt/storage        0755 justin justin -"
     # its-mytabs container state (rootful podman, so root-owned).
     "d /var/lib/its-mytabs 0755 root root -"
   ];
@@ -242,6 +262,19 @@
       # newly added content.
       media = {
         "path" = "/mnt/media";
+        "browseable" = "yes";
+        "read only" = "no";
+        "guest ok" = "no";
+        "valid users" = "justin";
+        "force user" = "justin";
+        "create mask" = "0644";
+        "directory mask" = "0755";
+      };
+      # General file storage, shared the same way as the media drive. Reachable
+      # on the LAN as smb://shire.local and over WireGuard as smb://10.100.0.1
+      # (mDNS does not cross the tunnel, so remote clients need the VPN IP).
+      storage = {
+        "path" = "/mnt/storage";
         "browseable" = "yes";
         "read only" = "no";
         "guest ok" = "no";
