@@ -28,11 +28,11 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1790096491,
-        "narHash": "sha256-zeY26igEw0G1GnVe1fA8pa/+q7mxanzCUV91GUTedzk=",
+        "lastModified": 1790193712,
+        "narHash": "sha256-f9ri1oARsL50D9mowaBGx2mmcbekvqRoxb9p8owXrVg=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "7e5f1c52ca206b2a3a535ec0e8f89bd1ae5f1afa",
+        "rev": "a4ada6cadb755b6fb9f225fe77d5b8211d0d969a",
         "type": "github"
       },
       "original": {
@@ -64,11 +64,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790162083,
-        "narHash": "sha256-9HIPOFxvre0oU0s0Ba/xb+fT1Bvd9pLv9zvPRiEqE00=",
+        "lastModified": 1790206435,
+        "narHash": "sha256-21YwjuCZixyxU4SO8RxrjZof+ShhzV7FqP7Gp6d7YMA=",
         "ref": "refs/heads/main",
-        "rev": "5a1a2e3bfb919fa24604c8e88add0a384343e8ef",
-        "revCount": 47,
+        "rev": "190904d4b3a8fcd83aa8f3fd72b5a86f52482f46",
+        "revCount": 79,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/dia-swift-poc.git"
       },
@@ -80,11 +80,11 @@
     "dia-dist": {
       "flake": false,
       "locked": {
-        "lastModified": 1790160932,
-        "narHash": "sha256-LwSbcq7zg8MyZKv91BxGZfLFSd4D++5k3DxgUMCdQtY=",
+        "lastModified": 1790206207,
+        "narHash": "sha256-SPuCyMSXAVO/SeUke/A9khjhFmdgWvRQHxPACyEOfmo=",
         "ref": "refs/heads/main",
-        "rev": "086ba36fc22165b515e7b57c3dc3edf357859cbf",
-        "revCount": 2,
+        "rev": "26ddd98ebb5f68394648b0ce88899378c827a12d",
+        "revCount": 3,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/dia-dist.git"
       },
@@ -422,11 +422,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1789998861,
-        "narHash": "sha256-62XMQD4WLdMAfdT0/8gJmPH2dKeTw908ryNloAplTr8=",
+        "lastModified": 1790113641,
+        "narHash": "sha256-D2aaQetafdpHxbwA4ldAxs51UX0b11pXL+JL/5L8VrM=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "1e8bc658fc985ef27ccd66d107d767b32bb7ef98",
+        "rev": "1bc55b9def8165e82073919945c3239903fe4dc2",
         "type": "github"
       },
       "original": {
