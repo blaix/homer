@@ -6,8 +6,6 @@
     inputs.dia.nixosModules.dia
     inputs.doitanyway.nixosModules.doitanyway
     inputs.growth.nixosModules.growth
-    inputs.mynotes.nixosModules.mynotes
-    inputs.myrecords.nixosModules.myrecords
     inputs.blog.nixosModules.blog
     inputs.prettynice-software.nixosModules.prettynice-software
   ];
@@ -38,15 +36,15 @@
   # has no published binary for x86_64-linux, its package attribute does not
   # exist and this host's rebuild fails rather than deploying nothing.
   #
-  # Credentials are not in nix: /etc/htpasswd is a plain file on the host, shared
-  # with mynotes. Add dia's line with (no -c — it would truncate the file):
+  # Credentials are not in nix: /etc/htpasswd is a plain file on the host.
+  # Add dia's line with (no -c — it would truncate the file):
   #   sudo nix shell nixpkgs#apacheHttpd --command htpasswd -B /etc/htpasswd dia
   services.dia = {
     enable = true;
     domain = "dia-sync.blaix.com";
     acmeEmail = "justin@blaix.com";
     port = 3035;                      # next free: 3030-3034 and 3040 are taken
-    basicAuthFile = "/etc/htpasswd";  # shared with mynotes
+    basicAuthFile = "/etc/htpasswd";
     enableBackups = true;
   };
 
@@ -57,27 +55,6 @@
     acmeEmail = "justin@blaix.com";
     appPort = 3030;
     ws4sqlPort = 12322;
-    basicAuth.enable = true;
-  };
-
-  # Enable mynotes service
-  services.mynotes = {
-    enable = true;
-    domain = "notes.blaix.com";
-    port_ = 3033;
-    ws4sqlPort = 12325;
-    enableBackups = true;
-    basicAuthFile = "/etc/htpasswd";
-  };
-  security.acme.certs."notes.blaix.com".email = "justin@blaix.com";
-
-  # Enable myrecords service
-  services.myrecords = {
-    enable = true;
-    domain = "records.blaix.com";
-    acmeEmail = "justin@blaix.com";
-    appPort = 3032;
-    ws4sqlPort = 12324;
     basicAuth.enable = true;
   };
 
