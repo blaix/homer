@@ -331,11 +331,11 @@
         "ws4sql": "ws4sql_2"
       },
       "locked": {
-        "lastModified": 1783518024,
-        "narHash": "sha256-ViEOGzA6kL3mBkQ3f0zgmATTQPJ7Sd3q+A/ecrSi+8g=",
+        "lastModified": 1790165545,
+        "narHash": "sha256-KYohDLphp1l8Vxm1s06OCUTbEmr6m8f+PNvJzF8KJfU=",
         "owner": "blaix",
         "repo": "growth",
-        "rev": "fa8819e775a4fcc4fb9c38b2b1f0439070072470",
+        "rev": "d08ff2b7c73e1431f53a77458523355cc6e5cc28",
         "type": "github"
       },
       "original": {
