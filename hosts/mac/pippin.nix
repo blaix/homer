@@ -19,45 +19,17 @@
   # backup drive can spin down between runs instead of spinning 24/7.
   power.sleep.computer = "never";
 
-  # Spotlight indexing churns continuously over restic's pack files on the
-  # backup drive. There is no nix-darwin option for mdutil, but StartOnMount
-  # fires the job on every filesystem mount - so unlike a one-shot activation
-  # script this re-applies whenever the drive is unplugged and reconnected,
-  # not just on darwin-rebuild. RunAtLoad covers boot.
+  # Spotlight is kept off /Volumes/backup so it does not churn over restic's
+  # pack files. That is deliberately NOT automated here: a launchd daemon cannot
+  # touch the volume at all, because removable volumes are TCC-protected and Full
+  # Disk Access is granted per-executable - a daemon would need it granted to
+  # /bin/sh (far too broad) or to a nix store path that changes every rebuild.
   #
-  # Belt and braces, because `mdutil -i off` from a launchd daemon did NOT take
-  # effect on first deploy (it works fine from an interactive sudo shell, which
-  # points at TCC: Full Disk Access is granted per-executable, and a bare daemon
-  # does not inherit Terminal's):
-  #
-  #   - .metadata_never_index is a plain file at the volume root that Spotlight
-  #     honours at MOUNT time. It needs no entitlement, so TCC cannot block it,
-  #     and it travels with the drive to any other Mac. It only takes effect on
-  #     the next mount - which is exactly the case this daemon exists for.
-  #   - mdutil is still attempted, since it applies immediately when it works.
-  #     It is explicitly allowed to fail without failing the job.
-  #
-  # Both are logged, so the next failure is not silent like the first one was.
-  launchd.daemons.spotlight-off-backup = {
-    script = ''
-      if /sbin/mount | grep -q ' on /Volumes/backup '; then
-        echo "$(date): /Volumes/backup mounted, disabling spotlight"
-        touch /Volumes/backup/.metadata_never_index \
-          && echo "  .metadata_never_index ok" \
-          || echo "  .metadata_never_index FAILED"
-        /usr/bin/mdutil -i off /Volumes/backup \
-          || echo "  mdutil FAILED (expected if TCC is blocking it)"
-      else
-        echo "$(date): /Volumes/backup not mounted, nothing to do"
-      fi
-    '';
-    serviceConfig = {
-      RunAtLoad = true;
-      StartOnMount = true;
-      StandardOutPath = "/var/log/spotlight-off-backup.log";
-      StandardErrorPath = "/var/log/spotlight-off-backup.log";
-    };
-  };
+  # It does not need automating either. The durable switch is a
+  # .metadata_never_index file at the volume root: Spotlight honours it at mount
+  # time, and because it lives ON the drive it survives replugging and follows the
+  # drive to any other Mac. Created once by hand; see the pippin section of the
+  # README for that and the mdutil commands.
 
   # match the GID that Nix was installed with on this machine
   ids.gids.nixbld = 350;

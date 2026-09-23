@@ -102,30 +102,38 @@ _WireGuard peer devices connect to `home.blaix.com:51820` using configs kept in
 
 ### pippin (mac; restic backup target)
 
-Shire pushes a nightly restic backup of `/mnt/storage` to `/Volumes/backup` here. Sleep
-and Spotlight are handled declaratively in [`hosts/mac/pippin.nix`](/hosts/mac/pippin.nix),
-but two things are not:
+Shire pushes a nightly restic backup of `/mnt/storage` to `/Volumes/backup` here. Only
+the sleep setting is declarative (`power.sleep.computer` in
+[`hosts/mac/pippin.nix`](/hosts/mac/pippin.nix)) — pippin must stay awake for the 03:00
+run. Two things are not declarative and must be done by hand per machine:
 
 * **Remote Login must be on** — System Settings → General → Sharing → Remote Login.
   nix-darwin does not manage `sshd`, and the entire backup depends on it. Shire
   authenticates as `justin` with the key already in
   [`users/justin/ssh-keys.nix`](/users/justin/ssh-keys.nix).
-* **Spotlight must be disabled on `/Volumes/backup` by hand, once, per machine:**
+* **Spotlight must be kept off `/Volumes/backup`.** Three one-time commands, and the
+  order matters:
   ```bash
-  sudo mdutil -i off /Volumes/backup   # disable  (must come first)
-  sudo mdutil -E /Volumes/backup       # erase the existing index (~627M at setup)
+  touch /Volumes/backup/.metadata_never_index   # the durable one - see below
+  sudo mdutil -i off /Volumes/backup            # disable (must precede -E)
+  sudo mdutil -E /Volumes/backup                # erase the existing index
   ```
-  Order matters: `-E` only erases, it does not disable, so erasing first just lets
-  Spotlight rebuild what you deleted.
+  `-E` only erases, it does not disable, so erasing first just lets Spotlight
+  rebuild what you deleted.
 
-  This is manual because **`mdutil` does not work from the launchd daemon** — it
-  succeeds from an interactive `sudo` shell but silently does nothing when run by
-  `launchd.daemons.spotlight-off-backup`. Full Disk Access is granted per-executable
-  and a bare daemon does not inherit Terminal's. The daemon therefore also writes
-  `.metadata_never_index` to the volume root, which needs no entitlement and which
-  Spotlight honours at *mount* time — that is what actually covers replugging the
-  drive or moving it to another Mac. The daemon logs to
-  `/var/log/spotlight-off-backup.log`.
+  `.metadata_never_index` is the one that actually matters: Spotlight honours it at
+  *mount* time, and because it lives on the drive it survives replugging and follows
+  the drive to another Mac. The `mdutil` calls only fix the machine you run them on,
+  and only until the volume is re-mounted somewhere else.
+
+  **This cannot be automated from nix, and it was a mistake to try.** A launchd
+  daemon cannot touch `/Volumes/backup` at all - removable volumes are TCC-protected,
+  and Full Disk Access is granted per-executable, which a daemon does not inherit.
+  Running `touch` from one produced `Operation not permitted` and `mdutil` produced
+  `could not resolve path`. Granting FDA would mean whitelisting `/bin/sh` or a nix
+  store path that changes every rebuild. Interactive `sudo` and `ssh` sessions both
+  work, because Terminal and `sshd` have FDA - so running these over ssh from shire
+  is fine if the drive is elsewhere.
 
 ### pippinix (decommissioned home server)
 
