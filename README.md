@@ -110,8 +110,22 @@ but two things are not:
   nix-darwin does not manage `sshd`, and the entire backup depends on it. Shire
   authenticates as `justin` with the key already in
   [`users/justin/ssh-keys.nix`](/users/justin/ssh-keys.nix).
-* `sudo mdutil -E /Volumes/backup` — one-time, erases the Spotlight index already built
-  on that volume. The launchd job only stops *new* indexing.
+* **Spotlight must be disabled on `/Volumes/backup` by hand, once, per machine:**
+  ```bash
+  sudo mdutil -i off /Volumes/backup   # disable  (must come first)
+  sudo mdutil -E /Volumes/backup       # erase the existing index (~627M at setup)
+  ```
+  Order matters: `-E` only erases, it does not disable, so erasing first just lets
+  Spotlight rebuild what you deleted.
+
+  This is manual because **`mdutil` does not work from the launchd daemon** — it
+  succeeds from an interactive `sudo` shell but silently does nothing when run by
+  `launchd.daemons.spotlight-off-backup`. Full Disk Access is granted per-executable
+  and a bare daemon does not inherit Terminal's. The daemon therefore also writes
+  `.metadata_never_index` to the volume root, which needs no entitlement and which
+  Spotlight honours at *mount* time — that is what actually covers replugging the
+  drive or moving it to another Mac. The daemon logs to
+  `/var/log/spotlight-off-backup.log`.
 
 ### pippinix (decommissioned home server)
 
