@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779877912,
-        "narHash": "sha256-ZOH429qn2NvVTIzZlIusN4PnGpcdQT/t8refmiv4UwE=",
+        "lastModified": 1790165185,
+        "narHash": "sha256-oigZYrMh/TQ3PddKLho/j3Mg+tbXZOBCT6k5dqbWMDA=",
         "ref": "refs/heads/main",
-        "rev": "31f3b5ac6b27e8fe6fb40867824465169bfd6eb4",
-        "revCount": 81,
+        "rev": "054ec3cb1e50db2816e54259085c370065fb13c1",
+        "revCount": 82,
         "type": "git",
         "url": "ssh://git@github.com/blaix/blog.blaix.com.git"
       },
