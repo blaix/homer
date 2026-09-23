@@ -30,6 +30,10 @@
   # (frigate-rtsp-password is declared in cameras.nix.)
   sops.defaultSopsFile = ../../secrets/shire.yaml;
   sops.secrets."wg0-private-key" = {};
+  # Restic repository password for the /mnt/storage backup. owner = justin
+  # because that backup service runs as justin, not root (sops defaults to
+  # root:root 0400). Backed up in 1Password as "shire restic storage repo".
+  sops.secrets."restic-storage-password".owner = "justin";
   # neededForUsers: user accounts are created very early in activation, before
   # normal secret decryption, so the login-password hash must be decrypted in the
   # earlier "for-users" pass or hashedPasswordFile won't exist when justin is set up.
@@ -219,6 +223,54 @@
     # its-mytabs container state (rootful podman, so root-owned).
     "d /var/lib/its-mytabs 0755 root root -"
   ];
+
+  # restic's sftp backend shells out to ssh. The backup service runs as justin,
+  # whose key is already in users/justin/ssh-keys.nix and therefore already in
+  # pippin's authorized_keys. BatchMode so a changed host key fails the unit
+  # fast instead of hanging forever on an interactive prompt.
+  programs.ssh.extraConfig = ''
+    Host pippin.local
+      User justin
+      IdentityFile /home/justin/.ssh/id_ed25519
+      BatchMode yes
+  '';
+
+  # Nightly backup of /mnt/storage to the external drive on pippin. This is the
+  # local tier only - redundancy, not offsite. The Backblaze B2 tier described in
+  # BACKUPS.md becomes a second services.restic.backups entry alongside this one.
+  #
+  # Runs as justin rather than root: /mnt/storage is justin-owned and the ssh key
+  # above is justin's. Giving root its own key would mean adding it to
+  # ssh-keys.nix, which installs it on every host.
+  services.restic.backups.storage = {
+    user = "justin";
+    repository = "sftp:pippin.local:/Volumes/backup/restic-storage";
+    paths = [ "/mnt/storage" ];
+    exclude = [ "/mnt/storage/lost+found" "/mnt/storage/.Trashes" ];
+    passwordFile = config.sops.secrets."restic-storage-password".path;
+
+    # Deliberately NOT true. If the external drive ejects, macOS leaves
+    # /Volumes/backup as an ordinary directory on pippin's boot SSD - and
+    # initialize would create a second, empty repo there and then report
+    # successful backups forever while the real one silently went stale.
+    # The repo is created once by hand; see the README checklist.
+    initialize = false;
+
+    # Same failure guarded from the other side: abort unless the repo's config
+    # file is actually there, which is the cheapest reliable proxy for "the
+    # external drive is mounted". Runs before restic is invoked at all.
+    backupPrepareCommand = ''
+      ssh pippin.local test -f /Volumes/backup/restic-storage/config
+    '';
+
+    timerConfig = {
+      OnCalendar = "03:00";
+      Persistent = true;          # catch up if shire was down at 03:00
+      RandomizedDelaySec = "30m";
+    };
+
+    pruneOpts = [ "--keep-daily 7" "--keep-weekly 4" "--keep-monthly 12" ];
+  };
 
   # SMB share reachable from Macs as smb://shire.local (read-write).
   #

@@ -66,6 +66,10 @@ only so you know where they live:_
   `shire frigate camera rtsp`; rendered into Frigate's environment via a sops template.
   The only related action is setting **that same password** on each camera's `admin`
   account when you provision them.
+* **Restic repo password** — `restic-storage-password`, in 1Password as
+  `shire restic storage repo`. Encrypts the `/mnt/storage` backup repo on pippin.
+  **Without this value the backup is unrecoverable**, so the 1Password copy is not
+  optional — sops only protects it as long as the age key survives too.
 
 _Still manual (app accounts created through each service's own web UI / DB):_
 
@@ -76,6 +80,11 @@ _Still manual (app accounts created through each service's own web UI / DB):_
   it. ext4 keeps the ownership on the drive, so this only needs doing once per
   reformat. Without it the SMB share is read-only in practice (`force user = justin`
   has no write permission at the share root).
+* `sudo -u justin restic-storage init` — one-time, creates the backup repo on pippin.
+  The service sets `initialize = false` on purpose: if pippin's external drive ejects,
+  macOS leaves `/Volumes/backup` as a plain directory on its boot SSD, and auto-init
+  would build a second empty repo there and report success forever while the real
+  backup went stale. Requires pippin's drive mounted and Remote Login on (see below).
 * **Jellyfin** (`:8096`): create the admin account in the web UI; add the movie/show
   libraries.
 * **Navidrome** (`:4533`): complete first-run admin setup in the web UI.
@@ -90,6 +99,19 @@ _Still manual (app accounts created through each service's own web UI / DB):_
 
 _WireGuard peer devices connect to `home.blaix.com:51820` using configs kept in
 1Password / each device's WireGuard app (the server key itself is sops-managed, above)._
+
+### pippin (mac; restic backup target)
+
+Shire pushes a nightly restic backup of `/mnt/storage` to `/Volumes/backup` here. Sleep
+and Spotlight are handled declaratively in [`hosts/mac/pippin.nix`](/hosts/mac/pippin.nix),
+but two things are not:
+
+* **Remote Login must be on** — System Settings → General → Sharing → Remote Login.
+  nix-darwin does not manage `sshd`, and the entire backup depends on it. Shire
+  authenticates as `justin` with the key already in
+  [`users/justin/ssh-keys.nix`](/users/justin/ssh-keys.nix).
+* `sudo mdutil -E /Volumes/backup` — one-time, erases the Spotlight index already built
+  on that volume. The launchd job only stops *new* indexing.
 
 ### pippinix (decommissioned home server)
 
@@ -122,7 +144,7 @@ These files must exist on the server and are not managed by nix _(TODO: migrate 
 
 * **pippinix restic backups**: a restic repo password + Backblaze B2 env, both via sops
   (`secrets/pippinix.yaml`), plus `sudo smbpasswd -a` for the `arwen`/`bilbo` SMB users.
-  See [`TODO-storage-backup-plan.md`](/TODO-storage-backup-plan.md).
+  See [`BACKUPS.md`](/BACKUPS.md).
 
 ## Initial setup
 
