@@ -6,7 +6,6 @@
     inputs.dia.nixosModules.dia
     inputs.doitanyway.nixosModules.doitanyway
     inputs.growth.nixosModules.growth
-    inputs.mycomics.nixosModules.mycomics
     inputs.mynotes.nixosModules.mynotes
     inputs.myrecords.nixosModules.myrecords
     inputs.blog.nixosModules.blog
@@ -58,16 +57,6 @@
     acmeEmail = "justin@blaix.com";
     appPort = 3030;
     ws4sqlPort = 12322;
-    basicAuth.enable = true;
-  };
-
-  # Enable mycomics service
-  services.mycomics = {
-    enable = true;
-    domain = "comics.blaix.com";
-    acmeEmail = "justin@blaix.com";
-    appPort = 3031;
-    ws4sqlPort = 12323;
     basicAuth.enable = true;
   };
 

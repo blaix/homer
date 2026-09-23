@@ -26,10 +26,6 @@
     growth.url = "github:blaix/growth";
     growth.inputs.nixpkgs.follows = "nixpkgs";
 
-    # mycomics web application
-    mycomics.url = "github:blaix/mycomics";
-    mycomics.inputs.nixpkgs.follows = "nixpkgs";
-
     # mynotes web application
     mynotes.url = "github:blaix/mynotes";
     mynotes.inputs.nixpkgs.follows = "nixpkgs";
