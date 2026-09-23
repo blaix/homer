@@ -56,6 +56,26 @@
         "type": "github"
       }
     },
+    "dia": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790121616,
+        "narHash": "sha256-9L9OuvuB/n+lOg5SI4/Evi0v9JVvmnB1NHRTp7GS9CQ=",
+        "ref": "refs/heads/main",
+        "rev": "de87f29c6983c8454c3a961c5ec3473a3cfdf559",
+        "revCount": 44,
+        "type": "git",
+        "url": "ssh://forgejo@git.blaix.com/blaix/dia-swift-poc.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://forgejo@git.blaix.com/blaix/dia-swift-poc.git"
+      }
+    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -666,6 +686,7 @@
       "inputs": {
         "blog": "blog",
         "claude-code": "claude-code",
+        "dia": "dia",
         "disko": "disko",
         "doitanyway": "doitanyway",
         "gren-format": "gren-format",

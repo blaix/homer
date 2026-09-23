@@ -34,6 +34,10 @@
     mynotes.url = "github:blaix/mynotes";
     mynotes.inputs.nixpkgs.follows = "nixpkgs";
 
+    # dia sync server (the swift todo app's server half)
+    dia.url = "git+ssh://forgejo@git.blaix.com/blaix/dia-swift-poc.git";
+    dia.inputs.nixpkgs.follows = "nixpkgs";
+
     # myrecords web application
     myrecords.url = "github:blaix/myrecords";
     myrecords.inputs.nixpkgs.follows = "nixpkgs";

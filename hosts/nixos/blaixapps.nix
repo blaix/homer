@@ -3,6 +3,7 @@
   imports = [
     ./blaixapps-base.nix
     ./common.nix
+    inputs.dia.nixosModules.dia
     inputs.doitanyway.nixosModules.doitanyway
     inputs.growth.nixosModules.growth
     inputs.mycomics.nixosModules.mycomics
@@ -20,6 +21,26 @@
     enable = true;
     domain = "dia.blaix.com";
     acmeEmail = "justin@blaix.com";
+    enableBackups = true;
+  };
+
+  # dia sync server. dia-sync.blaix.com, not dia.blaix.com — that one is
+  # doitanyway, the previous iteration this app succeeds.
+  #
+  # DISABLED until the server builds under nix: nixpkgs ships Swift 5.10.1 and
+  # dia needs 6.2, so the derivation evaluates (which is what its `checks.module`
+  # deploy guardrail tests) but does not compile. Flipping this to true before
+  # that is settled fails the whole host's rebuild. See the dia README,
+  # "Before the first deploy".
+  #
+  # Also still to do before flipping it: an A record for dia-sync.blaix.com
+  # (ACME cannot issue without one), and `htpasswd -B /etc/htpasswd dia`.
+  services.dia = {
+    enable = false;
+    domain = "dia-sync.blaix.com";
+    acmeEmail = "justin@blaix.com";
+    port = 3035;                      # next free: 3030-3034 and 3040 are taken
+    basicAuthFile = "/etc/htpasswd";  # shared with mynotes
     enableBackups = true;
   };
 
