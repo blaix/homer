@@ -27,16 +27,23 @@
   # dia sync server. dia-sync.blaix.com, not dia.blaix.com — that one is
   # doitanyway, the previous iteration this app succeeds.
   #
-  # DISABLED until the server builds under nix: nixpkgs ships Swift 5.10.1 and
-  # dia needs 6.2, so the derivation evaluates (which is what its `checks.module`
-  # deploy guardrail tests) but does not compile. Flipping this to true before
-  # that is settled fails the whole host's rebuild. See the dia README,
-  # "Before the first deploy".
+  # nix does not compile this one: nixpkgs ships Swift 5.10.1 and dia needs 6.2,
+  # so the binary is built in a container on a Linux host and published to the
+  # private blaix/dia-dist repo, which dia takes as a flake input. That input is
+  # fetched during *evaluation* — here, on the Mac — and the source is copied to
+  # the build host, so blaixapps needs no credentials for the forge. See the dia
+  # README, "How the Linux server binary gets built".
   #
-  # Also still to do before flipping it: an A record for dia-sync.blaix.com
-  # (ACME cannot issue without one), and `htpasswd -B /etc/htpasswd dia`.
+  # The consequence for this host: `nix flake update dia` is what picks up a new
+  # server build, and dia's own flake.lock decides which binary that is. If dia
+  # has no published binary for x86_64-linux, its package attribute does not
+  # exist and this host's rebuild fails rather than deploying nothing.
+  #
+  # Credentials are not in nix: /etc/htpasswd is a plain file on the host, shared
+  # with mynotes. Add dia's line with (no -c — it would truncate the file):
+  #   sudo nix shell nixpkgs#apacheHttpd --command htpasswd -B /etc/htpasswd dia
   services.dia = {
-    enable = false;
+    enable = true;
     domain = "dia-sync.blaix.com";
     acmeEmail = "justin@blaix.com";
     port = 3035;                      # next free: 3030-3034 and 3040 are taken
