@@ -164,6 +164,8 @@
       bind K resize-pane -U 2
       bind H resize-pane -L 2
       bind L resize-pane -R 2
+      # Enable scrolling with mouse
+      set -g mouse on
     '';
   };
 
