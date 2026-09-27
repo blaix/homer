@@ -64,11 +64,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790374283,
-        "narHash": "sha256-kulZKdGwBIBB06W6ShY5sXcp5Tdv+PeqQRj5lmpl9QQ=",
+        "lastModified": 1790507768,
+        "narHash": "sha256-G1mkU6n3Rf3DNFgu3hDjznFJTgEQGcRwb99Y9ihlflM=",
         "ref": "refs/heads/main",
-        "rev": "4deed4c56a5aa858f737ab84a5f817636f72068c",
-        "revCount": 133,
+        "rev": "68828cb748e3dfb0b49d959667fee2389e40dfb2",
+        "revCount": 148,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/dia-swift-poc.git"
       },
@@ -80,11 +80,11 @@
     "dia-dist": {
       "flake": false,
       "locked": {
-        "lastModified": 1790334372,
-        "narHash": "sha256-nSH9KlxShN0qJRMHwJ0ImE79zJFwlk2w37TBfOFaYMk=",
+        "lastModified": 1790507445,
+        "narHash": "sha256-hSJX+/oBG8cE/tJgntoqj04C3xkjgteoniU8FPmtmKc=",
         "ref": "refs/heads/main",
-        "rev": "6c1c2aefac0b4c5131a7085f40771068e0921bae",
-        "revCount": 6,
+        "rev": "60a47a6b4db59adb43808435b69ef714a1a3d776",
+        "revCount": 7,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/dia-dist.git"
       },
@@ -422,11 +422,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1790218706,
-        "narHash": "sha256-6e4Na3z008XpdVyOXgfasXIn1aN+z8AXFG+jXdQSyuI=",
+        "lastModified": 1790450978,
+        "narHash": "sha256-/eLCD/X9kaWJqPR47+fDozEC87Hjmm3i8gJbYmDAD7g=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "c508844df6c28fa6dabc1b6af70f3ccbd65c5201",
+        "rev": "5e2305d577ca00acbba631b05cb1094d172b29f3",
         "type": "github"
       },
       "original": {
@@ -531,11 +531,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790247521,
-        "narHash": "sha256-TNfgoHsqsYYvaJImlWctfRkh4PseTagzegU1Dgdbehw=",
+        "lastModified": 1790498116,
+        "narHash": "sha256-rs9meAYxW3zzrh43yaW7htrqCD+X9+pupDPHN86fumI=",
         "owner": "Mic92",
         "repo": "sops-nix",
-        "rev": "2bd00bd9bb35fe6d114888c8f1c2e946c541dd8f",
+        "rev": "5efb5a6f4f5ab192817d28557dd4d650fa14d866",
         "type": "github"
       },
       "original": {
