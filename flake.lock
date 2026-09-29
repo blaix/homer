@@ -28,11 +28,11 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1790622107,
-        "narHash": "sha256-pDJebGqhamp5ANX6vx5oAgwHye6CPTWAIss8aMEH1ds=",
+        "lastModified": 1790712110,
+        "narHash": "sha256-cdbWitXVBgXb4g+I8uEyTOS3VAj4XlOzZI5kDisdJ0c=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "041321f576473e072ebe03d6d9a3e79a2aad9580",
+        "rev": "82ee196c58667c5f76fdd4ac646e2e2c05778e86",
         "type": "github"
       },
       "original": {
@@ -64,11 +64,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790693031,
-        "narHash": "sha256-xH913hTxgISeFXmnHix61lx8oYZl/JauSzM/gGfrMEM=",
+        "lastModified": 1790763305,
+        "narHash": "sha256-snnpbkgY2B1Ieoo6dMEvlCsrnX3dSRe+6M+eoe62O1I=",
         "ref": "refs/heads/main",
-        "rev": "f85d67fe65714898cadcfc4e49a20631a991bd41",
-        "revCount": 176,
+        "rev": "43f5010c5c6175b0d40ec8a6859080ca71b585a1",
+        "revCount": 197,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/dia-swift-poc.git"
       },
@@ -80,11 +80,11 @@
     "dia-dist": {
       "flake": false,
       "locked": {
-        "lastModified": 1790692998,
-        "narHash": "sha256-TBezfQ0hJbcK/tX9yuws755irl9HdY3ELJaUL31H2jk=",
+        "lastModified": 1790763210,
+        "narHash": "sha256-b3lnqv91zsKPx6xCEH7424ZXmxE8kKQTzwJWDH/3zVM=",
         "ref": "refs/heads/main",
-        "rev": "b81ffeec20d9da608ad39fd65bdcf02ca1929b1d",
-        "revCount": 10,
+        "rev": "752beb2bbadb6873bdf9ec8470215661701489a2",
+        "revCount": 12,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/dia-dist.git"
       },
@@ -297,11 +297,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790215976,
-        "narHash": "sha256-VkR1rMGyjU9jtw8ISFx5uqR9e+LEaOlhHwrseFkiIVk=",
+        "lastModified": 1790742243,
+        "narHash": "sha256-kaNo6xHiL31AbNNEreG0OTKf4j6Cxlo5bPawjX7lnbQ=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "a6631107a83ceab5872f298a2ea710859c80c4cb",
+        "rev": "e5fcd298a00f08b6e8390baf04aa8edb62203070",
         "type": "github"
       },
       "original": {
