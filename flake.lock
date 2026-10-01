@@ -28,11 +28,11 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1790798517,
-        "narHash": "sha256-KUudJ87dsfhnM2LVa4QXJdrLSjCNbuWOLFZGtiDDrtE=",
+        "lastModified": 1790877775,
+        "narHash": "sha256-99y6MBHLBNKhcUl4PprE5m4/ooopH8nuOCwxh8uKMCs=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "cf73bd2bece41565ca483050a3a7385ef3663aec",
+        "rev": "eca59bb0000a0f3ebf7db73717ebd3838de940fe",
         "type": "github"
       },
       "original": {
@@ -64,11 +64,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790872441,
-        "narHash": "sha256-I6BIZIVYvH654AQl311MzONb3248t/YVVsr7xKvg8k0=",
+        "lastModified": 1790895252,
+        "narHash": "sha256-0DslPg31hJPMMZlgMe0cnO4zHZ1Tnfjp5Bt7DiaEhpI=",
         "ref": "refs/heads/main",
-        "rev": "459fcfacc5f0673051413e684994651c4d22ac0b",
-        "revCount": 238,
+        "rev": "010325487fc0823b47b15bba52d1d4503993b3ca",
+        "revCount": 245,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/dia-swift-poc.git"
       },
@@ -80,11 +80,11 @@
     "dia-dist": {
       "flake": false,
       "locked": {
-        "lastModified": 1790871374,
-        "narHash": "sha256-dfapcbgfVVlwjR4cLDPwd2UtwwdxReJ0Itx/zYATLL0=",
+        "lastModified": 1790892054,
+        "narHash": "sha256-5hpyk6yTvU8WU+WwWE/9mQeZ6PhPPEPs+wFkhZVcSdk=",
         "ref": "refs/heads/main",
-        "rev": "302bac03d2687a3c22da1fde0ae825561e4f3925",
-        "revCount": 7,
+        "rev": "a704f9642b7cec0651dafb59328ff34cdcee252b",
+        "revCount": 8,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/dia-dist.git"
       },
