@@ -64,11 +64,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790895252,
-        "narHash": "sha256-0DslPg31hJPMMZlgMe0cnO4zHZ1Tnfjp5Bt7DiaEhpI=",
+        "lastModified": 1790949284,
+        "narHash": "sha256-H+5oIIaHmSbThcDzSo0JN/rflUYhUcMVr0uNPMg3tMc=",
         "ref": "refs/heads/main",
-        "rev": "010325487fc0823b47b15bba52d1d4503993b3ca",
-        "revCount": 245,
+        "rev": "fcd406cb87d0821295b048c5d005ccc277ed3027",
+        "revCount": 251,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/dia-swift-poc.git"
       },
@@ -80,11 +80,11 @@
     "dia-dist": {
       "flake": false,
       "locked": {
-        "lastModified": 1790892054,
-        "narHash": "sha256-5hpyk6yTvU8WU+WwWE/9mQeZ6PhPPEPs+wFkhZVcSdk=",
+        "lastModified": 1790949235,
+        "narHash": "sha256-RQj3WxHt2T8mdDUIUiFfBWekQ5XpnLHOwG8GegYEHcs=",
         "ref": "refs/heads/main",
-        "rev": "a704f9642b7cec0651dafb59328ff34cdcee252b",
-        "revCount": 8,
+        "rev": "c8f37be018d1bc120dea63193924953bbf265957",
+        "revCount": 9,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/dia-dist.git"
       },
@@ -422,11 +422,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1790750587,
-        "narHash": "sha256-VfjaoJ1Uyb7JZTrBgE5Jf2nhjtQPmD9KOd19HJwmZwM=",
+        "lastModified": 1790920529,
+        "narHash": "sha256-nQyFkMR78WP6PiXKkDW2SjqzLf/spQqjRuxRGSbcV8k=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "78e9c786dc08cd4f3420c2395cd977206a9b1da2",
+        "rev": "774debe7a0d1b496e35677ad955a1011c6ff74f3",
         "type": "github"
       },
       "original": {
