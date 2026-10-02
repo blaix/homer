@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "aisdlc": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790970784,
+        "narHash": "sha256-MJX6bgPrqSLvUVrAk5VueFbJMFZayjcvwwuMTBNiL8U=",
+        "ref": "refs/heads/main",
+        "rev": "784c48f427a3665f35cb81023e32518df5145bce",
+        "revCount": 1,
+        "type": "git",
+        "url": "ssh://forgejo@git.blaix.com/blaix/aisdlc.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://forgejo@git.blaix.com/blaix/aisdlc.git"
+      }
+    },
     "blog": {
       "inputs": {
         "nixpkgs": [
@@ -488,6 +508,7 @@
     },
     "root": {
       "inputs": {
+        "aisdlc": "aisdlc",
         "blog": "blog",
         "claude-code": "claude-code",
         "dia": "dia",

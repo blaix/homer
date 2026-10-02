@@ -38,6 +38,10 @@
     prettynice-software.url = "git+ssh://forgejo@git.blaix.com/blaix/prettynice.software.git";
     prettynice-software.inputs.nixpkgs.follows = "nixpkgs";
 
+    # aisdlc kanban board (LAN-only, on shire)
+    aisdlc.url = "git+ssh://forgejo@git.blaix.com/blaix/aisdlc.git";
+    aisdlc.inputs.nixpkgs.follows = "nixpkgs";
+
     # disko for declarative disk management
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
