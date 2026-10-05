@@ -115,6 +115,14 @@
   # into /var/lib/aisdlc/backups.
   services.aisdlc.enable = true;
 
+  # Forgejo API tokens for the aisdlc agents' bot users on git.blaix.com
+  sops.secrets."forgejo-dev-token".owner = "justin";
+  sops.secrets."forgejo-review-token".owner = "justin";
+  environment.sessionVariables = {
+    FORGEJO_DEV_TOKEN_FILE = config.sops.secrets."forgejo-dev-token".path;
+    FORGEJO_REVIEW_TOKEN_FILE = config.sops.secrets."forgejo-review-token".path;
+  };
+
   # Enable mosh connections (opens UDP ports)
   programs.mosh.enable = true;
 
