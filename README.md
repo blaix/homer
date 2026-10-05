@@ -30,143 +30,7 @@ handled two ways:
   recipient) is the one manual part.
 * **Out-of-band** — a file created by hand on the machine (`chmod 600`), or an account
   created through a service's own web UI. These are **not declarative**: they must be
-  redone on a from-scratch rebuild. Where a value is noted as being in **1Password**,
-  that's where I keep it.
-
-This section inventories every manual credential step, by host. It's the checklist for
-standing a machine back up from nothing.
-
-### Every NixOS host
-
-* `passwd justin` — set the user login password (as root, on first boot). _Not needed on
-  hosts that set `hashedPasswordFile` from sops (e.g. shire)._
-* sops-nix bootstrap, **only if the host needs secrets**: place my personal age key
-  from 1Password at `~/.config/sops/age/keys.txt`, then register the host as a recipient
-  in `.sops.yaml`. Full steps in [`SECRETS.md`](/SECRETS.md).
-
-### Every Mac
-
-* Import my GPG key from 1Password.
-
-### Torrent/Jellyfin Macs
-
-* qBittorrent Web UI **admin password** (in 1Password). Plus the qBittorrent Web UI and
-  Proton bind-address setup in
-  [`hosts/mac/proton-portforward.nix`](/hosts/mac/proton-portforward.nix).
-
-### shire (home media + cameras)
-
-_Managed by sops (`secrets/shire.yaml`), **no manual step** on a rebuild — listed here
-only so you know where they live:_
-
-* **Login password** — `users.users.justin.hashedPasswordFile` (replaces `passwd justin`).
-* **WireGuard server key** — `wg0-private-key`, backed up in 1Password as
-  `shire wireguard wg0 private key`.
-* **Frigate camera RTSP password** — `frigate-rtsp-password`, in 1Password as
-  `shire frigate camera rtsp`; rendered into Frigate's environment via a sops template.
-  The only related action is setting **that same password** on each camera's `admin`
-  account when you provision them.
-* **Restic repo password** — `restic-storage-password`, in 1Password as
-  `shire restic storage repo`. Encrypts the `/mnt/storage` backup repo on pippin.
-  **Without this value the backup is unrecoverable**, so the 1Password copy is not
-  optional — sops only protects it as long as the age key survives too.
-
-_Still manual (app accounts created through each service's own web UI / DB):_
-
-* `sudo smbpasswd -a justin` — Samba share password.
-* `sudo chown justin:justin /mnt/storage` — one-time, after formatting the storage
-  drive. A fresh ext4 root is owned by root, and the `nofail` mount is not ordered
-  before `systemd-tmpfiles-setup`, so the tmpfiles rule cannot be relied on to fix
-  it. ext4 keeps the ownership on the drive, so this only needs doing once per
-  reformat. Without it the SMB share is read-only in practice (`force user = justin`
-  has no write permission at the share root).
-* `sudo -u justin restic-storage init` — one-time, creates the backup repo on pippin.
-  The service sets `initialize = false` on purpose: if pippin's external drive ejects,
-  macOS leaves `/Volumes/backup` as a plain directory on its boot SSD, and auto-init
-  would build a second empty repo there and report success forever while the real
-  backup went stale. Requires pippin's drive mounted and Remote Login on (see below).
-* **Jellyfin** (`:8096`): create the admin account in the web UI; add the movie/show
-  libraries.
-* **Navidrome** (`:4533`): complete first-run admin setup in the web UI.
-* **Komga** (`:25600`): create the admin account in the web UI; add the comics library.
-* **its-mytabs** (`:47777`): create the admin account in the web UI.
-* **Home Assistant** (`:8123`): complete onboarding (create admin account), then add the
-  **MQTT** (`127.0.0.1:1883`) and **Frigate** (`http://127.0.0.1:5000`) integrations from
-  the HA UI.
-* **Frigate** (`:8971`): nothing to set up — it has no login. The UI listens only on
-  shire's WireGuard address, so connect the VPN and open <http://10.100.0.1:8971>
-  (it is not reachable from the LAN, and `shire.local` won't resolve over the tunnel).
-
-_WireGuard peer devices connect to `home.blaix.com:51820` using configs kept in
-1Password / each device's WireGuard app (the server key itself is sops-managed, above)._
-
-### pippin (mac; restic backup target)
-
-Shire pushes a nightly restic backup of `/mnt/storage` to `/Volumes/backup` here. Only
-the sleep setting is declarative (`power.sleep.computer` in
-[`hosts/mac/pippin.nix`](/hosts/mac/pippin.nix)) — pippin must stay awake for the 03:00
-run. Two things are not declarative and must be done by hand per machine:
-
-* **Remote Login must be on** — System Settings → General → Sharing → Remote Login.
-  nix-darwin does not manage `sshd`, and the entire backup depends on it. Shire
-  authenticates as `justin` with the key already in
-  [`users/justin/ssh-keys.nix`](/users/justin/ssh-keys.nix).
-* **Spotlight must be kept off `/Volumes/backup`.** Three one-time commands, and the
-  order matters:
-  ```bash
-  touch /Volumes/backup/.metadata_never_index   # the durable one - see below
-  sudo mdutil -i off /Volumes/backup            # disable (must precede -E)
-  sudo mdutil -E /Volumes/backup                # erase the existing index
-  ```
-  `-E` only erases, it does not disable, so erasing first just lets Spotlight
-  rebuild what you deleted.
-
-  `.metadata_never_index` is the one that actually matters: Spotlight honours it at
-  *mount* time, and because it lives on the drive it survives replugging and follows
-  the drive to another Mac. The `mdutil` calls only fix the machine you run them on,
-  and only until the volume is re-mounted somewhere else.
-
-  **This cannot be automated from nix, and it was a mistake to try.** A launchd
-  daemon cannot touch `/Volumes/backup` at all - removable volumes are TCC-protected,
-  and Full Disk Access is granted per-executable, which a daemon does not inherit.
-  Running `touch` from one produced `Operation not permitted` and `mdutil` produced
-  `could not resolve path`. Granting FDA would mean whitelisting `/bin/sh` or a nix
-  store path that changes every rebuild. Interactive `sudo` and `ssh` sessions both
-  work, because Terminal and `sshd` have FDA - so running these over ssh from shire
-  is fine if the drive is elsewhere.
-
-### pippinix (decommissioned home server)
-
-* `sudo smbpasswd -a justin` — Samba share password.
-
-### blaixapps (remote server)
-
-These files must exist on the server and are not managed by nix _(TODO: migrate to
-[sops](/SECRETS.md))_:
-
-* **`/etc/grafana-admin-password`** — Grafana `admin` user password:
-  ```bash
-  echo 'your-secure-password' | sudo tee /etc/grafana-admin-password
-  sudo chown grafana:grafana /etc/grafana-admin-password
-  sudo chmod 0600 /etc/grafana-admin-password
-  ```
-* **`/etc/grafana-secret-key`** — key Grafana uses to sign cookies / encrypt data:
-  ```bash
-  nix run nixpkgs#openssl -- rand -hex 32 | sudo tee /etc/grafana-secret-key
-  sudo chown grafana:grafana /etc/grafana-secret-key
-  sudo chmod 0600 /etc/grafana-secret-key
-  ```
-* **`/etc/htpasswd`** — nginx basic-auth file fronting several of my personal apps:
-  ```bash
-  nix-shell -p apacheHttpd
-  sudo htpasswd -c /etc/htpasswd <username>
-  ```
-
-### Planned (not yet built)
-
-* **pippinix restic backups**: a restic repo password + Backblaze B2 env, both via sops
-  (`secrets/pippinix.yaml`), plus `sudo smbpasswd -a` for the `arwen`/`bilbo` SMB users.
-  See [`BACKUPS.md`](/BACKUPS.md).
+  redone on a from-scratch rebuild and I normally keep them in **1Password**.
 
 ## Initial setup
 
@@ -198,11 +62,6 @@ These files must exist on the server and are not managed by nix _(TODO: migrate 
 NOTE: If some OS X settings don't seem to take affect (e.g. key repeat rate),
 you may need to restart. The workarounds I've tried for this have not worked.
 
-#### Torrents and Jellyfin
-
-There's some manual setup required if you're going to use this mac to download
-media. See [`hosts/mac/proton-portforward.nix`](hosts/mac/proton-portforward.nix).
-
 ### NixOS (local machine or vm)
 
 This section is for setting up a local NixOS instance you have physical access to.
@@ -231,11 +90,10 @@ Follow the instructions at: https://github.com/nix-community/nixos-apple-silicon
 
 For the Software Preparation > Nix step, the path of least resistance is to download a release iso and copy to a usb stick with `dd` as described in the "Nix" section.
 
-#### Other
+#### Normal Local NixOs
 
-I don't have any non-mac/non-remote nix setups so no specific instructions here.
 Just use the nix docs to get a bare-bones base system set up.
-Don't worry about customizing it yet.
+Then continue here.
 
 #### Common NixOS Setup
 
@@ -317,9 +175,3 @@ Apps hosted on this server maintain their own flake for building the project, bu
 7. Set up server secrets (see below).
 
 8. Deploy the full config and applications: `just deploy-blaixapps`
-
-#### Server Secrets
-
-See the blaixapps entry under [Secrets and passwords](#secrets-and-passwords) for the
-`/etc/grafana-admin-password`, `/etc/grafana-secret-key`, and `/etc/htpasswd` files this
-server needs.
