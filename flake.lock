@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791281660,
-        "narHash": "sha256-EQfNJZ3uHj/GTb28mWwNNreqkk05XPyjD6WxAyLJ3so=",
+        "lastModified": 1791316627,
+        "narHash": "sha256-v+BxWUcmuwgqlVkhl/dkTR2PchaQXsvqzuHkfIoG3hc=",
         "ref": "refs/heads/main",
-        "rev": "66ff56950fe6b50ce500789ba768865758667d91",
-        "revCount": 43,
+        "rev": "170c9ce7834b51d1bb7e1d42c30d4db64cf521f7",
+        "revCount": 63,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/aisdlc.git"
       },
@@ -48,11 +48,11 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1791259350,
-        "narHash": "sha256-zFzAgJWwGylQEnlX3wC/j2sVjMRCVnYNn8ogLDF7JGc=",
+        "lastModified": 1791313301,
+        "narHash": "sha256-6wQM1lQAb3q0hVIZ48KsrFlLGwu6W2HCmLDqnoyqvvU=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "05717477d9464707396b6387ae401175450173d6",
+        "rev": "13f3032e7a46582bbd3ed749e25817c7ac584b77",
         "type": "github"
       },
       "original": {
