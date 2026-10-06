@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791220278,
-        "narHash": "sha256-Y4fReUIdjcSTnzGftlYyVP6g/TUp4jEZzF0XazbN8PY=",
+        "lastModified": 1791249059,
+        "narHash": "sha256-V0KG836Uh7rpdSsNW7WOmb4Wkm7iApvq84KhjmNhjoc=",
         "ref": "refs/heads/main",
-        "rev": "0c48f2dca34de2df33b64fc96b52cb473cc30a69",
-        "revCount": 28,
+        "rev": "8b99fe66dbf0eea73c969d806e099b55d6160bfc",
+        "revCount": 42,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/aisdlc.git"
       },
@@ -48,11 +48,11 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1791071338,
-        "narHash": "sha256-YBAFoulgm9qEavWtmb2gHwk7lgpVZL7vtr4+yi6H3UU=",
+        "lastModified": 1791245035,
+        "narHash": "sha256-E9kwJEswHFAQyQc1ifzBRRp4gWlH5Dc2jul8+UTtdu8=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "b17e42820330bd34ab890632c2f6f80daf4e517f",
+        "rev": "0fc971964fd8e86b1ff6cbfff8ce26d00ab3e967",
         "type": "github"
       },
       "original": {
@@ -84,11 +84,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791212945,
-        "narHash": "sha256-BLmwzX+YI+AFfrphoQcfuF6y91LQU2qirVRFXrdLEe0=",
+        "lastModified": 1791225221,
+        "narHash": "sha256-RaV6L95RTuWn6TNh7iVlHe+2FZ1a8gmXEZP1cEbiHSE=",
         "ref": "refs/heads/main",
-        "rev": "85e256736185e13c2e9b4d4f085b961ccb52c9cc",
-        "revCount": 268,
+        "rev": "be3f649dc785c9378a671585498f0c26934c8801",
+        "revCount": 269,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/dia-swift-poc.git"
       },
@@ -567,11 +567,11 @@
     },
     "systems": {
       "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "lastModified": 1791244623,
+        "narHash": "sha256-uuanbkFk8a313Zfrxdcz8Us/yQtaxNnKJtX8v0ZPpd8=",
         "owner": "nix-systems",
         "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "rev": "d36eeed142f88b5a636f2e3856a53c61654cf29b",
         "type": "github"
       },
       "original": {
