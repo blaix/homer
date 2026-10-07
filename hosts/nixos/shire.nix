@@ -123,6 +123,32 @@
     FORGEJO_REVIEW_TOKEN_FILE = config.sops.secrets."forgejo-review-token".path;
   };
 
+  # Registration token for the Forgejo Actions runner. The module passes
+  # tokenFile to systemd as an EnvironmentFile, so the sops value must be the
+  # whole line "TOKEN=<token>", not just the token.
+  sops.secrets."forgejo-runner-token".restartUnits = [ "gitea-runner-shire.service" ];
+  services.gitea-actions-runner = {
+    package = pkgs.forgejo-runner;
+    instances.shire = {
+      enable = true;
+      name = "shire";
+      url = "https://git.blaix.com";
+      tokenFile = config.sops.secrets."forgejo-runner-token".path;
+      labels = [ "nix:host" ];
+      hostPackages = with pkgs; [
+        bash
+        coreutils
+        curl
+        gawk
+        gitMinimal
+        gnused
+        nodejs
+        wget
+        nix
+      ];
+    };
+  };
+
   # Enable mosh connections (opens UDP ports)
   programs.mosh.enable = true;
 
