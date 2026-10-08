@@ -113,7 +113,11 @@
   # No auth by design (LAN-only); the module opens TCP 3333 in the firewall
   # itself (openFirewall defaults to true) and takes daily sqlite backups
   # into /var/lib/aisdlc/backups.
-  services.aisdlc.enable = true;
+  services.aisdlc = {
+    enable = true;
+    sops.secrets.aisdlc-auth = {};
+    services.aisdlc.authFile = config.sops.secrets.aisdlc-auth.path;
+  }
 
   # Forgejo API tokens for the aisdlc agents' bot users on git.blaix.com
   sops.secrets."forgejo-dev-token".owner = "justin";
