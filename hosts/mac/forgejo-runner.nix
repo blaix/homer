@@ -1,8 +1,8 @@
 { config, lib, pkgs, ... }:
 # Forgejo Actions runner for git.blaix.com, running jobs directly on this Mac
-# (host mode) for workflows with `runs-on: macos`. It's a separate label from
-# shire's `nix` runner on purpose: deploy jobs (`runs-on: nix`) must never land
-# here.
+# (host mode) for workflows with `runs-on: macos` (any Mac) or `runs-on: pippin`
+# (this one). Its labels never overlap shire's, so jobs meant for shire, like
+# deploys (`runs-on: shire`), can't land here.
 #
 # nix-darwin has no module for this, so it's a plain launchd daemon running as
 # its own hidden user, _forgejo-runner. Like any launchd daemon, it can't touch
@@ -18,7 +18,7 @@ let
   # nixbld users (350+ on this machine, up to the low 380s).
   id = 450;
   dir = "/var/lib/forgejo-runner";
-  labels = "macos:host";
+  labels = lib.concatStringsSep "," [ "macos:host" "pippin:host" ];
   tokenFile = config.sops.secrets.forgejo-runner-token.path;
 
   configFile = (pkgs.formats.yaml { }).generate "forgejo-runner.yaml" {

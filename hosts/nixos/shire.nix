@@ -139,7 +139,9 @@
       name = "shire";
       url = "https://git.blaix.com";
       tokenFile = config.sops.secrets."forgejo-runner-token".path;
-      labels = [ "nix:host" ];
+      # Jobs pick runners by label: `nixos` for any NixOS host (like `macos`
+      # on the Macs), `shire` for jobs that must run here, e.g. deploys.
+      labels = [ "nixos:host" "shire:host" ];
       hostPackages = with pkgs; [
         bash
         coreutils
