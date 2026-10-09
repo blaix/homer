@@ -92,13 +92,16 @@
   # UDP 7359 is Jellyfin client auto-discovery.
   networking.firewall = {
     enable = true;
+    # Dev servers, reachable from browsers on other machines: 8000 for a
+    # project's main checkout, 8001-8099 for its git worktrees (one port
+    # each, assigned by the project's `just worktree`). Jellyfin's 8096 is
+    # in this range but stays listed below in its own right.
+    allowedTCPPortRanges = [ { from = 8000; to = 8099; } ];
     allowedTCPPorts = [
-      22 
-      3000 
-      5150 
-      8000 
-      8080 
-      8096 
+      22
+      3000
+      5150
+      8096
       8100 
       4533 
       25600 
