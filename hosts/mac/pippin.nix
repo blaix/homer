@@ -1,6 +1,16 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 {
-  imports = [ ./common.nix ];
+  imports = [
+    ./common.nix
+    inputs.sops-nix.darwinModules.sops
+    # CI jobs with `runs-on: macos` from git.blaix.com
+    ./forgejo-runner.nix
+  ];
+
+  # sops-nix secrets for this host, encrypted in secrets/pippin.yaml and
+  # decrypted at activation (and at boot) using pippin's SSH host key,
+  # /etc/ssh/ssh_host_ed25519_key, like the NixOS hosts. See SECRETS.md.
+  sops.defaultSopsFile = ../../secrets/pippin.yaml;
 
   networking = {
     computerName = "pippin";

@@ -5,6 +5,8 @@ Encrypted files live under [`secrets/`](/secrets).
 Recipients are managed in [`.sops.yaml`](/.sops.yaml).
 
 Each NixOS host decrypts its own secrets at activation using its existing `/etc/ssh/ssh_host_ed25519_key` as an age identity.
+Macs (nix-darwin) work the same way, using the macOS SSH host key at the same path (it exists once Remote Login is on), and also decrypt at boot.
+So far only pippin uses sops; a Mac host opts in by importing `inputs.sops-nix.darwinModules.sops` and setting `sops.defaultSopsFile` (see `hosts/mac/pippin.nix`).
 My personal age key (kept in 1Password) is the editor identity used to add and update secrets.
 
 ## One-time setup (if machine can edit secrets)
@@ -49,7 +51,7 @@ sops secrets/<host>.yaml
 
 Opens an editor on the decrypted contents. New files are created encrypted to whatever recipients `creation_rules` says.
 
-Reference a secret from a NixOS module:
+Reference a secret from a NixOS (or nix-darwin) module:
 
 ```nix
 { config, ... }:

@@ -10,10 +10,17 @@ keys:
   - &template  REPLACE_WITH_HOSTS_AGE_PUBLIC_KEY
   - &justin    age1swfw2mncv9wkmszg7pe5fanwexha625ex29ztzjxp02sxwzw6ucq4g3jvy
   - &shire     age13akzycmgvle66snk9tggaud0nede66zx8nr4w8nadu88l2wzcfds43tl3n
+  - &pippin    age1ggdksefe2hkpd802v3l5y8sccsw5r7js5y68dhdagvup3zswxvnsgptch4
   - &pippinix  REPLACE_WITH_PIPPINIX_AGE_PUBLIC_KEY
   - &blaixapps REPLACE_WITH_BLAIXAPPS_AGE_PUBLIC_KEY
 
 creation_rules:
+  - path_regex: secrets/pippin\.yaml$
+    key_groups:
+      - age:
+          - *justin
+          - *pippin
+
   - path_regex: secrets/pippinix\.yaml$
     key_groups:
       - age:
@@ -37,5 +44,6 @@ creation_rules:
     key_groups:
       - age:
           - *justin
+          - *pippin
           - *pippinix
           - *blaixapps
