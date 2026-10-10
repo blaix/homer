@@ -6,13 +6,17 @@ build HOST:
 switch HOST:
   sudo darwin-rebuild switch --flake .#{{HOST}}
 
+# nixos-rebuild runs as root (so the sudo prompt comes up front, not after a
+# long build), but private flake inputs on git.blaix.com need my ssh key.
+git_ssh := "ssh -i " + home_directory() + "/.ssh/id_ed25519 -o UserKnownHostsFile=" + home_directory() + "/.ssh/known_hosts"
+
 [linux]
 build HOST:
-  sudo nixos-rebuild build --impure --flake .#{{HOST}}
+  sudo env GIT_SSH_COMMAND="{{git_ssh}}" nixos-rebuild build --impure --flake .#{{HOST}}
 
 [linux]
 switch HOST:
-  sudo nixos-rebuild switch --impure --flake .#{{HOST}}
+  sudo env GIT_SSH_COMMAND="{{git_ssh}}" nixos-rebuild switch --impure --flake .#{{HOST}}
 
 # TODO: replace dia.blaix.com with more generalized domain for blaixapps
 
