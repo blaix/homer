@@ -42,6 +42,10 @@
     aisdlc.url = "git+ssh://forgejo@git.blaix.com/blaix/aisdlc.git";
     aisdlc.inputs.nixpkgs.follows = "nixpkgs";
 
+    # miniapp: the Django app template's own app (LAN-only, on shire)
+    miniapp.url = "git+ssh://forgejo@git.blaix.com/blaix/miniapp-template.git";
+    miniapp.inputs.nixpkgs.follows = "nixpkgs";
+
     # disko for declarative disk management
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
