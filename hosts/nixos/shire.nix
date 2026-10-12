@@ -15,7 +15,6 @@ in
     # Home camera stack: Frigate + Home Assistant + Mosquitto on an isolated
     # camera subnet (enp3s0). See the header of cameras.nix for first-run notes.
     ./cameras.nix
-    inputs.aisdlc.nixosModules.aisdlc
     inputs.miniapp.nixosModules.miniapp
   ];
 
@@ -125,14 +124,6 @@ in
     assertion = lib.allUnique (lib.attrValues appPorts);
     message = "Two apps in appPorts (hosts/nixos/shire.nix) have the same port.";
   }];
-
-  # aisdlc kanban board, reachable on the LAN at http://shire.local:3333.
-  # No auth by design (LAN-only); the module opens TCP 3333 in the firewall
-  # itself (openFirewall defaults to true) and takes daily sqlite backups
-  # into /var/lib/aisdlc/backups.
-  services.aisdlc.enable = true;
-  sops.secrets.aisdlc-auth = {};
-  services.aisdlc.authFile = config.sops.secrets.aisdlc-auth.path;
 
   # Running example of minitapp-template.
   sops.secrets.miniapp-secret-key.restartUnits = [ "miniapp.service" ];

@@ -38,10 +38,6 @@
     prettynice-software.url = "git+ssh://forgejo@git.blaix.com/blaix/prettynice.software.git";
     prettynice-software.inputs.nixpkgs.follows = "nixpkgs";
 
-    # aisdlc kanban board (LAN-only, on shire)
-    aisdlc.url = "git+ssh://forgejo@git.blaix.com/blaix/aisdlc.git";
-    aisdlc.inputs.nixpkgs.follows = "nixpkgs";
-
     # miniapp: the Django app template's own app (LAN-only, on shire)
     miniapp.url = "git+ssh://forgejo@git.blaix.com/blaix/miniapp-template.git";
     miniapp.inputs.nixpkgs.follows = "nixpkgs";
