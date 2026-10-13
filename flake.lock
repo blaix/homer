@@ -376,6 +376,26 @@
         "url": "ssh://forgejo@git.blaix.com/blaix/miniapp-template.git"
       }
     },
+    "miniapp_scratch": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791912337,
+        "narHash": "sha256-wi81CEfJKsmSn1ZiBGu9KexAsTs5DmdThcyikmE2w4s=",
+        "ref": "refs/heads/main",
+        "rev": "5ec6e3a9ec2868229f06d80a3987c3ffdba101b3",
+        "revCount": 6,
+        "type": "git",
+        "url": "ssh://forgejo@git.blaix.com/blaix/miniapp-scratch.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://forgejo@git.blaix.com/blaix/miniapp-scratch.git"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -539,6 +559,7 @@
         "home-manager": "home-manager",
         "komorebi": "komorebi",
         "miniapp": "miniapp",
+        "miniapp_scratch": "miniapp_scratch",
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs_4",
         "prettynice-software": "prettynice-software",

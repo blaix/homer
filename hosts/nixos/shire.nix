@@ -6,6 +6,7 @@ let
   appPorts = {
     miniapp = 8200;
     aisdlc = 8201;
+    miniapp_scratch = 8202;
   };
 in
 {
@@ -18,6 +19,7 @@ in
     ./cameras.nix
     inputs.miniapp.nixosModules.miniapp
     inputs.aisdlc.nixosModules.aisdlc
+    inputs.miniapp_scratch.nixosModules.miniapp_scratch
   ];
 
   system.stateVersion = "25.11";
@@ -143,6 +145,16 @@ in
     port = appPorts.aisdlc;
     deploy.enable = true;
     secretKeyFile = config.sops.secrets.aisdlc-secret-key.path;
+  };
+
+  # Scratch app for trying the aisdlc agent workflow, at
+  # http://shire.local:8202 on the LAN.
+  sops.secrets.miniapp_scratch-secret-key.restartUnits = [ "miniapp_scratch.service" ];
+  services.miniapp_scratch = {
+    enable = true;
+    port = appPorts.miniapp_scratch;
+    deploy.enable = true;
+    secretKeyFile = config.sops.secrets.miniapp_scratch-secret-key.path;
   };
 
   # Forgejo API token for the aisdlc agents' bot user (claude-dev) on git.blaix.com

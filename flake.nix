@@ -46,6 +46,11 @@
     miniapp.url = "git+ssh://forgejo@git.blaix.com/blaix/miniapp-template.git";
     miniapp.inputs.nixpkgs.follows = "nixpkgs";
 
+    # miniapp_scratch: a scratch app for trying the aisdlc agent workflow
+    # end to end (LAN-only, on shire)
+    miniapp_scratch.url = "git+ssh://forgejo@git.blaix.com/blaix/miniapp-scratch.git";
+    miniapp_scratch.inputs.nixpkgs.follows = "nixpkgs";
+
     # disko for declarative disk management
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
