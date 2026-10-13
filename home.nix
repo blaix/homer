@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, inputs, ... }:
 {
   # ---------------------------------------------------------------------------
   #   User home and dotfile settings common to all machines
@@ -241,6 +241,24 @@
   home.file.".claude/CLAUDE.md" = {
     source = ./shared/CLAUDE.md;
   };
+
+  # The aisdlc board's agent plugin.
+  home.activation.aisdlcPlugin =
+    let
+      claude = "${inputs.claude-code.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/claude";
+      jq = "${pkgs.jq}/bin/jq";
+    in
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      export PATH=${lib.makeBinPath [ pkgs.git pkgs.openssh ]}:$PATH
+      if ! ${claude} plugin marketplace list --json | ${jq} -e 'any(.name == "aisdlc")' >/dev/null; then
+        run ${claude} plugin marketplace add forgejo@git.blaix.com:blaix/aisdlc.git \
+          || warnEcho "Couldn't add the aisdlc plugin marketplace"
+      fi
+      if ! ${claude} plugin list --json | ${jq} -e 'any(.id == "aisdlc@aisdlc")' >/dev/null; then
+        run ${claude} plugin install aisdlc@aisdlc \
+          || warnEcho "Couldn't install the aisdlc plugin"
+      fi
+    '';
 
   xdg.configFile = {
     "nvim" = {

@@ -79,6 +79,7 @@
     let
       homeManagerConfig = {
         home-manager.users.justin = import ./home.nix;
+        home-manager.extraSpecialArgs = { inherit inputs; };
       };
 
       mkDarwinSystem = hostname: nix-darwin.lib.darwinSystem {
