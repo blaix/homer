@@ -148,9 +148,13 @@ in
   # Forgejo API tokens for the aisdlc agents' bot users on git.blaix.com
   sops.secrets."forgejo-dev-token".owner = "justin";
   sops.secrets."forgejo-review-token".owner = "justin";
+  # The board login the agents use (the `claude` user on the aisdlc board)
+  sops.secrets."aisdlc-claude-password".owner = "justin";
   environment.sessionVariables = {
     FORGEJO_DEV_TOKEN_FILE = config.sops.secrets."forgejo-dev-token".path;
     FORGEJO_REVIEW_TOKEN_FILE = config.sops.secrets."forgejo-review-token".path;
+    AISDLC_USER = "claude";
+    AISDLC_PASSWORD_FILE = config.sops.secrets."aisdlc-claude-password".path;
   };
 
   # Registration token for the Forgejo Actions runner. The module passes
