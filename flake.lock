@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791895105,
-        "narHash": "sha256-tdzyDm3wWN8vapsjFf+/IHGxKXDAAa+3iVd3u6PYIJc=",
+        "lastModified": 1791919671,
+        "narHash": "sha256-zoS/ayJRoE5K1HwUbwXQNHHTcsrL8/xJbecOtvyYRGo=",
         "ref": "refs/heads/main",
-        "rev": "61899479af52dac65b9a11887bec9e45879f5440",
-        "revCount": 14,
+        "rev": "2a5c41d15e8f839c820c6883930a8191b5168b0b",
+        "revCount": 19,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/aisdlc.git"
       },
@@ -363,11 +363,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791887374,
-        "narHash": "sha256-f3zDTy96VXUMZih4UJxpeVth9k2ZV04CWMEmZAT1P2k=",
+        "lastModified": 1791912726,
+        "narHash": "sha256-MmMmX5ZPPKBg810IvWloXDHDH+9ww/21wYmab4cQts4=",
         "ref": "refs/heads/main",
-        "rev": "95fbb3c0a3639f54861fe63a4aac55ddfe133d17",
-        "revCount": 49,
+        "rev": "d031ab65da18e1bb67fcd6d3d16a6cfb38dc750f",
+        "revCount": 52,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/miniapp-template.git"
       },
