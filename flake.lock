@@ -28,11 +28,11 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1791399799,
-        "narHash": "sha256-OA4FQegGDTcdXsiBjQsrtgmTlY//pdTjmlCAw7lNPYg=",
+        "lastModified": 1791736119,
+        "narHash": "sha256-e6V9dNQEfoJu1MPHb6ALx3ZJIWUOp8dj2Sn/NYgMJ54=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "a7d0e55859b355f2010a89e99d85999b681562b5",
+        "rev": "7a91b64f9378dcff2180dc35b9ba033754d93b0a",
         "type": "github"
       },
       "original": {
@@ -343,11 +343,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791813921,
-        "narHash": "sha256-Bo6YJlxRtwZz1Yy4MWGf0w1kIveCheQqinMPdexXPUA=",
+        "lastModified": 1791841436,
+        "narHash": "sha256-SxYsrqASCqsxQcf2fMUtdF/f7MK8LWa4yW4/be0QAXQ=",
         "ref": "refs/heads/main",
-        "rev": "09e4c5246ef3764f65d9a8bcce3e905d80d68652",
-        "revCount": 38,
+        "rev": "4e7d37ff79932604abfb89a1ea65c209b29a8629",
+        "revCount": 48,
         "type": "git",
         "url": "ssh://forgejo@git.blaix.com/blaix/miniapp-template.git"
       },
@@ -442,11 +442,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1791426274,
-        "narHash": "sha256-MWhktfFtFE8Jl7bf9Pkp7TR5MSdYCjCswSo0Gkb4ywc=",
+        "lastModified": 1791662279,
+        "narHash": "sha256-xI8L+UwJLIg75yVJwLPsY+AUEP1teCT3FyuvodyJu2Y=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "7c8764b7c7b09b34f632464276218ef9090eaa11",
+        "rev": "6fcc160353f63555b560f25588925133c8f61f2a",
         "type": "github"
       },
       "original": {
@@ -552,11 +552,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791103873,
-        "narHash": "sha256-nFxM+pKoZ8LJAEnUXARyCaOAloWgaW9kZQOSjWzKcTE=",
+        "lastModified": 1791710405,
+        "narHash": "sha256-mVD4XIc5JkqMW2K04IkFUzHgHmyJZlzw5ktfgMDCbKU=",
         "owner": "Mic92",
         "repo": "sops-nix",
-        "rev": "dcd241ba97088c22569d1573286e1b9daad340c0",
+        "rev": "ee48786c6f9160d2c1a084aac841f68195b8420c",
         "type": "github"
       },
       "original": {
