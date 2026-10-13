@@ -5,6 +5,7 @@ let
   # From 8200 up, above the dev servers' 8000-8099.
   appPorts = {
     miniapp = 8200;
+    aisdlc = 8201;
   };
 in
 {
@@ -16,6 +17,7 @@ in
     # camera subnet (enp3s0). See the header of cameras.nix for first-run notes.
     ./cameras.nix
     inputs.miniapp.nixosModules.miniapp
+    inputs.aisdlc.nixosModules.aisdlc
   ];
 
   system.stateVersion = "25.11";
@@ -132,6 +134,15 @@ in
     port = appPorts.miniapp;
     deploy.enable = true;
     secretKeyFile = config.sops.secrets.miniapp-secret-key.path;
+  };
+
+  # aisdlc kanban board, at http://shire.local:8201 on the LAN.
+  sops.secrets.aisdlc-secret-key.restartUnits = [ "aisdlc.service" ];
+  services.aisdlc = {
+    enable = true;
+    port = appPorts.aisdlc;
+    deploy.enable = true;
+    secretKeyFile = config.sops.secrets.aisdlc-secret-key.path;
   };
 
   # Forgejo API tokens for the aisdlc agents' bot users on git.blaix.com
