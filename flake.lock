@@ -496,6 +496,26 @@
         "type": "github"
       }
     },
+    "pencils": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792004540,
+        "narHash": "sha256-a80OGnSZ5lliuw9joJGv3suUE6f4t7nEqm+Q0tkXDB4=",
+        "ref": "refs/heads/main",
+        "rev": "fbf181d88097926b2ceaa9963daa7d2584fa6f00",
+        "revCount": 2,
+        "type": "git",
+        "url": "ssh://forgejo@git.blaix.com/blaix/pencils.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://forgejo@git.blaix.com/blaix/pencils.git"
+      }
+    },
     "prettynice-software": {
       "inputs": {
         "nixpkgs": [
@@ -562,6 +582,7 @@
         "miniapp_scratch": "miniapp_scratch",
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs_4",
+        "pencils": "pencils",
         "prettynice-software": "prettynice-software",
         "sops-nix": "sops-nix"
       }

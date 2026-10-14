@@ -51,6 +51,10 @@
     miniapp_scratch.url = "git+ssh://forgejo@git.blaix.com/blaix/miniapp-scratch.git";
     miniapp_scratch.inputs.nixpkgs.follows = "nixpkgs";
 
+    # pencils
+    pencils.url = "git+ssh://forgejo@git.blaix.com/blaix/pencils.git";
+    pencils.inputs.nixpkgs.follows = "nixpkgs";
+
     # disko for declarative disk management
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";

@@ -7,6 +7,7 @@ let
     miniapp = 8200;
     aisdlc = 8201;
     miniapp_scratch = 8202;
+    pencils = 8203;
   };
 in
 {
@@ -18,8 +19,9 @@ in
     # camera subnet (enp3s0). See the header of cameras.nix for first-run notes.
     ./cameras.nix
     inputs.miniapp.nixosModules.miniapp
-    inputs.aisdlc.nixosModules.aisdlc
     inputs.miniapp_scratch.nixosModules.miniapp_scratch
+    inputs.aisdlc.nixosModules.aisdlc
+    inputs.pencils.nixosModules.pencils
   ];
 
   system.stateVersion = "25.11";
@@ -145,6 +147,15 @@ in
     port = appPorts.aisdlc;
     deploy.enable = true;
     secretKeyFile = config.sops.secrets.aisdlc-secret-key.path;
+  };
+
+  # pencils
+  sops.secrets.pencils-secret-key.restartUnits = [ "pencils.service" ];
+  services.pencils = {
+    enable = true;         # enable the service
+    port = appPorts.pencils;
+    deploy.enable = true;  # automatically deploy to shire on merges to main
+    secretKeyFile = config.sops.secrets.pencils-secret-key.path;
   };
 
   # Scratch app for trying the aisdlc agent workflow, at
