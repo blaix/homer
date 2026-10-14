@@ -260,6 +260,26 @@
       fi
     '';
 
+  # Wrapper for the claude plugin's aisdlc executable so you can run it in a
+  # normal shell outside of a claude session.
+  home.packages = [
+    (pkgs.writeShellApplication {
+      name = "aisdlc";
+      runtimeInputs = [
+        pkgs.jq
+        inputs.claude-code.packages.${pkgs.stdenv.hostPlatform.system}.default
+      ];
+      text = ''
+        plugin=$(claude plugin list --json | jq -r '.[] | select(.id == "aisdlc@aisdlc").installPath')
+        if [ -z "$plugin" ]; then
+          echo "aisdlc: the aisdlc plugin isn't installed (see home.activation.aisdlcPlugin in homer)" >&2
+          exit 1
+        fi
+        exec "$plugin/bin/aisdlc" "$@"
+      '';
+    })
+  ];
+
   xdg.configFile = {
     "nvim" = {
       enable = true;
