@@ -14,6 +14,10 @@
     EDITOR = "nvim";
     TASKFILES_HOME = "$HOME/dia";
 
+    # sops defaults to ~/Library/Application Support on macOS; keep the age
+    # key in the same place on every host (see SECRETS.md)
+    SOPS_AGE_KEY_FILE = "$HOME/.config/sops/age/keys.txt";
+
     # opt out of project telemetries
     ET_NO_TELEMETRY = 1;          # eternal terminal
     NEXT_TELEMETRY_DISABLED = 1;  # next.js

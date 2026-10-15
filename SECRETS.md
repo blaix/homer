@@ -18,6 +18,9 @@ My personal age key (kept in 1Password) is the editor identity used to add and u
    # paste private key into keys.txt
    chmod 600 ~/.config/sops/age/keys.txt
    ```
+   sops only looks there by default on Linux (on macOS it uses `~/Library/Application Support/sops/age/`), so `home.nix` sets `SOPS_AGE_KEY_FILE` to this path on every host.
+   Until that's active (rebuild, then a new shell), prefix sops commands with `SOPS_AGE_KEY_FILE=~/.config/sops/age/keys.txt`.
+
    First time ever (no key in 1Password yet)?
    Generate with `age-keygen -o ~/.config/sops/age/keys.txt`, save **both** halves to 1Password, then paste the public key into `.sops.yaml` (the value of `&justin`) and run `sops updatekeys secrets/*.yaml`.
 
