@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ config, pkgs, inputs, ... }:
 {
   imports = [
     ./common.nix
@@ -11,6 +11,16 @@
   # decrypted at activation (and at boot) using pippin's SSH host key,
   # /etc/ssh/ssh_host_ed25519_key, like the NixOS hosts. See SECRETS.md.
   sops.defaultSopsFile = ../../secrets/pippin.yaml;
+
+  # The aisdlc agents' logins, for running sessions here on projects that must
+  # build on a Mac (Swift). Mirrors shire's setup in hosts/nixos/shire.nix.
+  sops.secrets."forgejo-dev-token".owner = "justin";
+  sops.secrets."aisdlc-claude-password".owner = "justin";
+  environment.variables = {
+    FORGEJO_DEV_TOKEN_FILE = config.sops.secrets."forgejo-dev-token".path;
+    AISDLC_USER = "claude";
+    AISDLC_PASSWORD_FILE = config.sops.secrets."aisdlc-claude-password".path;
+  };
 
   networking = {
     computerName = "pippin";
