@@ -40,6 +40,26 @@
         "url": "ssh://git@github.com/blaix/blog.blaix.com.git"
       }
     },
+    "budget": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792099355,
+        "narHash": "sha256-kjGz7JMHNiCcUfjQKWvGTtmLig1lz+CEV1h2oiulWiI=",
+        "ref": "refs/heads/main",
+        "rev": "bf8b340b8ca52d5865b556c1a07bc5f726c922a4",
+        "revCount": 3,
+        "type": "git",
+        "url": "ssh://forgejo@git.blaix.com/blaix/budget.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://forgejo@git.blaix.com/blaix/budget.git"
+      }
+    },
     "claude-code": {
       "inputs": {
         "nixpkgs": [
@@ -570,6 +590,7 @@
       "inputs": {
         "aisdlc": "aisdlc",
         "blog": "blog",
+        "budget": "budget",
         "claude-code": "claude-code",
         "dia": "dia",
         "disko": "disko",

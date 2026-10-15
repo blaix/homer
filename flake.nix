@@ -55,6 +55,10 @@
     pencils.url = "git+ssh://forgejo@git.blaix.com/blaix/pencils.git";
     pencils.inputs.nixpkgs.follows = "nixpkgs";
 
+    # budget
+    budget.url = "git+ssh://forgejo@git.blaix.com/blaix/budget.git";
+    budget.inputs.nixpkgs.follows = "nixpkgs";
+
     # disko for declarative disk management
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";

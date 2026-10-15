@@ -8,6 +8,7 @@ let
     aisdlc = 8201;
     miniapp_scratch = 8202;
     pencils = 8203;
+    budget = 8204;
   };
 in
 {
@@ -22,6 +23,7 @@ in
     inputs.miniapp_scratch.nixosModules.miniapp_scratch
     inputs.aisdlc.nixosModules.aisdlc
     inputs.pencils.nixosModules.pencils
+    inputs.budget.nixosModules.budget
   ];
 
   system.stateVersion = "25.11";
@@ -166,6 +168,15 @@ in
     port = appPorts.miniapp_scratch;
     deploy.enable = true;
     secretKeyFile = config.sops.secrets.miniapp_scratch-secret-key.path;
+  };
+
+  # budget
+  sops.secrets.budget-secret-key.restartUnits = [ "budget.service" ];
+  services.budget = {
+    enable = true;         # enable the service
+    port = appPorts.budget;
+    deploy.enable = true;  # automatically deploy to shire on merges to main
+    secretKeyFile = config.sops.secrets.budget-secret-key.path;
   };
 
   # Forgejo API token for the aisdlc agents' bot user (claude-dev) on git.blaix.com
