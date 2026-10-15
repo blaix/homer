@@ -72,6 +72,12 @@
     acmeEmail = "justin@blaix.com";
   };
 
+  # The journal defaults to 10% of the filesystem (capped at 4G). On a small
+  # disk that's too much for logs nobody reads past a few weeks.
+  services.journald.extraConfig = ''
+    SystemMaxUse=500M
+  '';
+
   # Monitoring: Prometheus + Grafana
   # TODO: alerting! (will need an outbound email service. msmtp + fastmail?)
 
@@ -161,7 +167,10 @@
       enable = true;
       interval = "daily";
       backupDir = "/var/lib/forgejo/backups";
-      age = "30d";
+      # Each dump is a full ~1G zip (repos + LFS + db) on a 37G disk, and it
+      # lives on the same disk it's backing up. 30d of them filled the disk.
+      # Keep a few; off-site copies are what make these real backups.
+      age = "3d";
     };
   };
 

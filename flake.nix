@@ -87,6 +87,13 @@
   outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, disko, ... }:
     let
       homeManagerConfig = {
+        # Use the system's nixpkgs instead of a separate HM instance.
+        home-manager.useGlobalPkgs = true;
+        # Install home.packages via users.users.justin.packages instead of the
+        # per-user nix profile. That profile gains a generation on every
+        # activation and system GC never prunes it, so old package sets pile
+        # up in the store forever (blaixapps had 48).
+        home-manager.useUserPackages = true;
         home-manager.users.justin = import ./home.nix;
         home-manager.extraSpecialArgs = { inherit inputs; };
       };
