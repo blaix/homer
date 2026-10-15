@@ -72,6 +72,7 @@ in
     ripgrep
     rlwrap
     (callPackage ../pkgs/rwhat.nix {})
+    sops # edit secrets/*.yaml (see SECRETS.md)
     (callPackage ../pkgs/tag-music.nix {})
     tmux
     tree
