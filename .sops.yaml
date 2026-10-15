@@ -12,7 +12,7 @@ keys:
   - &shire     age13akzycmgvle66snk9tggaud0nede66zx8nr4w8nadu88l2wzcfds43tl3n
   - &pippin    age1ggdksefe2hkpd802v3l5y8sccsw5r7js5y68dhdagvup3zswxvnsgptch4
   - &pippinix  REPLACE_WITH_PIPPINIX_AGE_PUBLIC_KEY
-  - &blaixapps REPLACE_WITH_BLAIXAPPS_AGE_PUBLIC_KEY
+  - &blaixapps age14me8efd66ru3pdtzk537xt7722plw08phw94hp8v5aa2d6e23pxsdngetk
 
 creation_rules:
   - path_regex: secrets/pippin\.yaml$

@@ -3,6 +3,7 @@
   imports = [
     ./blaixapps-base.nix
     ./common.nix
+    ./health-alerts.nix
     inputs.dia.nixosModules.dia
     inputs.doitanyway.nixosModules.doitanyway
     inputs.growth.nixosModules.growth
@@ -12,6 +13,9 @@
 
   # Hostname
   networking.hostName = "blaixapps";
+
+  # sops-nix secrets for this host. Values are encrypted in secrets/blaixapps.yaml
+  sops.defaultSopsFile = ../../secrets/blaixapps.yaml;
 
   # Enable doitanyway service
   services.doitanyway = {
@@ -79,7 +83,7 @@
   '';
 
   # Monitoring: Prometheus + Grafana
-  # TODO: alerting! (will need an outbound email service. msmtp + fastmail?)
+  # Alerting: disk space and failed units push to ntfy, see health-alerts.nix
 
   services.prometheus.exporters.node = {
     enable = true;
