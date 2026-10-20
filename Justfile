@@ -26,3 +26,11 @@ init-blaixapps:
 # --no-reexec prevents re-exec to target's nixos-rebuild (which is x86_64-linux and can't run on this Mac)
 deploy-blaixapps:
   nix run nixpkgs#nixos-rebuild -- switch --flake .#blaixapps --target-host dia.blaix.com --build-host dia.blaix.com --sudo --no-reexec
+
+# Download a plain-text SQL dump of the doitanyway db on the server to DEST
+doitanyway-db-dump DEST="./":
+  #!/usr/bin/env sh
+  set -eu
+  out="{{DEST}}/todos-$(date +%Y%m%d-%H%M%S).sql"
+  ssh dia.blaix.com 'sudo nix run nixpkgs#sqlite -- /var/lib/doitanyway/todos.db .dump' > "$out"
+  echo "Downloaded: $out"
