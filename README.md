@@ -1,3 +1,6 @@
+**UPDATE 10/28/26**: Archived this repo and moved to my private forgejo instance, which makes things easier for some of the stuff I'm setting up for my homelab.
+It's grown so much and is so specific to my setup that it's no longer relevant to the general public anyway.
+
 # Homer (aka Blaix Flakes)
 
 My system and home settings using nix, flakes, and home manager for my macs, nixos vms, and servers.
